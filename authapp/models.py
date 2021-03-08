@@ -3,6 +3,16 @@ from django.db import models
 
 
 class Employer(models.Model):
+    DRAFT = 'draft'
+    NEED_MODER = 'need_moderation'
+    MODER_OK = 'moderation_ok'
+    MODER_REJECT = 'moderation_reject'
+    EMPLOYER_STATUS_CHOICES = (
+        (DRAFT, 'черновик'),
+        (NEED_MODER, 'требуется модерация'),
+        (MODER_OK, 'модерация пройдена успешно'),
+        (MODER_REJECT, 'отклонено модератором'),
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     company_name = models.CharField(verbose_name='название компании', max_length=256, unique=True)
     tax_number = models.CharField(verbose_name='ИНН компании', max_length=16, blank=True)
@@ -13,6 +23,8 @@ class Employer(models.Model):
     logo = models.ImageField(upload_to='company_logo', blank=True)
     city = models.CharField(verbose_name='город расположения компании', max_length=64, blank=True)
     is_active = models.BooleanField(default=True)
+    status = models.CharField(verbose_name='статус компании на сайте', choices=EMPLOYER_STATUS_CHOICES, default=DRAFT,
+                              max_length=32)
 
     class Meta:
         verbose_name_plural = 'Работодатели'

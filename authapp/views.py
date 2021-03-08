@@ -49,6 +49,7 @@ def register_employer(request):
             employer.short_description = register_form.cleaned_data.get('short_description')
             employer.logo = register_form.cleaned_data.get('logo')
             employer.city = register_form.cleaned_data.get('city')
+            employer.status = Employer.NEED_MODER
 
             employer.save()
 
