@@ -137,7 +137,16 @@ footer a:hover {
     border-color: #007bff;
 }
 
-
-.data_table_employer {
-	width: 900px;
+.employer_table {
+	width: 950px;
+	text-align: center;
+	margin-left: 20%;
 }
+
+.header_cabinet {
+	text-align: center;
+}
+
+.search_resume {
+	padding-top: 50px;
+	padding-bottom: 70px;
