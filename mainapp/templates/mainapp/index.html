@@ -40,11 +40,8 @@
             </div>
             <div class="row mb-5">
                 <div class="col">
-                    {% if item.description|length < 100 %}
-                    {{item.description}}
-                    {% else %}
                     {{ item.description|truncatewords:50 }}<a href="{% url 'news_detail' item.pk%}"><small class="text-muted">
-                подробнее...</small></a>{% endif %}</div>
+                подробнее...</small></a></div>
             </div>
             {% endfor %}
         </div>
