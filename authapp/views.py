@@ -3,8 +3,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from authapp.forms import UserLoginForm, EmployerRegisterForm
-from authapp.models import Employer
+from authapp.forms import UserLoginForm, EmployerRegisterForm, JobseekerRegisterForm
+from authapp.models import Employer, Jobseeker
 
 
 def login(request):
@@ -62,3 +62,35 @@ def register_employer(request):
         'register_form': register_form,
     }
     return render(request, 'authapp/register_employer.html', context=content)
+
+
+def register_jobseeker(request):
+    title = 'Регистрация соискателя'
+
+    if request.method == 'POST':
+        register_form = JobseekerRegisterForm(request.POST, request.FILES)
+
+        if register_form.is_valid():
+            user = register_form.save()
+            jobseeker = Jobseeker.objects.create(user=user)
+            jobseeker.middle_name = register_form.cleaned_data.get('middle_name')
+            jobseeker.gender = register_form.cleaned_data.get('gender')
+            jobseeker.phone_number = register_form.cleaned_data.get('phone_number')
+            jobseeker.birthday = register_form.cleaned_data.get('birthday')
+            jobseeker.married_status = register_form.cleaned_data.get('married_status')
+            jobseeker.about = register_form.cleaned_data.get('about')
+            jobseeker.photo = register_form.cleaned_data.get('photo')
+            jobseeker.city = register_form.cleaned_data.get('city')
+
+            jobseeker.save()
+
+            return HttpResponseRedirect(reverse('auth:login'))
+
+    else:
+        register_form = JobseekerRegisterForm()
+
+    content = {
+        'title': title,
+        'register_form': register_form,
+    }
+    return render(request, 'authapp/register_jobseeker.html', context=content)

@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
+from authapp.models import Jobseeker
+
 
 class UserLoginForm(AuthenticationForm):
     class Meta:
@@ -25,15 +27,16 @@ class EmployerRegisterForm(UserCreationForm):
         ('Marketing', 'Маркетинг'),
         ('Accounting', 'Бухгалтерия'),
     )
-
-    company_name = forms.CharField()
-    tax_number = forms.CharField()
-    phone_number = forms.CharField()
-    site = forms.CharField()
-    industry_type = forms.ChoiceField()
-    short_description = forms.CharField()
-    logo = forms.ImageField()
-    city = forms.CharField()
+    username = forms.CharField(label='Логин')
+    company_name = forms.CharField(label='Название компании')
+    email = forms.EmailField(label='Контактный e-mail')
+    tax_number = forms.IntegerField(label='ИНН компании')
+    phone_number = forms.IntegerField(label='Телефон компании')
+    site = forms.CharField(label='Сайт компании')
+    industry_type = forms.ChoiceField(label='Отрасль компании', choices=INDUSTRY_TYPES)
+    short_description = forms.CharField(label='Краткое описание вашей компании', widget=forms.Textarea)
+    logo = forms.ImageField(label='Ваш логотип', required=False, help_text='Необязательное поле')
+    city = forms.CharField(label='Город расположения')
 
     class Meta(UserCreationForm):
         model = User
@@ -53,17 +56,46 @@ class EmployerRegisterForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super(EmployerRegisterForm, self).__init__(*args, **kwargs)
-        self.fields['username'] = forms.CharField(label='Логин')
-        self.fields['company_name'] = forms.CharField(label='Название компании')
-        self.fields['email'] = forms.EmailField(label='Контактный e-mail')
-        self.fields['tax_number'] = forms.IntegerField(label='ИНН компании')
-        self.fields['phone_number'] = forms.IntegerField(label='Телефон компании')
-        self.fields['site'] = forms.CharField(label='Сайт компании')
-        self.fields['industry_type'] = forms.ChoiceField(label='Отрасль компании',
-                                                         choices=EmployerRegisterForm.INDUSTRY_TYPES)
-        self.fields['short_description'] = forms.CharField(label='Краткое описание вашей компании')
-        self.fields['logo'] = forms.ImageField(label='Ваш логотип', required=False,
-                                               help_text='Поле необязательно')
-        self.fields['city'] = forms.CharField(label='Город расположения')
+
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+
+class JobseekerRegisterForm(UserCreationForm):
+    username = forms.CharField(label='Логин')
+    first_name = forms.CharField(label='Имя')
+    middle_name = forms.CharField(label='Отчество')
+    last_name = forms.CharField(label='Фамилия')
+    email = forms.EmailField(label='Контактный e-mail')
+    gender = forms.ChoiceField(label='Пол', choices=Jobseeker.GENDER_CHOICES)
+    birthday = forms.DateField(label='Дата рождения', input_formats=['%d-%m-%Y', '%d.%m.%Y'])
+    city = forms.CharField(label='Город', max_length=64)
+    married_status = forms.ChoiceField(label='Статус в браке', choices=Jobseeker.MARRIED_STATUS_CHOICES)
+    photo = forms.ImageField(label='Фото', required=False, help_text='Необязательное поле')
+    phone_number = forms.CharField(label='Телефон', max_length=11)
+    about = forms.CharField(label='О себе', widget=forms.Textarea, max_length=512)
+
+    class Meta(UserCreationForm):
+        model = User
+        fields = ('username',
+                  'first_name',
+                  'middle_name',
+                  'last_name',
+                  'email',
+                  'gender',
+                  'birthday',
+                  'phone_number',
+                  'photo',
+                  'city',
+                  'married_status',
+                  'about',
+                  'password1',
+                  'password2',
+                  )
+
+    def __init__(self, *args, **kwargs):
+        super(JobseekerRegisterForm, self).__init__(*args, **kwargs)
+
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
