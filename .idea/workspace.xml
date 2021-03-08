@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="19c4f839-6016-4754-aa2e-511e609e3fee" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainapp/management/commands/fill_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainapp/management/commands/fill_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authapp/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/forms.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +87,14 @@
       <option name="project" value="LOCAL" />
       <updated>1615162946865</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="update fill_db, add admin form for Jobseekers">
+      <created>1615165503755</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1615165503755</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -98,6 +103,7 @@
     <MESSAGE value="add Employer model, form and employer registration" />
     <MESSAGE value="add jobseeker model, jobseeker registration view and form" />
     <MESSAGE value="add validation for registration forms" />
-    <option name="LAST_COMMIT_MESSAGE" value="add validation for registration forms" />
+    <MESSAGE value="update fill_db, add admin form for Jobseekers" />
+    <option name="LAST_COMMIT_MESSAGE" value="update fill_db, add admin form for Jobseekers" />
   </component>
 </project>

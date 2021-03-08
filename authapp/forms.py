@@ -39,6 +39,8 @@ class EmployerRegisterForm(UserCreationForm):
     short_description = forms.CharField(label='Краткое описание вашей компании', widget=forms.Textarea)
     logo = forms.ImageField(label='Ваш логотип', required=False, help_text='Необязательное поле')
     city = forms.CharField(label='Город расположения')
+    password1 = forms.CharField(widget=forms.TextInput(attrs={'type': 'password'}), label='Пароль')
+    password2 = forms.CharField(widget=forms.TextInput(attrs={'type': 'password'}), label='Подтвердите пароль')
 
     class Meta(UserCreationForm):
         model = User
@@ -87,6 +89,8 @@ class JobseekerRegisterForm(UserCreationForm):
     photo = forms.ImageField(label='Фото', required=False, help_text='Необязательное поле')
     phone_number = forms.CharField(label='Телефон', max_length=11)
     about = forms.CharField(label='О себе', widget=forms.Textarea, max_length=512)
+    password1 = forms.CharField(widget=forms.TextInput(attrs={'type': 'password'}), label='Пароль')
+    password2 = forms.CharField(widget=forms.TextInput(attrs={'type': 'password'}), label='Подтвердите пароль')
 
     class Meta(UserCreationForm):
         model = User
