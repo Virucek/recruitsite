@@ -1,0 +1,86 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block content %}
+{% if user.is_authenticated and user.employer %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col">
+            <p class="h4 font-italic">Добро пожаловать {{user.employer.company_name}} на портал IT
+                Recrut!</p>
+            <p>Статус: Работодатель</p>
+            <p class="my-5">Здесь будет выведен список всех доступных резюме соискателей,
+            зарегистрированных на данном портале.</p>
+            <p class="my-5">Также будет реализован простой и расширенный поиск резюме.</p>
+        </div>
+    </div>
+</div>
+{% elif user.is_authenticated and user.seeker %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col">
+            <p class="h4 font-italic">Добро пожаловать {{user.first_name}} {{ user.last_name }}
+                {{ user.seeker.patronimyc }} на портал IT Recrut!</p>
+            <p>Статус: Соискатель</p>
+            <p class="my-5">Здесь будет выведен список всех доступных вакансий
+                компаний-работодателей, зарегистрированных на данном портале</p>
+            <p class="my-5">Также будет реализован простой и расширенный поиск вакансий.</p>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col col-sm-8 col-md-9 about_h1">
+            <h1 class="text-center font-italic mb-5">Новости IT Portal</h1>
+            {% for item in news %}
+            <div class="row mb-3" id="{{ item.id }}">
+                <div class="col-2 h5">{{ item.published|date:"d.m.y" }}</div>
+                <div class="col-10 h5">{{ item.title|title }}</div>
+            </div>
+            <div class="row mb-5">
+                <div class="col">
+                    {% if item.description|length < 100 %}
+                    {{item.description}}
+                    {% else %}
+                    {{ item.description|truncatewords:50 }}<a href="{% url 'news_detail' item.pk%}"><small class="text-muted">
+                подробнее...</small></a>{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col col-sm-4 col-md-3 news_col">
+            <h5 class="text-center mt-2 font-italic" style="color: #808000;">Вход для
+                зарегистрированных пользователей</h5>
+            <form class="w-100" action="#" method="post">
+                <p class="mb-0 mt-2">Логин:</p>
+                <input class="w-100" type="text">
+                <p class="mb-0 mt-2">Пароль:</p>
+                <input class="w-100" type="text">
+                <br>
+                <input class="btn btn-primary form-control mt-3 mb-3" type="submit"
+                       value="войти на портал">
+            </form>
+            <p class="text-center text-muted mt-3 mb-2">регистрация:</p>
+            <a class="btn btn-outline-primary w-100 mb-3" role="button" href="">работодателя</a>
+            <a class="btn btn-outline-primary w-100 mb-3" role="button" href="">соискателя</a>
+
+        </div>
+    </div>
+    <h3 class="text-center mt-5">Компании партнеры</h3>
+    <div class="row justify-content-center mt-3">
+        <p class="text-center">Здесь будут размещены компании-партнеры</p>
+        <!--{% for item in employers %}
+        <div class="col-6 col-sm-3 col-lg-2">
+            <div class="card">
+                <img class="card-img-top" style="height:100px; width:cover;"
+                     src="/media/{{ item.logo }}" alt="Card image cap">
+                <div class="card-body">
+                    <p class="card-text text-center font-italic">{{ item.company_name }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}-->
+    </div>
+</div>
+{% endif %}
+{% endblock %}
