@@ -139,14 +139,22 @@ footer a:hover {
 
 .employer_table {
 	width: 950px;
-	text-align: center;
-	margin-left: 20%;
+	text-align: left;
+	/*margin-left: 20%;*/
 }
 
 .header_cabinet {
-	text-align: center;
+	text-align: left;
 }
 
 .search_resume {
 	padding-top: 50px;
 	padding-bottom: 70px;
+}
+
+.photo {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 150px;
+}

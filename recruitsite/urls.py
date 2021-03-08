@@ -26,6 +26,7 @@ urlpatterns = [
     path('news/<int:pk>/', views.news_detail, name='news_detail'),
     path('auth/', include('authapp.urls', namespace='auth')),
     path('employer/', include('employerapp.urls', namespace='employer')),
+    path('jobseeker/', include('jobseekerapp.urls', namespace='jobseeker')),
 ]
 
 if settings.DEBUG:
