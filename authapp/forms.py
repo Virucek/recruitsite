@@ -121,7 +121,7 @@ class JobseekerRegisterForm(UserCreationForm):
         cur_date = date.today()
         age = (cur_date - data).days // 365
         if age < 18:
-            raise forms.ValidationError("Вы слишком молоды, для регистрации в качестве соискателя")
+            raise forms.ValidationError("Вы слишком молоды для регистрации в качестве соискателя")
         return data
 
     def clean_email(self):
