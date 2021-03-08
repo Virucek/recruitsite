@@ -3,6 +3,7 @@ from django.db import models
 
 
 class Employer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     company_name = models.CharField(verbose_name='название компании', max_length=256, unique=True)
     tax_number = models.CharField(verbose_name='ИНН компании', max_length=16, blank=True)
     phone_number = models.CharField(verbose_name='телефон', max_length=11, blank=True)
@@ -12,7 +13,6 @@ class Employer(models.Model):
     logo = models.ImageField(upload_to='company_logo', blank=True)
     city = models.CharField(verbose_name='город расположения компании', max_length=64, blank=True)
     is_active = models.BooleanField(default=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
     class Meta:
         verbose_name_plural = 'Работодатели'
@@ -31,6 +31,7 @@ class Jobseeker(models.Model):
         ('m', 'замужем/женат'),
         ('d', 'разведен/разведена'),
     )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     middle_name = models.CharField(verbose_name='отчество', max_length=32)
     gender = models.CharField(verbose_name='пол', max_length=16, choices=GENDER_CHOICES)
     birthday = models.DateField(verbose_name='дата рождения', null=True, blank=True)
@@ -39,7 +40,6 @@ class Jobseeker(models.Model):
     photo = models.ImageField(upload_to='jobseeker_photo', blank=True)
     phone_number = models.CharField(verbose_name='телефон', max_length=11)
     about = models.TextField(verbose_name='о себе', max_length=512, blank=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
     class Meta:
         verbose_name_plural = 'Соискатели'
