@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="19c4f839-6016-4754-aa2e-511e609e3fee" name="Default Changelist" comment="">
+    <list default="true" id="19c4f839-6016-4754-aa2e-511e609e3fee" name="Default Changelist" comment="add validation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/authapp/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,13 +73,21 @@
       <option name="project" value="LOCAL" />
       <updated>1615156267035</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="add jobseeker model, jobseeker registration view and form">
+      <created>1615161619226</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1615161619226</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
     <MESSAGE value="add authapp.&#10;add superuser in fill_db.&#10;add login/logout views and forms." />
     <MESSAGE value="add Employer model, form and employer registration" />
-    <option name="LAST_COMMIT_MESSAGE" value="add Employer model, form and employer registration" />
+    <MESSAGE value="add jobseeker model, jobseeker registration view and form" />
+    <option name="LAST_COMMIT_MESSAGE" value="add jobseeker model, jobseeker registration view and form" />
   </component>
 </project>

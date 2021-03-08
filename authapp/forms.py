@@ -1,3 +1,5 @@
+from datetime import date
+
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
@@ -60,6 +62,17 @@ class EmployerRegisterForm(UserCreationForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        try:
+            email_db = User.objects.filter(email=data)
+        except User.DoesNotExist:
+            email_db = None
+
+        if email_db:
+            raise forms.ValidationError(f'Пользователь с такой электронной почтой уже зарегистрирован')
+        return data
+
 
 class JobseekerRegisterForm(UserCreationForm):
     username = forms.CharField(label='Логин')
@@ -99,3 +112,21 @@ class JobseekerRegisterForm(UserCreationForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
+    def clean_birthday(self):
+        data = self.cleaned_data['birthday']
+        cur_date = date.today()
+        age = (cur_date - data).days // 365
+        if age < 18:
+            raise forms.ValidationError("Вы слишком молоды, для регистрации в качестве соискателя")
+        return data
+
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        try:
+            email_db = User.objects.filter(email=data)
+        except User.DoesNotExist:
+            email_db = None
+
+        if email_db:
+            raise forms.ValidationError(f'Пользователь с такой электронной почтой уже зарегистрирован')
+        return data
