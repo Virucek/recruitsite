@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col">
             <p class="h4 font-italic">Добро пожаловать {{user.employer.company_name}} на портал IT
-                Recrut!</p>
+                Recruit!</p>
             <p>Статус: Работодатель</p>
             <p class="my-5">Здесь будет выведен список всех доступных резюме соискателей,
             зарегистрированных на данном портале.</p>
@@ -15,12 +15,12 @@
         </div>
     </div>
 </div>
-{% elif user.is_authenticated and user.seeker %}
+{% elif user.is_authenticated and user.jobseeker %}
 <div class="container my-5">
     <div class="row">
         <div class="col">
             <p class="h4 font-italic">Добро пожаловать {{user.first_name}} {{ user.last_name }}
-                {{ user.seeker.patronimyc }} на портал IT Recrut!</p>
+               на портал IT Recrut!</p>
             <p>Статус: Соискатель</p>
             <p class="my-5">Здесь будет выведен список всех доступных вакансий
                 компаний-работодателей, зарегистрированных на данном портале</p>
@@ -40,33 +40,40 @@
             </div>
             <div class="row mb-5">
                 <div class="col">
-                    {{ item.description|truncatewords:50 }}<a href="{% url 'news_detail' item.pk%}"><small class="text-muted">
-                подробнее...</small></a></div>
+                    {{ item.description|truncatewords:50 }}
+                    <p><a href="{% url 'news_detail' item.pk%}"><small class="text-muted">
+                        подробнее...</small></a></p></div>
             </div>
             {% endfor %}
         </div>
         <div class="col col-sm-4 col-md-3 news_col">
             <h5 class="text-center mt-2 font-italic" style="color: #808000;">Вход для
                 зарегистрированных пользователей</h5>
-            <form class="w-100" action="#" method="post">
+            <form class="w-100" action="{% url 'auth:login' %}" method="post">
+                {% csrf_token %}
                 <p class="mb-0 mt-2">Логин:</p>
-                <input class="w-100" type="text">
+                <input class="w-100" type="text" name="username">
                 <p class="mb-0 mt-2">Пароль:</p>
-                <input class="w-100" type="text">
+                <input class="w-100" type="password" name="password">
                 <br>
                 <input class="btn btn-primary form-control mt-3 mb-3" type="submit"
                        value="войти на портал">
             </form>
             <p class="text-center text-muted mt-3 mb-2">регистрация:</p>
-            <a class="btn btn-outline-primary w-100 mb-3" role="button" href="">работодателя</a>
-            <a class="btn btn-outline-primary w-100 mb-3" role="button" href="">соискателя</a>
+            <a class="btn btn-outline-primary w-100 mb-3" role="button" href="{% url 'auth:register_employer' %}">
+                работодателя
+            </a>
+            <a class="btn btn-outline-primary w-100 mb-3" role="button" href="{% url 'auth:register_jobseeker' %}">
+                соискателя
+            </a>
 
         </div>
     </div>
+    {% if employers %}
     <h3 class="text-center mt-5">Компании партнеры</h3>
     <div class="row justify-content-center mt-3">
-        <p class="text-center">Здесь будут размещены компании-партнеры</p>
-        <!--{% for item in employers %}
+<!--        <p class="text-center">Здесь будут размещены компании-партнеры</p>-->
+        {% for item in employers %}
         <div class="col-6 col-sm-3 col-lg-2">
             <div class="card">
                 <img class="card-img-top" style="height:100px; width:cover;"
@@ -76,8 +83,9 @@
                 </div>
             </div>
         </div>
-        {% endfor %}-->
+        {% endfor %}
     </div>
+    {% endif %}
 </div>
 {% endif %}
 {% endblock %}
