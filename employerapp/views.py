@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from authapp.models import Employer
 
-# Create your views here.
+def main(request):
+    data_emploers = Employer.objects.all()[:4]
+    return data_emploers
