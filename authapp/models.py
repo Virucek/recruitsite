@@ -2,6 +2,16 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class IndustryType(models.Model):
+    descx = models.CharField(verbose_name='Описание типа отрасли', max_length=64)
+
+    class Meta:
+        verbose_name_plural = 'Типы отраслей'
+
+    def __str__(self):
+        return self.descx
+
+
 class Employer(models.Model):
     DRAFT = 'draft'
     NEED_MODER = 'need_moderation'
@@ -18,7 +28,7 @@ class Employer(models.Model):
     tax_number = models.CharField(verbose_name='ИНН компании', max_length=16, blank=True)
     phone_number = models.CharField(verbose_name='телефон', max_length=11, blank=True)
     site = models.CharField(verbose_name='сайт компании', max_length=32, blank=True)
-    industry_type = models.CharField(verbose_name='тип отрасли компании', max_length=32, blank=True)
+    industry_type = models.ForeignKey(IndustryType, on_delete=models.CASCADE, null=True, blank=True)
     short_description = models.TextField(verbose_name='краткое описание компании', blank=True)
     logo = models.ImageField(upload_to='company_logo', blank=True)
     city = models.CharField(verbose_name='город расположения компании', max_length=64, blank=True)

@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from authapp.models import Jobseeker
+from authapp.models import Jobseeker, IndustryType
 
 
 class UserLoginForm(AuthenticationForm):
@@ -23,19 +23,17 @@ class UserLoginForm(AuthenticationForm):
 
 
 class EmployerRegisterForm(UserCreationForm):
-    INDUSTRY_TYPES = (
-        ('IT', 'IT'),
-        ('Banking', 'Банковские услуги'),
-        ('Marketing', 'Маркетинг'),
-        ('Accounting', 'Бухгалтерия'),
-    )
+    industry_type_queryset = IndustryType.objects.all()
+    INDUSTRY_TYPE_CHOICES = ()
+    if industry_type_queryset:
+        INDUSTRY_TYPE_CHOICES = tuple([(i.id, i.descx) for i in industry_type_queryset])
     username = forms.CharField(label='Логин')
     company_name = forms.CharField(label='Название компании')
     email = forms.EmailField(label='Контактный e-mail')
     tax_number = forms.CharField(label='ИНН компании', widget=forms.NumberInput(), max_length=16)
     phone_number = forms.CharField(label='Телефон компании', widget=forms.NumberInput(), max_length=11)
     site = forms.CharField(label='Сайт компании')
-    industry_type = forms.ChoiceField(label='Отрасль компании', choices=INDUSTRY_TYPES)
+    industry_type = forms.ChoiceField(label='Отрасль компании', choices=INDUSTRY_TYPE_CHOICES)
     short_description = forms.CharField(label='Краткое описание вашей компании', widget=forms.Textarea)
     logo = forms.ImageField(label='Ваш логотип', required=False, help_text='Необязательное поле')
     city = forms.CharField(label='Город расположения')

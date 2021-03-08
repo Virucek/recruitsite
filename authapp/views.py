@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from authapp.forms import UserLoginForm, EmployerRegisterForm, JobseekerRegisterForm
-from authapp.models import Employer, Jobseeker
+from authapp.models import Employer, Jobseeker, IndustryType
 
 
 def login(request):
@@ -45,7 +45,9 @@ def register_employer(request):
             employer.tax_number = register_form.cleaned_data.get('tax_number')
             employer.phone_number = register_form.cleaned_data.get('phone_number')
             employer.site = register_form.cleaned_data.get('site')
-            employer.industry_type = register_form.cleaned_data.get('industry_type')
+            industry_type_id = register_form.cleaned_data.get('industry_type')
+            industry_type = IndustryType.objects.get(id=industry_type_id)
+            employer.industry_type = industry_type
             employer.short_description = register_form.cleaned_data.get('short_description')
             employer.logo = register_form.cleaned_data.get('logo')
             employer.city = register_form.cleaned_data.get('city')
