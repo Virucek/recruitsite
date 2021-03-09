@@ -18,15 +18,28 @@
 			  <span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+
 			  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 			  	{% if user.is_authenticated and user.employer %}
-				<li><a class="nav-item" href="#">редактирование профиля</a></li>
-				<li><a class="nav-item" href="#">выйти</a></li>
-				<li><a class="nav-item" href="#">личный кабинет</a></li>
-			  	{% elif user.is_authenticated and user.seeker %}
-				<li><a class="nav-item" href="#">редактирование профиля</a></li>
-				<li><a class="nav-item" href="#">выйти</a></li>
-				<li><a class="nav-item" href="#">личный кабинет</a></li>
+				  <li class="nav-item">
+					<a class="nav-link" href="#">редактирование профиля</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="#">личный кабинет</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="{% url 'auth:logout' %}">выход</a>
+				  </li>
+			  	{% elif user.is_authenticated and user.jobseeker %}
+				  <li class="nav-item">
+					<a class="nav-link" href="#">редактирование профиля</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="#">личный кабинет</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="{% url 'auth:logout' %}">выход</a>
+				  </li>
 			  	{% else %}
 
 			  	{% endif %}

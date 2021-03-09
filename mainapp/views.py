@@ -1,12 +1,18 @@
 from django.shortcuts import render
 
+from authapp.models import Employer
 from mainapp.models import News
 
 
 def main(request):
     title = 'Главная'
     news = News.objects.filter(is_active=True).order_by('-published')
-    context = {'title': title, 'news': news}
+    employers = Employer.objects.filter(is_active=True, status=Employer.MODER_OK)[:5]
+    context = {
+        'title': title,
+        'news': news,
+        'employers': employers,
+    }
     return render(request, 'mainapp/index.html', context)
 
 
