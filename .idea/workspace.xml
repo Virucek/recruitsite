@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="19c4f839-6016-4754-aa2e-511e609e3fee" name="Default Changelist" comment="update password1, password2 in forms.py">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/templates/authapp/base.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/templates/authapp/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/templates/authapp/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/templates/authapp/register_employer.html" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/templates/authapp/register_employer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authapp/templates/authapp/register_jobseeker.html" beforeDir="false" afterPath="$PROJECT_DIR$/authapp/templates/authapp/register_jobseeker.html" afterDir="false" />
+    <list default="true" id="19c4f839-6016-4754-aa2e-511e609e3fee" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/jobseekerapp/templates/jobseekerapp/jobseeker_cabinet.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jobseekerapp/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/img/employers/example.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/employerapp/templates/employerapp/employer_cabinet.html" beforeDir="false" afterPath="$PROJECT_DIR$/employerapp/templates/employerapp/employer_cabinet.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobseekerapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/jobseekerapp/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mainapp/templates/mainapp/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/mainapp/templates/mainapp/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainapp/templates/mainapp/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/mainapp/templates/mainapp/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainapp/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/recruitsite/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/recruitsite/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/recruitsite/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/recruitsite/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,16 +49,72 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/authapp/templates/authapp" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/jobseekerapp" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.django.DjangoModulesConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/jobseekerapp" />
       <recent name="D:\GeekBrains\COMMAND_WORK\recruitsite\authapp\templates\authapp" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/jobseekerapp/templates" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Recruit site" type="Python.DjangoServer" factoryName="Django server">
+      <module name="recruitsite" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/venv/bin/python" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="Python.DjangoServer" factoryName="Django server">
+      <module name="recruitsite" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/venv/bin/python" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -120,10 +174,64 @@
       <option name="project" value="LOCAL" />
       <updated>1615166642462</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="* init">
+      <created>1615217260663</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1615217260663</updated>
+    </task>
+    <task id="LOCAL-00009" summary="* Add table for employer cabinet">
+      <created>1615221099893</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1615221099893</updated>
+    </task>
+    <task id="LOCAL-00010" summary="* Add .idea gitignore">
+      <created>1615221361763</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1615221361763</updated>
+    </task>
+    <task id="LOCAL-00011" summary="* Del wrong index">
+      <created>1615223544590</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1615223544590</updated>
+    </task>
+    <task id="LOCAL-00012" summary="* Add raw view employer">
+      <created>1615230226293</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1615230226293</updated>
+    </task>
+    <task id="LOCAL-00013" summary="* Start build jobseekerapp">
+      <created>1615232041205</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1615232041205</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="initial commit" />
     <MESSAGE value="add authapp.&#10;add superuser in fill_db.&#10;add login/logout views and forms." />
     <MESSAGE value="add Employer model, form and employer registration" />
@@ -131,6 +239,12 @@
     <MESSAGE value="add validation for registration forms" />
     <MESSAGE value="update fill_db, add admin form for Jobseekers" />
     <MESSAGE value="update password1, password2 in forms.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="update password1, password2 in forms.py" />
+    <MESSAGE value="* init" />
+    <MESSAGE value="* Add table for employer cabinet" />
+    <MESSAGE value="* Add .idea gitignore" />
+    <MESSAGE value="* Del wrong index" />
+    <MESSAGE value="* Add raw view employer" />
+    <MESSAGE value="* Start build jobseekerapp" />
+    <option name="LAST_COMMIT_MESSAGE" value="* Start build jobseekerapp" />
   </component>
 </project>

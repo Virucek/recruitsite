@@ -1,0 +1,52 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <div class="container">
+    <h1 class="my-5 header_cabinet">{{ employer.company_name }}</h1>
+            <table class="table employer_table">
+                <thead>
+                <tr>
+                    <th scope="col">Поле</th>
+                    <th scope="col">Данные</th>
+                </tr>
+                <tr>
+                    <th scope="col">Деятельность</th>
+                    <th scope="col">{{ industry_type }}</th>
+                </tr>
+                <tr>
+                    <th scope="col">Телeфон</th>
+                    <th scope="col">{{ employer.phone_number }}</th>
+                </tr>
+                <tr>
+                    <th scope="col">Город</th>
+                    <th scope="col">{{ employer.city }}</th>
+                </tr>
+                <tr>
+                    <th scope="col">Сайт</th>
+                    <th scope="col">{{ employer.site }}</th>
+                </tr>
+                <tr>
+                    <th scope="col">Статус</th>
+                    <th scope="col">{{ employer.status }}</th>
+                </tr>
+                </thead>
+            </table>
+    <button type="button" class="btn btn-primary">Создать вакасию</button>
+    <div class="container search_resume"><h1 class="my-5">Поиск резюме</h1>
+    <p>Здесь будет раздел для поиска резюме</p>
+    </div>
+    <div class="container search_resume"><h1 class="my-5">Список опубликованных вакасний</h1>
+    <p>Здесь будет список опубликованных вакансий</p>
+    </div>
+    <div class="container search_resume"><h1 class="my-5">Мои сообщения</h1>
+    <p>Переход в раздел с личными сообщениями и откликами</p>
+    <div class="container search_resume"><h1 class="my-5">Избранное</h1>
+    <p>Переход в раздел с избранными резюме</p>
+
+    </div>
+    </div>
+
+    {#<h1> {{ employer }}</h1>#}
+{% endblock %}
