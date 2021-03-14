@@ -38,6 +38,10 @@ class Resume(models.Model):
     def get_education_items(self):
         return self.educationitems.select_related().filter(is_active=True)
 
+    @staticmethod
+    def get_user_resumes(user_id):
+        return Resume.objects.filter(is_active=True, user_id=user_id)
+
 
 class ResumeEducation(models.Model):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='Резюме', related_name='educationitems')

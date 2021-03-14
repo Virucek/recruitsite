@@ -65,7 +65,8 @@ def jobseeker_cabinet(request):
     title = 'Личный кабинет работодателя'
     current_user = request.user.id
     jobseeker_data = Jobseeker.objects.get(user_id=current_user)
-    content = {'title': title, 'jobseeker': jobseeker_data}
+    resumes = Resume.get_user_resumes(current_user)
+    content = {'title': title, 'jobseeker': jobseeker_data, 'resumes': resumes}
     return render(request, 'jobseekerapp/jobseeker_cabinet.html', content)
 
 
@@ -87,7 +88,7 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         if 'salary_min' not in form.cleaned_data and 'salary_max' not in form.cleaned_data:
-            form.cleaned_data.pop('currency')
+            form.cleaned_data['currency'].pop()
         self.object = form.save
 
         return super(ResumeCreateView, self).form_valid(form)
@@ -96,7 +97,7 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
 class ResumeDetailView(JobseekerViewMixin, DetailView):
     model = Resume
     template_name = 'jobseekerapp/resume_detail.html'
-    title = 'Просмотр резюме'
+    title = 'Резюме'
 
 
 class ResumeUpdateView(JobseekerViewMixin, UpdateView):

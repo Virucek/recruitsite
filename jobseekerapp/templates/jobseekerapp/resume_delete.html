@@ -3,13 +3,11 @@
 
 {% block content %}
    <div class="container">
-       <div class="h1">Уверены, что хотите удалить?</div>
+       <h3 class="my-3 text-center">Уверены, что хотите удалить ваше резюме {{ object.name }}?</h3>
        <form action="{% url 'jobseeker:resume_delete' object.pk %}" method="post">
            {% csrf_token %}
-           <input class="btn btn-danger" type="submit" value="удалить">
+           <input class="btn btn-danger form-control last" type="submit" value="удалить">
        </form>
-       <button class="btn btn-success">
-           <a href="{% url 'jobseeker:cabinet' %}">отмена</a>
-       </button>
+       <a class="btn btn-round form-control last" href="{% url 'jobseeker:cabinet' %}">отмена</a>
    </div>
 {% endblock %}

@@ -3,14 +3,16 @@
 
 {% block content %}
    <div class="container">
+       <h3 class="my-4 text-center"> Ваше резюме </h3>
+       <br>
        <form action="" method="post">
            {% csrf_token %}
            {% for field in form %}
                 <p>
                     {% if field.id_for_label == 'id_currency' %}
                         <label id="{{ field.id_for_label }}" style="display:block;">Желаемая зарплата:</label>
-                        <input id="id_salary_min" class="form-control" type="number" name="salary_min" style="width:20%; display:inline;">
-                        <input id="id_salary_max" class="form-control" type="number" name="salary_max" style="width:20%; display:inline;">
+                        <input id="id_salary_min" class="form-control resume-salary" type="number" name="salary_min">
+                        <input id="id_salary_max" class="form-control resume-salary" type="number" name="salary_max">
                         {{ field }}
                     {% elif field.id_for_label in 'id_salary_min, id_salary_max' %}
                     {% else %}
@@ -23,7 +25,7 @@
        </form>
        <button class="btn btn-round form-control last">
             <a href="{% url 'jobseeker:cabinet' %}">
-                к личному кабинету
+                К личному кабинету
             </a>
         </button>
    </div>
