@@ -3,9 +3,13 @@
 
 {% block content %}
 
-    <div class="container">
-    <h1 class="my-5 header_cabinet"><img class="photo" src="{% static 'img/employers/example.jpg' %}" alt="My image"></h1>
-            <table class="table employer_table">
+<div class="container my-5">
+    <div class="row">
+        <div class="col-4 col-sm-2">
+            <img class="img-fluid" src="{% static 'img/employers/example.jpg' %}" alt="My image">
+        </div>
+        <div class="col-11 col-sm-10">
+            <table class="table">
                 <thead>
                 <tr>
                     <th scope="col">Поле</th>
@@ -41,19 +45,21 @@
                 </tr>
                 </thead>
             </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
             <button type="button" class="btn btn-primary">Создать резюме</button>
-    <div class="container search_resume"><h1 class="my-5">Мои резюме</h1>
-    <p>Здесь будет раздел со списком ативных резюме</p>
+            <h1 class="my-5">Мои резюме</h1>
+            <p>Здесь будет раздел со списком ативных резюме</p>
+            <h1 class="my-5">Поиск вакансий</h1>
+            <p>Здесь будет форма поиска вакасий или переход в раздел поиска </p>
+            <h1 class="my-5">Избранные вакасии</h1>
+            <p>Здесь будет раздел избранных вакасий</p>
+            <h1 class="my-5">Раздел сообщения</h1>
+            <p>Здесь будет раздел избранных вакасий</p>
+        </div>
     </div>
-    <div class="container search_resume"><h1 class="my-5">Поиск вакансий</h1>
-        <p>Здесь будет форма поиска вакасий или переход в раздел поиска </p>
-    </div>
-    <div class="container search_resume"><h1 class="my-5">Избранные вакасии</h1>
-        <p>Здесь будет раздел избранных вакасий</p>
-    <div class="container search_resume"><h1 class="my-5">Раздел сообщения</h1>
-        <p>Здесь будет раздел избранных вакасий</p>
-    </div>
-    </div>
+</div>
 
-    {#<h1> {{ employer }}</h1>#}
 {% endblock %}

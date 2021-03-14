@@ -3,63 +3,41 @@
 
 {% block content %}
 
-<div class="container">
-    <h1 class="my-5 header_cabinet">{{ employer.company_name }}</h1>
-    <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">Поле</th>
-                <th scope="col">Данные</th>
-            </tr>
-            <tr>
-                <th scope="col">Деятельность</th>
-                <th scope="col">{{ industry_type }}</th>
-            </tr>
-            <tr>
-                <th scope="col">Телeфон</th>
-                <th scope="col">{{ employer.phone_number }}</th>
-            </tr>
-            <tr>
-                <th scope="col">Город</th>
-                <th scope="col">{{ employer.city }}</th>
-            </tr>
-            <tr>
-                <th scope="col">Сайт</th>
-                <th scope="col">{{ employer.site }}</th>
-            </tr>
-            <tr>
-                <th scope="col">Статус</th>
-                <th scope="col">{{ employer.status }}</th>
-            </tr>
-            </thead>
-        </table>
-    <div class="row my-5">
-        <div class="col">
-           <button type="button" class="btn btn-primary">Создать вакасию</button>
-        </div>
-    </div>
-    <h1 class="my-5">Поиск резюме</h1>
+<div class="container my-5">
+    <h3 class="font-italic mb-5 text-center">Личный кабинет: "{{ employer.company_name }}" </h3>
     <div class="row">
-        <div class="col">
-           <p>Здесь будет раздел для поиска резюме</p>
+        <div class="col-5 col-sm-4 col-md-3 pr-sm-4">
+            {% include 'employerapp/include/left-menu.html' %}
         </div>
-    </div>
-    <h1 class="my-5">Список опубликованных вакасний</h1>
-    <div class="row">
-        <div class="col">
-           <p>Здесь будет список опубликованных вакансий</p>
-        </div>
-    </div>
-    <h1 class="my-5">Мои сообщения</h1>
-    <div class="row">
-        <div class="col">
-           <p>Переход в раздел с личными сообщениями и откликами</p>
-        </div>
-    </div>
-     <h1 class="my-5">Избранное</h1>
-     <div class="row mb-5">
-        <div class="col">
-           <p>Переход в раздел с избранными резюме</p>
+        <div class="col-7 col-sm-8 col-md-9 pl-sm-5">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Поле</th>
+                    <th scope="col">Данные</th>
+                </tr>
+                <tr>
+                    <th scope="col">Деятельность</th>
+                    <th scope="col">{{ industry_type }}</th>
+                </tr>
+                <tr>
+                    <th scope="col">Телeфон</th>
+                    <th scope="col">{{ employer.phone_number }}</th>
+                </tr>
+                <tr>
+                    <th scope="col">Город</th>
+                    <th scope="col">{{ employer.city }}</th>
+                </tr>
+                <tr>
+                    <th scope="col">Сайт</th>
+                    <th scope="col">{{ employer.site }}</th>
+                </tr>
+                <tr>
+                    <th scope="col">Статус</th>
+                    <th scope="col">{{ employer.status }}</th>
+                </tr>
+                </thead>
+            </table>
         </div>
     </div>
 </div>

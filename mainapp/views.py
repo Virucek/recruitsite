@@ -1,17 +1,28 @@
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 
 from authapp.models import Employer
+from employerapp.models import Vacancy
 from mainapp.models import News
 
 
-def main(request):
+def main(request, page=1):
     title = 'Главная'
     news = News.objects.filter(is_active=True).order_by('-published')
-    employers = Employer.objects.filter(is_active=True, status=Employer.MODER_OK)[:5]
+    employers = Employer.objects.filter(is_active=True, status=Employer.MODER_OK).order_by('?')[:6]
+    vacancies = Vacancy.objects.filter(action='moderation_ok')
+    paginator = Paginator(news, 5)
+    try:
+        news_paginator = paginator.page(page)
+    except PageNotAnInteger:
+        news_paginator = paginator.page(1)
+    except EmptyPage:
+        news_paginator = paginator.page(paginator.num_pages)
     context = {
         'title': title,
-        'news': news,
+        'news': news_paginator,
         'employers': employers,
+        'vacancies': vacancies
     }
     return render(request, 'mainapp/index.html', context)
 
