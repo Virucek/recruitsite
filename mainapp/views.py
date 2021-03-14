@@ -11,7 +11,7 @@ def main(request, page=1):
     news = News.objects.filter(is_active=True).order_by('-published')
     employers = Employer.objects.filter(is_active=True, status=Employer.MODER_OK).order_by('?')[:6]
     vacancies = Vacancy.objects.filter(action='moderation_ok')
-    paginator = Paginator(news, 5)
+    paginator = Paginator(news, 4)
     try:
         news_paginator = paginator.page(page)
     except PageNotAnInteger:

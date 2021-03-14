@@ -69,15 +69,15 @@
         <div class="col-12 col-sm-8 col-md-9 about_h1">
             <h1 class="text-center font-italic mb-5">Новости IT Portal</h1>
             {% for item in news %}
-            <div class="row mb-3" id="{{ item.id }}">
+            <div class="row mb-3 mt-5" id="{{ item.id }}">
                 <div class="col-2 h5">{{ item.published|date:"d.m.y" }}</div>
                 <div class="col-10 h5">{{ item.title|capfirst }}</div>
             </div>
             <div class="row mb-1">
-                <div class="col">
+                <div class="col mb-0 text_news">
                     {% if item.description|wordcount > 40 %}
                     {{ item.description|linebreaks|truncatewords:40 }}
-                    <p class="mb-0"><a href="{% url 'news_detail' item.pk%}"><small class="text-muted">
+                    <p class="mb-2"><a href="{% url 'news_detail' item.pk%}"><small class="text-muted">
                         подробнее...</small></a></p>{% else %} {{ item.description|linebreaks }}
                     {% endif %}
                 </div>

@@ -168,3 +168,6 @@ footer a:hover {
 .vacancy_form input, .vacancy_form textarea {
     width: 100%;
 }
+.text_news p {
+    margin-bottom: 0;
+}

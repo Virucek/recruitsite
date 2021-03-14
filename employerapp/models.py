@@ -33,9 +33,9 @@ class Vacancy(models.Model):
     currency = models.CharField(verbose_name='валюта', max_length=4, blank=True,
                                 choices=CURRENCY_CHOICE, help_text='поле необязательное для '
                                                                    'заполнения')
-    description = models.TextField(verbose_name='описание / обязанности', max_length=264)
-    requirements = models.TextField(verbose_name='требования к кандидату', max_length=264)
-    conditions = models.TextField(verbose_name='что мы предлагаем', max_length=264, blank=True,
+    description = models.TextField(verbose_name='описание / обязанности', max_length=1024)
+    requirements = models.TextField(verbose_name='требования к кандидату', max_length=1024)
+    conditions = models.TextField(verbose_name='что мы предлагаем', max_length=1024, blank=True,
                                   help_text='поле необязательное для заполнения')
     published = models.DateField(verbose_name='дата публикации', default=datetime.now)
     contact_person = models.CharField(verbose_name='контактное лицо', max_length=128)
