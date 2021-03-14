@@ -41,7 +41,11 @@
                 </tr>
                 </thead>
             </table>
-            <button type="button" class="btn btn-primary">Создать резюме</button>
+            <button type="button" class="btn btn-primary">
+                <a href="{% url 'jobseeker:resume' %}">
+                Создать резюме
+                </a>
+            </button>
     <div class="container search_resume"><h1 class="my-5">Мои резюме</h1>
     <p>Здесь будет раздел со списком ативных резюме</p>
     </div>

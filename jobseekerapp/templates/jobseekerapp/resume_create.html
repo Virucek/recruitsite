@@ -5,56 +5,25 @@
    <div class="container">
        <form action="" method="post">
            {% csrf_token %}
-           {{ form.as_p }}
-           <table class="table">
-               {{ education_items.management_form }}
-               {% for form in education_items.forms %}
-                   {% for field in form.visible_fields %}
-                        <tr class="{% cycle 'tr1' 'tr2' 'tr3' %}formset_row">
-                            <td class="formset_td">
-                            {{ field.label|capfirst }}
-                            </td>
-                            <td class="formset_td">
-                               {{ field }}
-                           </td>
-                        </tr>
-                   {% endfor %}
-               {% endfor %}
-           </table>
-           <table class="table">
-               {{ experience_items.management_form }}
-               {% for form in experience_items.forms %}
-                   {% if forloop.first %}
-                       <thead>
-                       <tr>
-                           {% for field in form.visible_fields %}
-                               <th class="{% cycle 'td1' 'td2' 'td3' %} order formset_td">
-                                   {{ field.label|capfirst }}
-                               </th>
-                           {% endfor %}
-                       </tr>
-                       </thead>
-                   {% endif %}
-                   <tr class="formset_row">
-                       {% for field in form.visible_fields %}
-                           <td class="{% cycle 'td1' 'td2' 'td3' %} order formset_td">
-                               {% if forloop.first %}
-                                   {% for hidden in form.hidden_fields %}
-                                       {{ hidden }}
-                                   {% endfor %}
-                               {% endif %}
-                               {{ field.errors.as_ul }}
-                               {{ field }}
-                           </td>
-                       {% endfor %}
-                   </tr>
-               {% endfor %}
-           </table>
+           {% for field in form %}
+                <p>
+                    {% if field.id_for_label == 'id_currency' %}
+                        <label id="{{ field.id_for_label }}" style="display:block;">Желаемая зарплата:</label>
+                        <input id="id_salary_min" class="form-control" type="number" name="salary_min" style="width:20%; display:inline;">
+                        <input id="id_salary_max" class="form-control" type="number" name="salary_max" style="width:20%; display:inline;">
+                        {{ field }}
+                    {% elif field.id_for_label in 'id_salary_min, id_salary_max' %}
+                    {% else %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                    {% endif %}
+                </p>
+           {% endfor %}
            <button type="submit" value="сохранить" class="btn btn-default btn-round form-control last">сохранить</button>
        </form>
        <button class="btn btn-round form-control last">
             <a href="{% url 'jobseeker:cabinet' %}">
-                к списку заказов
+                к личному кабинету
             </a>
         </button>
    </div>

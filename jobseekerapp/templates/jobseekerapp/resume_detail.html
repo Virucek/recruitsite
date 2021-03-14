@@ -1,0 +1,58 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block content %}
+   <div class="container">
+       <p> Желаемая должность: </p>
+       <p>{{ object.name }}</p>
+       <p> Желаемая зарплата: </p>
+       <p>{{ object.salary_min }} - {{ object.salary_max }} {{ object.currency }}</p>
+       <p> Ключевые навыки: </p>
+       <p> {{ object.key_skills }} </p>
+       <p> О себе: </p>
+       <p> {{ object.about }} </p>
+       <p> Опыт работы </p>
+       {% if object.get_experience_items %}
+           {% for item in object.get_experience_items %}
+                <p> {{item.company_name}} {{ item.from_date }} - {{ item.to_date }}:
+                    <a href="{% url 'jobseeker:resume_experience_update' object.id item.id %}">редактировать</a>
+                    <a href="{% url 'jobseeker:resume_experience_delete' object.id item.id %}">удалить</a>
+                </p>
+           {% endfor %}
+       {% else %}
+            <p>У вас не указано ни одно место работы</p>
+       {% endif %}
+       <button class="btn btn-round form-control last">
+            <a href="{% url 'jobseeker:resume_experience' object.id %}">
+                Добавить место работы
+            </a>
+       </button>
+       <p> Образование </p>
+       {% if object.get_education_items %}
+           {% for item in object.get_education_items %}
+                <p> {{ item.edu_type }} {{ item.degree }} {{ item.from_date }} - {{ item.to_date }}:
+                    <a href="{% url 'jobseeker:resume_education_update' object.id item.id %}">редактировать</a>
+                    <a href="{% url 'jobseeker:resume_education_delete' object.id item.id %}">удалить</a>
+                </p>
+           {% endfor %}
+       {% else %}
+            <p>Информации об образовании нет</p>
+       {% endif %}
+       <button class="btn btn-round form-control last">
+            <a href="{% url 'jobseeker:resume_education' object.id %}">
+                Добавить информацию об образовании
+            </a>
+       </button>
+       <button class="btn btn-round form-control last">
+            <a href="{% url 'jobseeker:resume_delete' object.id %}">
+                Удалить резюме
+            </a>
+       </button>
+       <button class="btn btn-round form-control last">
+            <a href="{% url 'jobseeker:cabinet' %}">
+                к личному кабинету
+            </a>
+        </button>
+   </div>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block content %}
+   <div class="container">
+       <div class="h1">Уверены, что хотите удалить?</div>
+       <form action="{% url 'jobseeker:resume_delete' object.pk %}" method="post">
+           {% csrf_token %}
+           <input class="btn btn-danger" type="submit" value="удалить">
+       </form>
+       <button class="btn btn-success">
+           <a href="{% url 'jobseeker:cabinet' %}">отмена</a>
+       </button>
+   </div>
+{% endblock %}
