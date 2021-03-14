@@ -3,15 +3,43 @@
 
 {% block content %}
    <div class="container">
+       <h4>Основная информация </h4>
        <p> Желаемая должность: </p>
        <p>{{ object.name }}</p>
        <p> Желаемая зарплата: </p>
-       <p>{{ object.salary_min }} - {{ object.salary_max }} {{ object.currency }}</p>
+       <p>
+           {% if object.salary_min and object.salary_max %}
+                {{ object.salary_min }} - {{ object.salary_max }} {{ object.currency }}
+           {% elif object.salary_min %}
+                {{ object.salary_min }} {{ object.currency }}
+           {% elif object.salary_max %}
+                {{ object.salary_max }} {{ object.currency }}
+           {% else %}
+                Информация о желаемой зарплате не указана
+           {% endif %}
+       </p>
        <p> Ключевые навыки: </p>
-       <p> {{ object.key_skills }} </p>
+       <p>
+           {% if object.key_skills %}
+                {{ object.key_skills }}
+           {% else %}
+                Информация о ключевых навыках не указана
+           {% endif %}
+       </p>
        <p> О себе: </p>
-       <p> {{ object.about }} </p>
-       <p> Опыт работы </p>
+       <p>
+           {% if object.about %}
+                {{ object.about }}
+           {% else %}
+                Информация о себе не указана
+           {% endif %}
+       </p>
+       <button class="btn btn-round form-control last">
+            <a href="{% url 'jobseeker:resume_update' object.id %}">
+                Редактировать "Основную информацию"
+            </a>
+       </button>
+       <h4> Опыт работы </h4>
        {% if object.get_experience_items %}
            {% for item in object.get_experience_items %}
                 <p> {{item.company_name}} {{ item.from_date }} - {{ item.to_date }}:
@@ -27,10 +55,14 @@
                 Добавить место работы
             </a>
        </button>
-       <p> Образование </p>
+       <h4> Образование </h4>
        {% if object.get_education_items %}
            {% for item in object.get_education_items %}
-                <p> {{ item.edu_type }} {{ item.degree }} {{ item.from_date }} - {{ item.to_date }}:
+                <p>
+                    {{ item.get_edu_type_display }} ({{ item.get_degree_display }}) <br>
+                    {{ item.institution_name }} <br>
+                    {{ item.course_name }} <br>
+                    {{ item.from_date|date:'M Y' }} - {{ item.to_date|date:'M Y' }} <br>
                     <a href="{% url 'jobseeker:resume_education_update' object.id item.id %}">редактировать</a>
                     <a href="{% url 'jobseeker:resume_education_delete' object.id item.id %}">удалить</a>
                 </p>

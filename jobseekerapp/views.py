@@ -86,6 +86,8 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        if 'salary_min' not in form.cleaned_data and 'salary_max' not in form.cleaned_data:
+            form.cleaned_data.pop('currency')
         self.object = form.save
 
         return super(ResumeCreateView, self).form_valid(form)
