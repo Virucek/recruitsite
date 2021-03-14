@@ -1,9 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
-from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 
@@ -17,7 +15,7 @@ class JobseekerViewMixin:
         context = super().get_context_data(**kwargs)
         try:
             context['title'] = getattr(self, 'title')
-        except AttributeError as e:
+        except AttributeError:
             print("title for view isn't set")
             context['title'] = 'Untitled page'
 
@@ -44,9 +42,6 @@ class JobseekerViewMixin:
 
 
 class ResumeItemViewMixin(JobseekerViewMixin):
-
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         resume_id = self.kwargs['resume_id']
