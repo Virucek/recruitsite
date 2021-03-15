@@ -18,6 +18,13 @@
   <component name="Git.Merge.Settings">
     <option name="BRANCH" value="main" />
   </component>
+  <component name="Git.Pull.Settings">
+    <option name="OPTIONS">
+      <set>
+        <option value="SQUASH" />
+      </set>
+    </option>
+  </component>
   <component name="Git.Rebase.Settings">
     <option name="NEW_BASE" value="origin/add_authorize_register" />
   </component>
