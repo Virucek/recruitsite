@@ -171,3 +171,26 @@ footer a:hover {
 .text_news p {
     margin-bottom: 0;
 }
+
+.resume-data {
+    padding: 0.75rem;
+}
+
+.resume_table {
+	width: 950px;
+	text-align: left;
+	margin: 0;
+}
+
+.btn-resume-detail {
+    padding-left: 0.5rem;
+}
+
+.btn-resume-delete {
+    color: #ff0000;
+}
+
+.resume-salary {
+    width:20%;
+    display:inline;
+}
