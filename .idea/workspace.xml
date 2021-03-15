@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="19c4f839-6016-4754-aa2e-511e609e3fee" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="19c4f839-6016-4754-aa2e-511e609e3fee" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -26,7 +24,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="emp_seeker_cabinet" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -122,6 +120,7 @@
       <option name="presentableId" value="Default" />
       <updated>1614887082763</updated>
       <workItem from="1615807158380" duration="64000" />
+      <workItem from="1615807257150" duration="307000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1614888412781</created>
@@ -221,7 +220,14 @@
       <option name="project" value="LOCAL" />
       <updated>1615236324624</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="* New branch">
+      <created>1615807562493</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1615807562493</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -255,6 +261,7 @@
     <MESSAGE value="* Add raw view employer" />
     <MESSAGE value="* Start build jobseekerapp" />
     <MESSAGE value="* End build jobseekerapp" />
-    <option name="LAST_COMMIT_MESSAGE" value="* End build jobseekerapp" />
+    <MESSAGE value="* New branch" />
+    <option name="LAST_COMMIT_MESSAGE" value="* New branch" />
   </component>
 </project>
