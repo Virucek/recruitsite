@@ -214,3 +214,13 @@ def vacancy_delete(request, emp_id, pk):
     return render(request, 'employerapp/vacancy_delete.html', context)
 
 
+@login_required
+def vacancy_view(request, emp_id, pk):
+    title = 'Вакансия'
+    vacancy = get_object_or_404(Vacancy, pk=pk)
+    employer = get_object_or_404(Employer, pk=emp_id)
+
+    context = {'title': title, 'item': vacancy, 'employer': employer}
+
+    return render(request, 'employerapp/vacancy_view.html', context)
+

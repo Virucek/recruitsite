@@ -10,10 +10,6 @@ from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, Resume
 from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> sprint2_vacations
 class JobseekerViewMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
