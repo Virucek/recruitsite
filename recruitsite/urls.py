@@ -23,6 +23,7 @@ from recruitsite import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main, name='main'),
+    path('<int:page>/', views.main, name='main'),
     path('news/<int:pk>/', views.news_detail, name='news_detail'),
     path('auth/', include('authapp.urls', namespace='auth')),
     path('employer/', include('employerapp.urls', namespace='employer')),
