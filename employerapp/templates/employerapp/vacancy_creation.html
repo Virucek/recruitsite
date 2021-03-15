@@ -25,11 +25,9 @@
                 </p>
                 <p>Вам поступит сообщение о статусе модерации. Вы можете просмотреть данное сообщение в разделе "Сообщения" вашего личного кабинета.</p>
                 <div class="d-flex justify-content-around my-5">
-                    <a class="btn btn-outline-primary" role="button"
-                       href="{% url 'employer:vacancy_create' employer.pk %}">создать еще одну
+                    <a class="btn btn-outline-primary" role="button" href="{% url 'employer:vacancy_create' employer.pk %}">создать еще одну
                         вакансию</a>
-                    <a class="btn btn-outline-primary" role="button"
-                       href="{% url 'employer:main' employer.pk %}">
+                    <a class="btn btn-outline-primary" role="button" href="{% url 'employer:main' employer.pk %}">
                         вернуться в личный кабинет</a>
                 </div>
             </div>
