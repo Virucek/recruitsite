@@ -9,8 +9,15 @@
             <p class="h4 font-italic">Добро пожаловать "{{user.employer.company_name}}" на портал IT
                 Portal!</p>
             <p>Статус: Работодатель</p>
-            <p class="my-5">Здесь будет выведен список всех доступных резюме соискателей,
-            зарегистрированных на данном портале.</p>
+            <p class="h3">Резюме на портале</p>
+            {% for resume in resume_all %}
+                <p class="my-5"><b>Желаемая должность:</b> {{ resume.name }}</p>
+                <p class="my-5"><b>Ключевые навыки:</b> {{ resume.key_skills }}</p>
+                <p class="my-5"><b>О себе:</b> {{ resume.about }}</p>
+                <a href="/jobseeker/resume/{{ resume.id }}">Сылка на резюме</a><br>
+            <hr>
+
+            {% endfor %}
             <p class="my-5">Также будет реализован простой и расширенный поиск резюме.</p>
         </div>
     </div>

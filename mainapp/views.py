@@ -2,9 +2,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from authapp.models import Employer
 from employerapp.models import Vacancy
+from jobseekerapp.models import Resume
 from mainapp.models import News
 
 
@@ -23,11 +25,15 @@ def main(request, page=None):
         news_paginator = paginator.page(1)
     except EmptyPage:
         news_paginator = paginator.page(paginator.num_pages)
+
+    resume_all = Resume.objects.all().filter(status='opened').order_by('updated_at')
+
     context = {
         'title': title,
         'news': news_paginator,
         'employers': employers,
-        'vacancies': vacancies
+        'vacancies': vacancies,
+        'resume_all': resume_all
     }
     return render(request, 'mainapp/index.html', context)
 

@@ -6,6 +6,7 @@ from django.urls import reverse
 from authapp.models import Employer, IndustryType
 from employerapp.forms import VacancyCreationForm, VacancyEditForm
 from employerapp.models import Vacancy
+from jobseekerapp.models import Resume
 
 
 @login_required
