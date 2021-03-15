@@ -25,7 +25,7 @@ class ResumeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['currency'] = forms.ChoiceField(choices=CURRENCY_CHOICES)
+        self.fields['currency'] = forms.ChoiceField(label='Валюта', choices=CURRENCY_CHOICES)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
             if field_name in ('salary_min', 'salary_max', 'currency'):

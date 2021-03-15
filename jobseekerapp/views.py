@@ -61,6 +61,7 @@ class ResumeItemViewMixin(JobseekerViewMixin):
         return super().form_valid(form)
 
 
+@login_required
 def jobseeker_cabinet(request):
     title = 'Личный кабинет работодателя'
     current_user = request.user.id

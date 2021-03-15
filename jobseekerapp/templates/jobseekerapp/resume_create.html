@@ -7,20 +7,7 @@
        <br>
        <form action="" method="post">
            {% csrf_token %}
-           {% for field in form %}
-                <p>
-                    {% if field.id_for_label == 'id_currency' %}
-                        <label id="{{ field.id_for_label }}" style="display:block;">Желаемая зарплата:</label>
-                        <input id="id_salary_min" class="form-control resume-salary" type="number" name="salary_min">
-                        <input id="id_salary_max" class="form-control resume-salary" type="number" name="salary_max">
-                        {{ field }}
-                    {% elif field.id_for_label in 'id_salary_min, id_salary_max' %}
-                    {% else %}
-                        {{ field.label_tag }}
-                        {{ field }}
-                    {% endif %}
-                </p>
-           {% endfor %}
+           {{ form.as_p }}
            <button type="submit" value="сохранить" class="btn btn-default btn-round form-control last">сохранить</button>
        </form>
        <button class="btn btn-round form-control last">
