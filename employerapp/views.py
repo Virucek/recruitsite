@@ -6,6 +6,10 @@ from django.urls import reverse
 from authapp.models import Employer, IndustryType
 from employerapp.forms import VacancyCreationForm, VacancyEditForm
 from employerapp.models import Vacancy
+<<<<<<< HEAD
+=======
+from jobseekerapp.models import Resume
+>>>>>>> sprint2_vacations
 
 
 @login_required
@@ -220,4 +224,8 @@ def vacancy_view(request, emp_id, pk):
 
     context = {'title': title, 'item': vacancy, 'employer': employer}
 
+<<<<<<< HEAD
     return render(request, 'employerapp/vacancy_view.html', context)
+=======
+    return render(request, 'employerapp/vacancy_view.html', context)
+>>>>>>> sprint2_vacations

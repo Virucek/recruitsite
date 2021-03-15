@@ -4,13 +4,23 @@
     <list default="true" id="19c4f839-6016-4754-aa2e-511e609e3fee" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/employerapp/templates/employerapp/vacancy_creation.html" beforeDir="false" afterPath="$PROJECT_DIR$/employerapp/templates/employerapp/vacancy_creation.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/jobseekerapp/templates/jobseekerapp/jobseeker_cabinet.html" beforeDir="false" afterPath="$PROJECT_DIR$/jobseekerapp/templates/jobseekerapp/jobseeker_cabinet.html" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/employerapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/employerapp/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobseekerapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/jobseekerapp/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mainapp/templates/mainapp/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/mainapp/templates/mainapp/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mainapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainapp/views.py" afterDir="false" />
+>>>>>>> sprint2_vacations
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -21,7 +31,14 @@
     </option>
   </component>
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="main" />
+    <option name="BRANCH" value="origin/dev" />
+  </component>
+  <component name="Git.Pull.Settings">
+    <option name="OPTIONS">
+      <set>
+        <option value="SQUASH" />
+      </set>
+    </option>
   </component>
   <component name="Git.Rebase.Settings">
     <option name="NEW_BASE" value="origin/add_authorize_register" />
@@ -29,10 +46,15 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="emp_seeker_cabinet" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GithubProjectSettings">
+    <option name="CREATE_PULL_REQUEST_DEFAULT_BRANCH" value="main" />
+    <option name="CREATE_PULL_REQUEST_DEFAULT_REPO_USER" value="Virucek" />
+    <option name="CREATE_PULL_REQUEST_DEFAULT_REPO_NAME" value="recruitsite" />
   </component>
   <component name="ProjectId" id="1pJ2sYsSMMFi42ex6m7XCFMqme5" />
   <component name="ProjectLevelVcsManager">
@@ -48,8 +70,12 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/jobseekerapp" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.django.DjangoModulesConfigurable" />
   </component>
@@ -119,6 +145,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1614887082763</updated>
+      <workItem from="1615807158380" duration="64000" />
+      <workItem from="1615807257150" duration="12768000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1614888412781</created>
@@ -211,11 +239,51 @@
       <option name="project" value="LOCAL" />
       <updated>1615232041205</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="* End build jobseekerapp">
+      <created>1615236324624</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1615236324624</updated>
+    </task>
+    <task id="LOCAL-00015" summary="* New branch">
+      <created>1615807562493</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1615807562493</updated>
+    </task>
+    <task id="LOCAL-00016" summary="* New branch">
+      <created>1615807667145</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1615807667145</updated>
+    </task>
+    <task id="LOCAL-00017" summary="* Add git ignore">
+      <created>1615808011352</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1615808011352</updated>
+    </task>
+    <task id="LOCAL-00018" summary="* Add git ignore">
+      <created>1615808022173</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1615808022173</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
+<<<<<<< HEAD
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.css" />
+=======
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+>>>>>>> sprint2_vacations
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -244,6 +312,9 @@
     <MESSAGE value="* Del wrong index" />
     <MESSAGE value="* Add raw view employer" />
     <MESSAGE value="* Start build jobseekerapp" />
-    <option name="LAST_COMMIT_MESSAGE" value="* Start build jobseekerapp" />
+    <MESSAGE value="* End build jobseekerapp" />
+    <MESSAGE value="* New branch" />
+    <MESSAGE value="* Add git ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="* Add git ignore" />
   </component>
 </project>

@@ -2,9 +2,17 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+<<<<<<< HEAD
 
 from authapp.models import Employer
 from employerapp.models import Vacancy
+=======
+from django.contrib.auth.decorators import login_required
+
+from authapp.models import Employer
+from employerapp.models import Vacancy
+from jobseekerapp.models import Resume
+>>>>>>> sprint2_vacations
 from mainapp.models import News
 
 
@@ -23,11 +31,22 @@ def main(request, page=None):
         news_paginator = paginator.page(1)
     except EmptyPage:
         news_paginator = paginator.page(paginator.num_pages)
+<<<<<<< HEAD
+=======
+
+    resume_all = Resume.objects.all().filter(status='opened').order_by('updated_at')
+
+>>>>>>> sprint2_vacations
     context = {
         'title': title,
         'news': news_paginator,
         'employers': employers,
+<<<<<<< HEAD
         'vacancies': vacancies
+=======
+        'vacancies': vacancies,
+        'resume_all': resume_all
+>>>>>>> sprint2_vacations
     }
     return render(request, 'mainapp/index.html', context)
 
