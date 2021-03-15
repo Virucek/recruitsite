@@ -10,8 +10,8 @@ from authapp.models import Employer, Jobseeker, IndustryType
 
 
 def login(request):
-    page = 1
     title = 'вход'
+
     login_form = UserLoginForm(data=request.POST)
     if request.method == 'POST' and login_form.is_valid():
         username = request.POST['username']
@@ -20,7 +20,10 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
         if user and user.is_active:
             auth.login(request, user)
-            return HttpResponseRedirect(reverse('main', kwargs={'page': page}))
+            if user.is_superuser:
+                return HttpResponseRedirect(reverse('admin:index'))
+            else:
+                return HttpResponseRedirect(reverse('main'))
 
     content = {
         'title': title,
@@ -30,9 +33,8 @@ def login(request):
 
 
 def logout(request):
-    page = 1
     auth.logout(request)
-    return HttpResponseRedirect(reverse('main', kwargs={'page': page}))
+    return HttpResponseRedirect(reverse('main'))
 
 
 def register_employer(request):
