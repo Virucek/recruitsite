@@ -1,10 +1,10 @@
 from datetime import date
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
 
-from authapp.models import Jobseeker, IndustryType
+from authapp.models import Jobseeker, IndustryType, Employer
 
 
 class UserLoginForm(AuthenticationForm):
@@ -132,3 +132,28 @@ class JobseekerRegisterForm(UserCreationForm):
         if email_db:
             raise forms.ValidationError(f'Пользователь с такой электронной почтой уже зарегистрирован')
         return data
+
+
+class UserEditForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+    def __init__(self, *args, **kwargs):
+        super(UserEditForm, self).__init__(*args, **kwargs)
+        self.fields['username'] = forms.CharField(label='Логин')
+        self.fields['email'] = forms.EmailField(label='Ваш email')
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+
+class EmployerEditForm(forms.ModelForm):
+    class Meta:
+        model = Employer
+        fields = ('company_name', 'tax_number', 'phone_number', 'site', 'industry_type',
+                  'short_description', 'logo', 'city')
+
+    def __init__(self, *args, **kwargs):
+        super(EmployerEditForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'

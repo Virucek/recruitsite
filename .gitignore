@@ -2,4 +2,10 @@
 /authapp/__pycache__/
 /mainapp/__pycache__/
 /mainapp/migrations/__pycache__/
+<<<<<<< HEAD
+__pycache__
+.idea
+=======
+/recruitsite/__pycache__/
 /.idea/
+>>>>>>> sprint2_vacations

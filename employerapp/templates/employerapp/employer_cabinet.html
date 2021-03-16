@@ -3,9 +3,14 @@
 
 {% block content %}
 
-    <div class="container">
-    <h1 class="my-5 header_cabinet">{{ employer.company_name }}</h1>
-            <table class="table employer_table">
+<div class="container my-5">
+    <h3 class="font-italic mb-5 text-center">Личный кабинет: "{{ employer.company_name }}" </h3>
+    <div class="row">
+        <div class="col-5 col-sm-4 col-md-3 pr-sm-4">
+            {% include 'employerapp/include/left-menu.html' %}
+        </div>
+        <div class="col-7 col-sm-8 col-md-9 pl-sm-5">
+            <table class="table">
                 <thead>
                 <tr>
                     <th scope="col">Поле</th>
@@ -33,20 +38,7 @@
                 </tr>
                 </thead>
             </table>
-    <button type="button" class="btn btn-primary">Создать вакасию</button>
-    <div class="container search_resume"><h1 class="my-5">Поиск резюме</h1>
-    <p>Здесь будет раздел для поиска резюме</p>
+        </div>
     </div>
-    <div class="container search_resume"><h1 class="my-5">Список опубликованных вакасний</h1>
-    <p>Здесь будет список опубликованных вакансий</p>
-    </div>
-    <div class="container search_resume"><h1 class="my-5">Мои сообщения</h1>
-    <p>Переход в раздел с личными сообщениями и откликами</p>
-    <div class="container search_resume"><h1 class="my-5">Избранное</h1>
-    <p>Переход в раздел с избранными резюме</p>
-
-    </div>
-    </div>
-
-    {#<h1> {{ employer }}</h1>#}
+</div>
 {% endblock %}
