@@ -157,3 +157,60 @@ class EmployerEditForm(forms.ModelForm):
         super(EmployerEditForm, self).__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+
+class UserJobseekerEditForm(UserChangeForm):
+
+    class Meta:
+        model = User
+        fields = ('username',
+                  'email',
+                  'first_name',
+                  'last_name',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('password')
+        self.fields['username'] = forms.CharField(label='Логин')
+        self.fields['email'] = forms.EmailField(label='Ваш email')
+        self.fields['first_name'] = forms.CharField(label='Имя')
+        self.fields['last_name'] = forms.CharField(label='Фамилия')
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+
+class JobseekerEditForm(forms.ModelForm):
+    class Meta:
+        model = Jobseeker
+        fields = ('middle_name',
+                  'gender',
+                  'birthday',
+                  'city',
+                  'married_status',
+                  'photo',
+                  'phone_number',
+                  'about',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+    def clean_birthday(self):
+        data = self.cleaned_data['birthday']
+        cur_date = date.today()
+        age = (cur_date - data).days // 365
+        if age < 18:
+            raise forms.ValidationError("Вы слишком молоды для регистрации в качестве соискателя")
+        return data
+
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        try:
+            email_db = User.objects.filter(email=data)
+        except User.DoesNotExist:
+            email_db = None
+
+        if email_db:
+            raise forms.ValidationError(f'Пользователь с такой электронной почтой уже зарегистрирован')
+        return data
