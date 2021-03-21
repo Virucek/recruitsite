@@ -34,13 +34,13 @@
 				  </li>
 			  	{% elif user.is_authenticated and user.jobseeker %}
 				  <li class="nav-item">
-					<a class="nav-link" href="#">редактирование профиля</a>
+					<a class="nav-link" href="{% url 'auth:edit_jobseeker' user.pk %}">редактирование профиля</a>
 				  </li>
 				  <li class="nav-item">
-					<a class="nav-link" href="{% url 'jobseeker:resume' %}">создать резюме</a>
+					<a class="nav-link" href="{% url 'jobseeker:resume' user.pk %}">создать резюме</a>
 				  </li>
 				  <li class="nav-item">
-					<a class="nav-link" href="{% url 'jobseeker:cabinet' %}">личный кабинет</a>
+					<a class="nav-link" href="{% url 'jobseeker:cabinet' user.pk %}">личный кабинет</a>
 				  </li>
 				  <li class="nav-item">
 					<a class="nav-link" href="{% url 'auth:logout' %}">выход</a>

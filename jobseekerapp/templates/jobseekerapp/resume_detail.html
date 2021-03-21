@@ -47,7 +47,7 @@
                 </tbody>
             </table>
        <button class="btn btn-round form-control last text-left btn-resume-detail">
-            <a href="{% url 'jobseeker:resume_update' object.id %}">
+            <a href="{% url 'jobseeker:resume_update' user.pk object.id %}">
                 Редактировать Основную информацию
             </a>
        </button>
@@ -63,8 +63,8 @@
                         <p>{{ item.from_date|date:'M Y' }} - {{ item.to_date|date:'M Y' }}</p>
                     </td>
                     <td scope="col" class="text-right">
-                        <p><a href="{% url 'jobseeker:resume_experience_update' object.id item.id %}">редактировать запись</a></p>
-                        <p><a class="btn-resume-delete" href="{% url 'jobseeker:resume_experience_delete' object.id item.id %}">удалить запись</a></p>
+                        <p><a href="{% url 'jobseeker:resume_experience_update' user.pk object.id item.id %}">редактировать запись</a></p>
+                        <p><a class="btn-resume-delete" href="{% url 'jobseeker:resume_experience_delete' user.pk object.id item.id %}">удалить запись</a></p>
                     </td>
                 </tr>
            {% endfor %}
@@ -76,7 +76,7 @@
              </tbody>
        </table>
        <button class="btn btn-round form-control last text-left btn-resume-detail">
-            <a href="{% url 'jobseeker:resume_experience' object.id %}">
+            <a href="{% url 'jobseeker:resume_experience' user.pk object.id %}">
                 Добавить информацию о прежнем месте работы
             </a>
        </button>
@@ -93,8 +93,8 @@
                         <p>{{ item.from_date|date:'M Y' }} - {{ item.to_date|date:'M Y' }}</p>
                     </td>
                     <td scope="col" class="text-right">
-                        <p><a href="{% url 'jobseeker:resume_education_update' object.id item.id %}">редактировать запись</a></p>
-                        <p><a class="btn-resume-delete" href="{% url 'jobseeker:resume_education_delete' object.id item.id %}">удалить запись</a></p>
+                        <p><a href="{% url 'jobseeker:resume_education_update' user.pk object.id item.id %}">редактировать запись</a></p>
+                        <p><a class="btn-resume-delete" href="{% url 'jobseeker:resume_education_delete' user.pk object.id item.id %}">удалить запись</a></p>
                     </td>
                 </tr>
            {% endfor %}
@@ -107,17 +107,17 @@
                 </tbody>
             </table>
        <button class="btn btn-round form-control last text-left btn-resume-detail">
-            <a href="{% url 'jobseeker:resume_education' object.id %}">
+            <a href="{% url 'jobseeker:resume_education' user.pk object.id %}">
                 Добавить информацию об образовании
             </a>
        </button>
        <button class="btn btn-round form-control last">
-            <a class="btn-resume-delete" href="{% url 'jobseeker:resume_delete' object.id %}">
+            <a class="btn-resume-delete" href="{% url 'jobseeker:resume_delete' user.pk object.id %}">
                 Удалить резюме
             </a>
        </button>
        <button class="btn btn-round form-control last">
-            <a href="{% url 'jobseeker:cabinet' %}">
+            <a href="{% url 'jobseeker:cabinet' user.pk %}">
                 к личному кабинету
             </a>
         </button>

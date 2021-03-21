@@ -8,6 +8,6 @@
            {% csrf_token %}
            <input class="btn btn-danger form-control last" type="submit" value="удалить">
        </form>
-       <a class="btn btn-round form-control last" href="{% url 'jobseeker:resume_detail' resume.id %}">отмена</a>
+       <a class="btn btn-round form-control last" href="{% url 'jobseeker:resume_detail' user.pk resume.id %}">отмена</a>
    </div>
 {% endblock %}

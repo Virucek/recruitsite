@@ -41,8 +41,8 @@
                 </tr>
                 </thead>
             </table>
-            <a class="btn btn-primary mb-3" href="{% url 'jobseeker:resume' %}">
-                Создать резюме
+            <a class="btn btn-primary mb-3" href="{% url 'auth:edit_jobseeker' jobseeker.pk %}">
+                Редактировать
             </a>
         <h1 class="my-5">Мои резюме</h1>
         <table class="table employer_table">
@@ -65,14 +65,17 @@
                         {% endif %}
                     </td>
                     <td scope="col" class="text-right">
-                        <p><a href="{% url 'jobseeker:resume_detail' object.id %}">просмотреть резюме</a></p>
-                        <p><a class="btn-resume-delete" href="{% url 'jobseeker:resume_delete' object.id %}">удалить резюме</a></p>
+                        <p><a href="{% url 'jobseeker:resume_detail' jobseeker.pk object.id %}">просмотреть резюме</a></p>
+                        <p><a class="btn-resume-delete" href="{% url 'jobseeker:resume_delete' jobseeker.pk object.id %}">удалить резюме</a></p>
                     </td>
                 </tr>
             {% endfor %}
         {% endif %}
             </tbody>
         </table>
+            <a class="btn btn-primary mb-3" href="{% url 'jobseeker:resume' jobseeker.pk %}">
+                Создать резюме
+            </a>
         <h1 class="my-5">Поиск вакансий</h1>
             <p>Здесь будет форма поиска вакасий или переход в раздел поиска </p>
         <h1 class="my-5">Избранные вакасии</h1>

@@ -61,14 +61,18 @@ class ResumeItemViewMixin(JobseekerViewMixin):
         return super().form_valid(form)
 
 
-@login_required
-def jobseeker_cabinet(request):
+class JobseekerDetailView(JobseekerViewMixin, DetailView):
+    model = Resume
+    template_name = 'jobseekerapp/jobseeker_cabinet.html'
     title = 'Личный кабинет работодателя'
-    current_user = request.user.id
-    jobseeker_data = Jobseeker.objects.get(user_id=current_user)
-    resumes = Resume.get_user_resumes(current_user)
-    content = {'title': title, 'jobseeker': jobseeker_data, 'resumes': resumes}
-    return render(request, 'jobseekerapp/jobseeker_cabinet.html', content)
+
+    def get_object(self, queryset=None):
+        return Jobseeker.objects.get(user_id=self.request.user.id)
+
+    def get_context_data(self, **kwargs):
+        context = super(JobseekerDetailView, self).get_context_data()
+        context['resumes'] = Resume.get_user_resumes(self.request.user.id)
+        return context
 
 
 class ResumeCreateView(JobseekerViewMixin, CreateView):

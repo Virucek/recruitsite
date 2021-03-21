@@ -10,7 +10,7 @@
            <button type="submit" value="сохранить" class="btn btn-default btn-round form-control last">сохранить</button>
        </form>
        <button class="btn btn-round form-control last">
-            <a href="{% url 'jobseeker:resume_detail' resume.id %}">
+            <a href="{% url 'jobseeker:resume_detail' user.pk resume.id %}">
                 к резюме
             </a>
         </button>
