@@ -168,3 +168,9 @@ class ResumeEducationDeleteView(ResumeItemViewMixin, DeleteView):
         return reverse_lazy('jobseeker:resume_detail', kwargs={'pk': resume_id})
 
 
+class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
+    model = Resume
+    template_name = 'jobseekerapp/resume_external_detail.html'
+    title = 'Резюме'
+
+

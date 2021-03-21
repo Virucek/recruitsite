@@ -8,6 +8,7 @@ urlpatterns = [
     path('<int:jobseeker_id>/', views.JobseekerDetailView.as_view(), name='cabinet'),
     path('<int:jobseeker_id>/resume/', views.ResumeCreateView.as_view(), name='resume'),
     path('<int:jobseeker_id>/resume/<int:pk>/', views.ResumeDetailView.as_view(), name='resume_detail'),
+    path('resume/<int:pk>/external', views.ResumeExternalDetailView.as_view(), name='resume_external_detail'),
     path('<int:jobseeker_id>/resume/<int:pk>/edit', views.ResumeUpdateView.as_view(), name='resume_update'),
     path('<int:jobseeker_id>/resume/<int:pk>/delete', views.ResumeDeleteView.as_view(), name='resume_delete'),
     path('<int:jobseeker_id>/resume/<int:resume_id>/experience', views.ResumeExperienceCreateView.as_view(), name='resume_experience'),
