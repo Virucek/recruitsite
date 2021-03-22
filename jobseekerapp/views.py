@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 
 from authapp.models import Jobseeker
+from employerapp.models import SendOffers, Favorites
 from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm
 from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience
 
@@ -162,5 +163,33 @@ class ResumeEducationDeleteView(ResumeItemViewMixin, DeleteView):
     def get_success_url(self):
         resume_id = self.kwargs['resume_id']
         return reverse_lazy('jobseeker:resume_detail', kwargs={'pk': resume_id})
+
+
+# class ResumeView(DetailView):
+#     title = 'Резюме'
+#     model = Resume
+#     template_name = 'jobseekerapp/resume_view.html'
+#     success_url = reverse_lazy('resume_view')
+
+def resume_view(request, seeker_id, pk):
+    title = 'просмотр резюме'
+    seeker = get_object_or_404(Jobseeker, pk=seeker_id)
+    resume = get_object_or_404(Resume, pk=pk)
+    favorites = Favorites()
+    if request.method == 'POST':
+        favorites.resume = resume
+        favorites.employer = request.user.employer
+        if not Favorites.objects.filter(resume=resume, employer=request.user.employer).first():
+            favorites.save()
+    context = {'title': title, 'item': seeker, 'resume': resume}
+    return render(request, 'jobseekerapp/resume_view.html', context)
+
+
+def offers(request, seeker_id):
+    title = 'просмотр предложений'
+    seeker = get_object_or_404(Jobseeker, pk=seeker_id)
+    offers = SendOffers.objects.all()
+    context = {'title': title, 'offers': offers}
+    return render(request, 'jobseekerapp/offers.html', context)
 
 

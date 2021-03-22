@@ -13,7 +13,6 @@ class Resume(models.Model):
         (DRAFT, 'черновик'),
         (OPENED, 'открыт'),
     )
-
     name = models.CharField(verbose_name='Желаемая должность', max_length=128)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     salary_min = models.IntegerField(verbose_name='Минимальная зарплата', blank=True, null=True)

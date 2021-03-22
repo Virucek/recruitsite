@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from authapp.models import Employer
-from employerapp.models import Vacancy
+from employerapp.models import Vacancy, Favorites
 from django.contrib.auth.decorators import login_required
 
 from authapp.models import Employer
@@ -21,6 +21,7 @@ def main(request, page=None):
     news = News.objects.filter(is_active=True).order_by('-published')
     employers = Employer.objects.filter(is_active=True, status=Employer.MODER_OK).order_by('?')[:6]
     vacancies = Vacancy.objects.filter(action='moderation_ok')
+    resume_all = Resume.objects.all().filter(status='opened').order_by('updated_at')
     paginator = Paginator(news, 4)
     try:
         news_paginator = paginator.page(page)
@@ -29,7 +30,14 @@ def main(request, page=None):
     except EmptyPage:
         news_paginator = paginator.page(paginator.num_pages)
 
-    resume_all = Resume.objects.all().filter(status='opened').order_by('updated_at')
+    favorites = Favorites()
+    if request.method == 'POST' and request.user.employer:
+        resume = Resume.objects.get(pk=int(request.POST.get('checked')))
+        favorites.resume = resume
+        favorites.employer = request.user.employer
+        if not Favorites.objects.filter(resume=resume,
+                                        employer=request.user.employer).first():
+            favorites.save()
 
     context = {
         'title': title,

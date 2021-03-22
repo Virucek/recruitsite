@@ -1,0 +1,71 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 mb-5">
+            <div class="d-flex align-items-center">
+                <h4 style="color: blue;"><a href="">{{ resume.user.last_name }} {{ resume.user.first_name }}
+                    {{ resume.user.jobseeker.middle_name }}</a></h4>
+                <p class="ml-5">
+                    <form action="{% url 'jobseeker:resume_view' item.pk resume.pk %}"
+                          method="post" class="add_favorite">{% csrf_token %}
+                        <button class="btn btn-clear add-favorite" type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
+                        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                        </svg></button>
+                    </form>
+                </p>
+                <p class="h5 ml-5" style="color:black;">Уровень з/п:
+                    {% if resume.salary_min and resume.salary_max %}{{ resume.salary_min }} -
+                    {{ resume.salary_max }} {{ resume.currency }}
+                    {% elif resume.salary_min %} от {{ resume.salary_min }} {{ resume.currency }}
+                    {% elif resume.salary_max %} до {{ resume.salary_max }} {{ resume.currency }}
+                    {% else %} не указана
+                    {% endif %}
+                </p>
+            </div>
+            <p class="small text-muted mb-0">{{ resume.user.jobseeker.city }}</p>
+            <p class="text-muted mb-3">Дата рождения: {{resume.user.jobseeker.birthday|date:"d.m.Y"}}
+            <span class="mb-3 ml-5">Семейный статус:
+                {{resume.user.jobseeker.get_married_status_display}}</span></p>
+            <p>Желаемая должность: {{ resume.name }}</p>
+            <div class="d-flex">
+                <strong>Навыки:</strong> <span class="ml-3">{{resume.key_skills|linebreaks}}</span>
+            </div>
+            {% if resume.get_education_items %}
+            {% for item in resume.get_education_items %}
+            <p class="mb-0"><span class="font-weight-bold">Образование:</span> {{ item.get_edu_type_display }}</p>
+            <p class="mb-0">"{{ item.institution_name }}" {{ item.from_date|date:'M Y' }} - {{ item.to_date|date:'M Y' }}</p>
+            {% endfor %}
+            {% else %}
+            <p><span class="font-weight-bold">Образование: </span>не указано</p>
+            {% endif %}
+            {% if resume.get_experience_items %}
+            <p class="mb-0 mt-2 font-weight-bold">Опыт работы:</p>
+            {% for item in resume.get_experience_items %}
+            <p class="mb-0 font-weight-bold">"{{ item.company_name }}"</p>
+            <div class="d-flex ">
+                <p class="mb-0">{{ item.from_date|date:'M Y' }} - {{ item.to_date|date:'M Y' }}</p>
+                <p class="ml-5 mb-0">{{ item.job_title }}</p>
+            </div>
+            {% if item.description %}<p class="mt-0">Обазанности: {{ item.description }}</p>{% endif %}
+            {% endfor %}
+            {% else %}
+            Опыт работы не указан.
+            {% endif %}
+            <p class="mt-4">Дата публикации резюме: {{resume.updated_at|date:"d.m.Y" }}</p>
+            <div class="d-flex my-5">
+                <a class="btn btn-outline-primary mb-5 px-4" role="button" href="{% url 'main' 1 %}">Назад
+                </a>
+                <a class="btn btn-outline-primary mb-5 px-4 ml-5" role="button"
+                   href="{% url 'employer:send_offer' user.employer.pk resume.pk %}">Направить
+                    предложение
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

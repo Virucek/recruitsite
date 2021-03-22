@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db import models
 
 from authapp.models import Employer
+from jobseekerapp.models import Resume
 
 
 class Vacancy(models.Model):
@@ -57,3 +58,33 @@ class Vacancy(models.Model):
         if self.action == 'moderation_ok' or self.action == 'moderation_reject':
             self.published = datetime.now()
         super(Vacancy, self).save(*args, **kwargs)
+
+
+class SendOffers(models.Model):
+    date = models.DateField(verbose_name='дата направления предложения', default=datetime.now)
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, verbose_name='выберите '
+                            'вакансию по которой хотите направить предложение соискателю')
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='предложение для '
+                                                                              'резюме')
+    cover_letter = models.TextField(verbose_name='Сопроводительное письмо по предлагаемой '
+                'вакансии', blank=True, max_length=524, help_text='поле не обязательное')
+    contact_phone = models.CharField(max_length=12, blank=True, help_text='поле не обязательное',
+                                     verbose_name='конт. тел с кем связываться по вакансии')
+
+    class Meta:
+        verbose_name_plural = 'Предложения для соискателей'
+
+    def __str__(self):
+        return f'{self.vacancy.employer.company_name} ({self.resume.name})'
+
+
+class Favorites(models.Model):
+    date = models.DateField(verbose_name='дата добавления в избранное', default=datetime.now)
+    employer = models.ForeignKey(Employer, on_delete=models.CASCADE)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='избранное резюме')
+
+    class Meta:
+        verbose_name_plural = 'Избранные резюме'
+
+    def __str__(self):
+        return f'{self.employer.company_name} ({self.resume.name})'

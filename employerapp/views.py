@@ -1,13 +1,16 @@
+from itertools import chain
+
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from authapp.models import Employer, IndustryType
-from employerapp.forms import VacancyCreationForm, VacancyEditForm
-from employerapp.models import Vacancy
+from authapp.models import Employer, IndustryType, Jobseeker
+from employerapp.forms import VacancyCreationForm, VacancyEditForm, SendOfferForm
+from employerapp.models import Vacancy, SendOffers, Favorites
 from jobseekerapp.models import Resume
-
 
 
 @login_required
@@ -21,6 +24,7 @@ def employer_cabinet(request, emp_id):
     vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False,employer=employer).order_by('published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(
         action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
     content = {
         'title': title,
         'employer': employer,
@@ -28,7 +32,8 @@ def employer_cabinet(request, emp_id):
         'drafts': drafts,
         'vacancies_hide': vacancies_hide,
         'vacancies': vacancies,
-        'vacancies_all': vacancies_all
+        'vacancies_all': vacancies_all,
+        'favorites': favorites
     }
     return render(request, 'employerapp/employer_cabinet.html', content)
 
@@ -45,13 +50,15 @@ def vacancy_published(request, emp_id):
                                        employer=employer).order_by(
         'published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
     context = {
         'title': title,
         'employer': employer,
         'drafts': drafts,
         'vacancies_hide': vacancies_hide,
         'vacancies': vacancies,
-        'vacancies_all': vacancies_all
+        'vacancies_all': vacancies_all,
+        'favorites': favorites
     }
 
     return render(request, 'employerapp/vacancy_published.html', context)
@@ -68,13 +75,15 @@ def vacancy_draft(request, emp_id):
     vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False, employer=employer).order_by(
         'published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
     context = {
         'title': title,
         'employer': employer,
         'drafts': drafts,
         'vacancies_hide': vacancies_hide,
         'vacancies': vacancies,
-        'vacancies_all': vacancies_all
+        'vacancies_all': vacancies_all,
+        'favorites': favorites
     }
 
     return render(request, 'employerapp/vacancy_drafts.html', context)
@@ -91,13 +100,15 @@ def vacancy_hide(request, emp_id):
     vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False, employer=employer).order_by(
         'published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
     context = {
         'title': title,
         'employer': employer,
         'vacancies_hide': vacancies_hide,
         'drafts': drafts,
         'vacancies': vacancies,
-        'vacancies_all': vacancies_all
+        'vacancies_all': vacancies_all,
+        'favorites': favorites
     }
 
     return render(request, 'employerapp/vacancy_hide.html', context)
@@ -114,13 +125,15 @@ def messages(request, emp_id):
         'published')
     vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False, employer=employer).order_by(
         'published')
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
     context = {
         'title': title,
         'employer': employer,
         'vacancies_hide': vacancies_hide,
         'drafts': drafts,
         'vacancies': vacancies,
-        'vacancies_all': vacancies_all
+        'vacancies_all': vacancies_all,
+        'favorites': favorites
     }
 
     return render(request, 'employerapp/employer_messages.html', context)
@@ -224,3 +237,98 @@ def vacancy_view(request, emp_id, pk):
 
     return render(request, 'employerapp/vacancy_view.html', context)
 
+
+@login_required
+def send_offer(request, emp_id, pk):
+    title = 'Предложение по работе'
+    employer = get_object_or_404(Employer, pk=emp_id)
+    resume = get_object_or_404(Resume, pk=pk)
+
+    sent = False
+    if request.method == 'POST':
+        form = SendOfferForm(request.POST, employer=employer)
+        send = SendOffers()
+
+        if form.is_valid():
+            send.vacancy = form.cleaned_data.get('vacancy')
+            send.cover_letter = form.cleaned_data.get('cover_letter')
+            send.contact_phone = form.cleaned_data.get('contact_phone')
+            send.resume = resume
+            send.save()
+            sent = True
+    else:
+        form = SendOfferForm(employer=employer)
+
+    context = {'title': title, 'employer': employer, 'sent': sent, 'form': form}
+
+    return render(request, 'employerapp/send_offer.html',  context)
+
+
+@login_required
+def favorites(request, emp_id):
+    title = 'Избранные резюме'
+    employer = get_object_or_404(Employer, pk=emp_id)
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    vacancies_all = Vacancy.objects.filter(employer=employer).exclude(
+        action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
+    vacancies_hide = Vacancy.objects.filter(hide=True, employer=employer).order_by(
+        'published')
+    drafts = Vacancy.objects.filter(action=employer.DRAFT, hide=False, employer=employer).order_by(
+        'published')
+    vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False,
+                                       employer=employer).order_by(
+        'published')
+    context = {
+        'title': title,
+        'employer': employer,
+        'favorites': favorites,
+        'vacancies_hide': vacancies_hide,
+        'drafts': drafts,
+        'vacancies': vacancies,
+        'vacancies_all': vacancies_all
+    }
+    return render(request, 'employerapp/favorites.html', context)
+
+
+@login_required
+def delete_favorite(request, emp_id, pk):
+    title = 'Удаление избранных резюме'
+    employer = get_object_or_404(Employer, pk=emp_id)
+    favorite = get_object_or_404(Favorites, pk=pk)
+    if request.method == 'POST':
+        favorite.delete()
+        return HttpResponseRedirect(reverse('employer:favorites', args=[employer.pk]))
+
+    context = {'title': title, 'favorite': favorite, 'employer': employer}
+
+    return render(request, 'employerapp/delete_favorite.html', context)
+
+
+@login_required
+def search_resume(request, emp_id, page=None):
+    if page is None:
+        page=1
+    title = 'Поиск резюме'
+    employer = get_object_or_404(Employer, pk=emp_id)
+    search = request.GET.get('search')
+    object_list = []
+    if request.method == 'GET':
+        query = []
+        results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search)).filter(
+            status=Resume.OPENED).order_by(
+            '-updated_at')
+        query.append(results)
+        print('query= ', query)
+        object_list = list(chain(*query))
+
+    paginator = Paginator(object_list, 5)
+    try:
+        search_paginator = paginator.page(page)
+    except PageNotAnInteger:
+        search_paginator = paginator.page(1)
+    except EmptyPage:
+        search_paginator = paginator.page(paginator.num_pages)
+
+    context = {'title': title, 'object_list': search_paginator}
+
+    return render(request, 'employerapp/search_resume.html', context)

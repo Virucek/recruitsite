@@ -1,0 +1,31 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h3 class="font-italic mb-4">Предложения от работодателей</h3>
+    {% if offers %}
+    {% for offer in offers %}
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 mb-5">
+            <span class="font-weight-bold">{{ offer.date|date:"d.m.Y" }}</span>. Вам поступило
+            предложение от компании "{{ offer.vacancy.employer.company_name }}"
+            по вакансии {{ offer.vacancy.vacancy_name }} на ваше резюме (желаемая
+            должность: {{ offer.resume.name }}).
+            {% if offer.cover_letter %}
+            <p class="mb-0">{{ offer.cover_letter }}</p>
+            {% endif %}
+            {% if offer.contact_phone %}
+            <p class="mb-0">В случае заинтересованности вы можете связаться с нами по тел.:
+                {{ offer.contact_phone }}</p>
+            {% endif %}
+            {% if not offer.cover_letter %}<p class="mb-0">Контактное лицо: {{ offer.vacancy.contact_person }}.</p>{% endif %}
+            <a href="{% url 'employer:vacancy_view' offer.vacancy.employer.pk offer.vacancy.pk %}">Просмотреть предложенную вакансию.</a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>У вас нет ни одного предложения о работе</p>
+    {% endif %}
+</div>
+{% endblock %}
