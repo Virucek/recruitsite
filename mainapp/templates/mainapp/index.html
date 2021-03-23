@@ -113,6 +113,14 @@
     <div class="row justify-content-center">
         <div class="col-12 col-sm-8 col-md-9 about_h1">
             <h1 class="text-center font-italic mb-5">Новости IT Portal</h1>
+            <form action="{% url 'search_news' %}" class="mb-5" method="get">
+                <div class="form-group">
+                    <input type="text" class="d-inline form-control col-8 col-sm-6 col-md-4"
+                           name="search" placeholder="поиск новостей...">
+                    <button id="search_news" class="btn btn-primary px-4" type="submit">поиск
+                    </button>
+                </div>
+            </form>
             {% for item in news %}
             <div class="row mb-3 mt-5" id="{{ item.id }}">
                 <div class="col-2 h5">{{ item.published|date:"d.m.y" }}</div>

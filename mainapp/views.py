@@ -1,4 +1,7 @@
+from itertools import chain
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -57,3 +60,29 @@ def news_detail(request, pk):
         'one_news': one_news
     }
     return render(request, 'mainapp/news_detail.html', context)
+
+
+def search_news(request, page=None):
+    if page is None:
+        page = 1
+    title = 'Поиск новостей'
+    search = request.GET.get('search')
+    object_list = []
+    if search:
+        query = []
+        results = News.objects.filter(Q(title__icontains=search) | Q(description__icontains=search), is_active=True).order_by(
+            '-published')
+        query.append(results)
+        object_list = list(chain(*query))
+
+    paginator = Paginator(object_list, 3)
+    try:
+        search_paginator = paginator.page(page)
+    except PageNotAnInteger:
+        search_paginator = paginator.page(1)
+    except EmptyPage:
+        search_paginator = paginator.page(paginator.num_pages)
+
+    context = {'title': title, 'object_list': search_paginator}
+
+    return render(request, 'mainapp/search_news.html', context)
