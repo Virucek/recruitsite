@@ -17,4 +17,5 @@ urlpatterns = [
     path('<int:jobseeker_id>/resume/<int:resume_id>/education', views.ResumeEducationCreateView.as_view(), name='resume_education'),
     path('<int:jobseeker_id>/resume/<int:resume_id>/education/<int:pk>/edit', views.ResumeEducationUpdateView.as_view(), name='resume_education_update'),
     path('<int:jobseeker_id>/resume/<int:resume_id>/education/<int:pk>/delete', views.ResumeEducationDeleteView.as_view(), name='resume_education_delete'),
+    path('<int:jobseeker_id>/offer/<int:vacancy_id>/create', views.JobseekerOfferCreateView.as_view(), name='offer_create'),
 ]
