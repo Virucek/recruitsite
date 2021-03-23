@@ -66,5 +66,6 @@ class JobseekerOfferForm(forms.ModelForm):
         jobseeker = kwargs.pop('jobseeker_id')
         super(JobseekerOfferForm, self).__init__(*args, **kwargs)
         self.fields['resume'].queryset = Resume.objects.filter(user=jobseeker, is_active=True)
+        self.fields['resume'].empty_label = None
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'

@@ -87,12 +87,12 @@
                 </div>
                 <p class="small text-muted mb-0">{{ vacancy.city }} / {{ vacancy.vacancy_type }}</p>
                 <p class="text-muted mb-3">"{{vacancy.employer.company_name}}"
-                <span class="mb-3 ml-5">{% if vacancy.employer.site %}<a class="small" href="">{{vacancy.employer.site }}</a>{% endif %}</span></p>
+                <span class="mb-3 ml-5">{% if vacancy.employer.site %}<a class="small" href="#">{{vacancy.employer.site }}</a>{% endif %}</span></p>
                 <p class="font-weight-bold mb-0">Описание вакансии:</p>
                 <p class="mt-0">{{ vacancy.description|linebreaks|truncatewords:30 }}</p>
                 <div class="d-flex">
                     <p>Дата публикации: {{vacancy.published|date:"d.m.Y" }}</p>
-                    <a class="btn btn-outline-primary px-4 ml-5" role="button" href="#">Откликнуться
+                    <a class="btn btn-outline-primary px-4 ml-5" role="button" href="{% url 'jobseeker:offer_create' user.id vacancy.id %}">Откликнуться
                     </a>
                 </div>
             </div>
