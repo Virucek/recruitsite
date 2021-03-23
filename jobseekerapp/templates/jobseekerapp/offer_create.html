@@ -12,6 +12,11 @@
                     {{ form.as_p }}
                     <input class="form-control" type="submit" value="Отправить отклик">
                 </form>
+            <button class="btn btn-round form-control last">
+                <a href="{% url 'jobseeker:cabinet' user.pk %}">
+                    К личному кабинету
+                </a>
+            </button>
             </div>
         </div>
     </div>
