@@ -16,7 +16,7 @@
             <p class="mr-5">{{ object.user.jobseeker.phone_number }}</p>
             {% if object.user.email %}<p class="mr-5">{{ object.user.email }}</p>{% endif %}
             {% if object.user.jobseeker.city %}<p class="mr-5">{{ object.user.jobseeker.city }}</p>{% endif %}
-            <p class="h5 font-weight-bold mt-4">Желаемая должность и зарплата</p>
+            <p class="h5 font-weight-bold mt-5">Желаемая должность и зарплата</p>
             <hr>
             <p class="pt-0 mb-3 mt-3" style="color:black;">{{ object.name }}</p>
             <p class="pt-0 mb-3 mt-3" style="color:black;">Уровень з/п:
@@ -26,10 +26,10 @@
             {% else %} не указана
             {% endif %}
             </p>
-            <p class="h5 font-weight-bold mb-0 mt-4">Опыт работы</p>
-            <hr>
+            <p class="h5 font-weight-bold mb-0 mt-5">Опыт работы</p>
             {% if object.get_experience_items %}
             {% for item in object.get_experience_items %}
+            <hr>
             <p class="h6 mb-1"><b>{{ item.company_name }}</b></p>
             <p class="h6 mb-1">{{ item.job_title }} </p>
             <p class="mb-2">{{ item.from_date|date:'M Y' }} - {{ item.to_date|date:'M Y' }}</p>
@@ -39,7 +39,7 @@
             <hr>
              <p class="pt-0">О прежнем опыте работы нет никакой информации</p>
             {% endif %}
-            <p class="h5 font-weight-bold mb-0 mt-4">Образование, курсы, сертификаты</p>
+            <p class="h5 font-weight-bold mb-0 mt-5">Образование, курсы, сертификаты</p>
             <hr>
             {% if object.get_education_items %}
                {% for item in object.get_education_items %}
@@ -51,12 +51,12 @@
                 <p class="pt-0">Информации об образовании нет</p>
             {% endif %}
             {% if object.key_skills %}
-            <p class="h5 font-weight-bold mb-0 mt-4">Ключевые навыки</p>
+            <p class="h5 font-weight-bold mb-0 mt-5">Ключевые навыки</p>
             <hr>
             <p class="mb-2">{{ object.key_skills }}</p>
             {% endif %}
             {% if object.about %}
-            <p class="h5 font-weight-bold mb-0 mt-4">О кандидате</p>
+            <p class="h5 font-weight-bold mb-0 mt-5">О кандидате</p>
             <hr>
             <p class="mb-2">{{ object.about }}</p>
             {% endif %}
