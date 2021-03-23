@@ -99,7 +99,7 @@ class ResumeExperience(models.Model):
 
 
 class Offer(models.Model):
-    date = models.DateField(verbose_name='Дата направления предложения', auto_now_add=True)
+    date = models.DateField(verbose_name='Дата направления отклика', auto_now_add=True)
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, verbose_name='Вакансия')
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='Резюме')
     cover_letter = models.TextField(verbose_name='Сопроводительное письмо',
@@ -109,7 +109,12 @@ class Offer(models.Model):
 
     OUTGOING = 'O'
     INCOMING = 'I'
-    direction = models.CharField(verbose_name='Направление предложение (входящее/исходящее)', max_length=1)
+    DIRECTION_CHOICES = (
+        (OUTGOING, 'исходящий'),
+        (INCOMING, 'входящий'),
+    )
+    direction = models.CharField(verbose_name='Направление отклика (входящее/исходящее)', max_length=1,
+                                 choices=DIRECTION_CHOICES)
 
     NEW = 'new'
     READ = 'read'

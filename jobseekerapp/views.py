@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
+from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
 
 from authapp.models import Jobseeker
 from employerapp.models import Vacancy
@@ -193,3 +193,11 @@ class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
         self.object.save()
 
         return super(JobseekerOfferCreateView, self).form_valid(form)
+
+
+class JobseekerOfferListView(JobseekerViewMixin, ListView):
+    model = Offer
+
+    def get_queryset(self):
+        resumes = Resume.objects.filter(user=self.request.user, is_active=True)
+        return super().get_queryset().filter(resume__in=resumes)
