@@ -6,7 +6,7 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-4 col-sm-2">
-            <img class="img-fluid" src="{% static 'img/employers/example.jpg' %}" alt="My image">
+            <img class="img-fluid rounded shadow" src="/media/{{ jobseeker.photo }}" onerror ="this.src='{% static 'img/employers/example.jpg' %}';" alt="My image">
         </div>
         <div class="col-11 col-sm-10">
             <table class="table">

@@ -139,7 +139,8 @@ class JobseekerUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Редактирование'
         if self.request.POST:
-            context['user_form'] = UserJobseekerEditForm(self.request.POST, instance=self.request.user)
+            context['user_form'] = UserJobseekerEditForm(self.request.POST, self.request.FILES,
+                                                         instance=self.request.user)
         else:
             context['user_form'] = UserJobseekerEditForm(instance=self.request.user)
 

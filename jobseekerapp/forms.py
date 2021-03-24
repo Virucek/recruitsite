@@ -29,6 +29,17 @@ class ResumeForm(forms.ModelForm):
             if field_name in ('salary_min', 'salary_max', 'currency'):
                 field.widget.attrs['style'] = 'width: 20%; display: inline;'
 
+    def clean_salary_max(self):
+        salary_max = self.cleaned_data['salary_max']
+        salary_min = self.cleaned_data['salary_min']
+
+        if not salary_min or not salary_max:
+            return salary_max
+        elif salary_min > salary_max:
+            raise forms.ValidationError(f'Максимальный уровень зп меньше минимального')
+        else:
+            return salary_max
+
 
 class ResumeEducationForm(forms.ModelForm):
     class Meta:

@@ -80,7 +80,6 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
     model = Resume
     template_name = 'jobseekerapp/resume_create.html'
     form_class = ResumeForm
-    success_url = reverse_lazy('jobseeker:cabinet')
     title = 'Создание резюме'
 
     def get_success_url(self):
@@ -105,9 +104,12 @@ class ResumeDetailView(JobseekerViewMixin, DetailView):
 class ResumeUpdateView(JobseekerViewMixin, UpdateView):
     model = Resume
     template_name = 'jobseekerapp/resume_create.html'
-    success_url = reverse_lazy('jobseeker:cabinet')
     form_class = ResumeForm
     title = 'Редактирование резюме'
+
+    def get_success_url(self):
+        data = self.get_context_data()
+        return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': data['resume'].id})
 
 
 class ResumeDeleteView(JobseekerViewMixin, DeleteView):
