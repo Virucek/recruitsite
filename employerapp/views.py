@@ -220,7 +220,7 @@ def vacancy_view(request, emp_id, pk):
     vacancy = get_object_or_404(Vacancy, pk=pk)
     employer = get_object_or_404(Employer, pk=emp_id)
 
-    context = {'title': title, 'item': vacancy, 'employer': employer}
+    context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id}
 
     return render(request, 'employerapp/vacancy_view.html', context)
 

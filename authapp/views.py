@@ -1,11 +1,13 @@
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+from django.views.generic import UpdateView
 
 from authapp.forms import UserLoginForm, EmployerRegisterForm, JobseekerRegisterForm, UserEditForm, \
-    EmployerEditForm
+    EmployerEditForm, JobseekerEditForm, UserJobseekerEditForm
 from authapp.models import Employer, Jobseeker, IndustryType
 
 
@@ -123,3 +125,35 @@ def edit(request):
     content = {'title': title, 'edit_form': edit_form, 'employer_form': employer_form, 'sent': sent}
 
     return render(request, 'authapp/edit.html', content)
+
+
+class JobseekerUpdateView(UpdateView):
+    model = Jobseeker
+    template_name = 'authapp/edit_jobseeker.html'
+    form_class = JobseekerEditForm
+
+    def get_success_url(self):
+        return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Редактирование'
+        if self.request.POST:
+            context['user_form'] = UserJobseekerEditForm(self.request.POST, self.request.FILES,
+                                                         instance=self.request.user)
+        else:
+            context['user_form'] = UserJobseekerEditForm(instance=self.request.user)
+
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        form.instance.user = self.request.user
+        user_form = context['user_form']
+        with transaction.atomic():
+            self.object = form.save()
+            if user_form.is_valid():
+                user_form.instance = self.object.user
+                user_form.save()
+
+        return super().form_valid(form)
