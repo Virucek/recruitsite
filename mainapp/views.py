@@ -1,10 +1,13 @@
+from itertools import chain
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from authapp.models import Employer
-from employerapp.models import Vacancy
+from employerapp.models import Vacancy, Favorites
 from django.contrib.auth.decorators import login_required
 
 from authapp.models import Employer
@@ -21,6 +24,7 @@ def main(request, page=None):
     news = News.objects.filter(is_active=True).order_by('-published')
     employers = Employer.objects.filter(is_active=True, status=Employer.MODER_OK).order_by('?')[:6]
     vacancies = Vacancy.objects.filter(action='moderation_ok')
+    resume_all = Resume.objects.all().filter(status='opened').order_by('updated_at')
     paginator = Paginator(news, 4)
     try:
         news_paginator = paginator.page(page)
@@ -29,7 +33,14 @@ def main(request, page=None):
     except EmptyPage:
         news_paginator = paginator.page(paginator.num_pages)
 
-    resume_all = Resume.objects.all().filter(status='opened').order_by('updated_at')
+    favorites = Favorites()
+    if request.method == 'POST' and request.user.employer:
+        resume = Resume.objects.get(pk=int(request.POST.get('checked')))
+        favorites.resume = resume
+        favorites.employer = request.user.employer
+        if not Favorites.objects.filter(resume=resume,
+                                        employer=request.user.employer).first():
+            favorites.save()
 
     context = {
         'title': title,
@@ -49,3 +60,29 @@ def news_detail(request, pk):
         'one_news': one_news
     }
     return render(request, 'mainapp/news_detail.html', context)
+
+
+def search_news(request, page=None):
+    if page is None:
+        page = 1
+    title = 'Поиск новостей'
+    search = request.GET.get('search')
+    object_list = []
+    if search:
+        query = []
+        results = News.objects.filter(Q(title__icontains=search) | Q(description__icontains=search), is_active=True).order_by(
+            '-published')
+        query.append(results)
+        object_list = list(chain(*query))
+
+    paginator = Paginator(object_list, 3)
+    try:
+        search_paginator = paginator.page(page)
+    except PageNotAnInteger:
+        search_paginator = paginator.page(1)
+    except EmptyPage:
+        search_paginator = paginator.page(paginator.num_pages)
+
+    context = {'title': title, 'object_list': search_paginator}
+
+    return render(request, 'mainapp/search_news.html', context)

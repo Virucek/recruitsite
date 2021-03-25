@@ -24,6 +24,7 @@ body {
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
+	font-family: Roboto, sans-serif;
 }
 html, body {
     height: 100%;
@@ -193,4 +194,15 @@ footer a:hover {
 .resume-salary {
     width:20%;
     display:inline;
+}
+
+button.add-favorite:focus,
+button.add-favorite::-moz-focus-inner,
+button.add-favorite::-moz-focus-outer {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.star {
+    fill: blue;
 }

@@ -1,11 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
 
 from authapp.models import Jobseeker
+from employerapp.models import Favorites
 from employerapp.models import Vacancy
 from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm, JobseekerOfferForm
 from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer
@@ -172,6 +171,16 @@ class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
     template_name = 'jobseekerapp/resume_external_detail.html'
     title = 'Резюме'
 
+    def post(self, request, *args, **kwargs):
+        favorites = Favorites()
+        self.object = self.get_object()
+        context = self.get_context_data(**kwargs)
+        favorites.resume = context['resume']
+        favorites.employer = request.user.employer
+        if not Favorites.objects.filter(resume=context['resume'], employer=request.user.employer).first():
+            favorites.save()
+        return self.render_to_response(context=context)
+
 
 class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
     model = Offer
@@ -199,6 +208,7 @@ class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
 
 class JobseekerOfferListView(JobseekerViewMixin, ListView):
     model = Offer
+    title = 'Мои отклики'
 
     def get_queryset(self):
         resumes = Resume.objects.filter(user=self.request.user, is_active=True)
