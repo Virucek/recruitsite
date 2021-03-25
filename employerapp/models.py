@@ -3,7 +3,6 @@ from datetime import datetime
 from django.db import models
 
 from authapp.models import Employer
-from jobseekerapp.models import Resume
 
 
 class Vacancy(models.Model):
@@ -64,7 +63,7 @@ class SendOffers(models.Model):
     date = models.DateField(verbose_name='дата направления предложения', default=datetime.now)
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, verbose_name='выберите '
                             'вакансию по которой хотите направить предложение соискателю')
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='предложение для '
+    resume = models.ForeignKey('jobseekerapp.Resume', on_delete=models.CASCADE, verbose_name='предложение для '
                                                                               'резюме')
     cover_letter = models.TextField(verbose_name='Сопроводительное письмо по предлагаемой '
                 'вакансии', blank=True, max_length=524, help_text='поле не обязательное')
@@ -81,7 +80,7 @@ class SendOffers(models.Model):
 class Favorites(models.Model):
     date = models.DateField(verbose_name='дата добавления в избранное', default=datetime.now)
     employer = models.ForeignKey(Employer, on_delete=models.CASCADE)
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='избранное резюме')
+    resume = models.ForeignKey('jobseekerapp.Resume', on_delete=models.CASCADE, verbose_name='избранное резюме')
 
     class Meta:
         verbose_name_plural = 'Избранные резюме'

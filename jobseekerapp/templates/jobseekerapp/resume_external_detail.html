@@ -14,9 +14,16 @@
                 <div class="d-block ml-1">
                 <div class="d-flex">
                 <h4 style="color: #007bff;">{{ resume.user.last_name }} {{ resume.user.first_name }} {{ resume.user.jobseeker.middle_name }}</h4>
-                <p class="ml-5"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
-                  <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
-                </svg></p>
+                <p class="ml-5">
+                    <form action="{% url 'jobseeker:resume_external_detail' resume.pk %}"
+                          method="post" class="add_favorite">{% csrf_token %}
+                        <button class="btn btn-clear add-favorite" type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
+                        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                        </svg></button>
+                    </form>
+                </p>
                 </div>
                 <p class="text-muted mb-3">
                 Пол {{ resume.user.jobseeker.get_gender_display|title }}, д.р. {{ resume.user.jobseeker.birthday|date:"d.m.Y" }}
@@ -74,7 +81,8 @@
             <div class="d-flex">
                 <a class="btn btn-outline-primary mb-5 px-4" role="button" href="{% url 'main' 1 %}">К списку резюме
                 </a>
-                <a class="btn btn-outline-primary mb-5 px-4 ml-5" role="button" href="#">Откликнуться
+                <a class="btn btn-outline-primary mb-5 px-4 ml-5" role="button" href="{% url 'employer:send_offer' user.employer.pk resume.pk %}">Направить
+                    предложение
                 </a>
             </div>
         </div>

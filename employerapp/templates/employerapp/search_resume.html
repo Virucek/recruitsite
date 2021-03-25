@@ -11,12 +11,12 @@
             {% for object in object_list %}
                 {% if object.user.first_name or object.name  or object.key_skills %}
                 <div class="mt-4">
-                    <a class="h3" href="{% url 'jobseeker:resume_view' object.user.pk object.pk %}">{{ object.user.last_name }}
+                    <a class="h3" href="{% url 'jobseeker:resume_external_detail' object.pk %}">{{ object.user.last_name }}
                         {{ object.user.first_name }} {{ object.user.jobseeker.middle_name }}</a>
                     <p class="mb-0">Желаемая должность: {{ object.name }}</p>
                     <p>Навыки: {{ object.key_skills }}</p>
                     <a class="btn btn-outline-primary mb-5" role="button"
-                       href="{% url 'jobseeker:resume_view' object.user.pk object.pk %}">Просмотреть
+                       href="{% url 'jobseeker:resume_external_detail' object.pk %}">Просмотреть
                         резюме</a>
                 </div>
                 {% endif %}

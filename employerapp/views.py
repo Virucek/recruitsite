@@ -10,7 +10,7 @@ from django.urls import reverse
 from authapp.models import Employer, IndustryType, Jobseeker
 from employerapp.forms import VacancyCreationForm, VacancyEditForm, SendOfferForm
 from employerapp.models import Vacancy, SendOffers, Favorites
-from jobseekerapp.models import Resume
+from jobseekerapp.models import Resume, Offer
 
 
 @login_required
@@ -248,13 +248,16 @@ def send_offer(request, emp_id, pk):
     if request.method == 'POST':
         form = SendOfferForm(request.POST, employer=employer)
         send = SendOffers()
+        jobseeker_offer = Offer()
 
         if form.is_valid():
-            send.vacancy = form.cleaned_data.get('vacancy')
-            send.cover_letter = form.cleaned_data.get('cover_letter')
-            send.contact_phone = form.cleaned_data.get('contact_phone')
-            send.resume = resume
+            send.vacancy = jobseeker_offer.vacancy = form.cleaned_data.get('vacancy')
+            send.cover_letter = jobseeker_offer.cover_letter = form.cleaned_data.get('cover_letter')
+            send.contact_phone = jobseeker_offer.contact_phone = form.cleaned_data.get('contact_phone')
+            send.resume = jobseeker_offer.resume = resume
+            jobseeker_offer.direction = Offer.INCOMING
             send.save()
+            jobseeker_offer.save()
             sent = True
     else:
         form = SendOfferForm(employer=employer)

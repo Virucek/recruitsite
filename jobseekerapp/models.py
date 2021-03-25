@@ -1,10 +1,5 @@
-from datetime import date
-
 from django.contrib.auth.models import User
 from django.db import models
-
-from authapp.models import Jobseeker
-from employerapp.models import Vacancy
 
 
 class Resume(models.Model):
@@ -99,7 +94,7 @@ class ResumeExperience(models.Model):
 
 class Offer(models.Model):
     date = models.DateField(verbose_name='Дата направления отклика', auto_now_add=True)
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, verbose_name='Вакансия')
+    vacancy = models.ForeignKey('employerapp.Vacancy', on_delete=models.CASCADE, verbose_name='Вакансия')
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='Резюме')
     cover_letter = models.TextField(verbose_name='Сопроводительное письмо',
                                     blank=True, max_length=524, help_text='поле не обязательное')

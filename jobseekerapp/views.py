@@ -1,14 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
 
 from authapp.models import Jobseeker
-from employerapp.models import SendOffers, Favorites
-from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm
-from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience
+from employerapp.models import Favorites
 from employerapp.models import Vacancy
 from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm, JobseekerOfferForm
 from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer
@@ -175,6 +171,16 @@ class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
     template_name = 'jobseekerapp/resume_external_detail.html'
     title = 'Резюме'
 
+    def post(self, request, *args, **kwargs):
+        favorites = Favorites()
+        self.object = self.get_object()
+        context = self.get_context_data(**kwargs)
+        favorites.resume = context['resume']
+        favorites.employer = request.user.employer
+        if not Favorites.objects.filter(resume=context['resume'], employer=request.user.employer).first():
+            favorites.save()
+        return self.render_to_response(context=context)
+
 
 class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
     model = Offer
@@ -202,35 +208,8 @@ class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
 
 class JobseekerOfferListView(JobseekerViewMixin, ListView):
     model = Offer
+    title = 'Мои отклики'
 
     def get_queryset(self):
         resumes = Resume.objects.filter(user=self.request.user, is_active=True)
         return super().get_queryset().filter(resume__in=resumes)
-# class ResumeView(DetailView):
-#     title = 'Резюме'
-#     model = Resume
-#     template_name = 'jobseekerapp/resume_view.html'
-#     success_url = reverse_lazy('resume_view')
-
-def resume_view(request, seeker_id, pk):
-    title = 'просмотр резюме'
-    seeker = get_object_or_404(Jobseeker, pk=seeker_id)
-    resume = get_object_or_404(Resume, pk=pk)
-    favorites = Favorites()
-    if request.method == 'POST':
-        favorites.resume = resume
-        favorites.employer = request.user.employer
-        if not Favorites.objects.filter(resume=resume, employer=request.user.employer).first():
-            favorites.save()
-    context = {'title': title, 'item': seeker, 'resume': resume}
-    return render(request, 'jobseekerapp/resume_view.html', context)
-
-
-def offers(request, seeker_id):
-    title = 'просмотр предложений'
-    seeker = get_object_or_404(Jobseeker, pk=seeker_id)
-    offers = SendOffers.objects.all()
-    context = {'title': title, 'offers': offers}
-    return render(request, 'jobseekerapp/offers.html', context)
-
-

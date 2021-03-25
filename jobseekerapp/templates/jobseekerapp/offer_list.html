@@ -1,5 +1,6 @@
 {% extends 'mainapp/base.html' %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
 <div class="container my-5">
     <div class="row">
@@ -9,11 +10,16 @@
                 {% for object in object_list %}
                 <hr>
                 <p class="text-muted mb-3">{{ object.get_direction_display }} </p>
-                <p class="h6 mb-1"><b>{{ object.vacancy.employer.company_name }} ({{ object.vacancy.vacancy_name }})</b></p>
+                <p class="h6 mb-1"><b><a href="{% url 'employer:vacancy_view' object.vacancy.employer.pk object.vacancy.pk %}">{{ object.vacancy.employer.company_name }} ({{ object.vacancy.vacancy_name }})</a></b></p>
                 <p class="h6 mb-1">{{ object.date }} </p>
                 <p class="h6 mb-1">резюме: <a href="{% url 'jobseeker:resume_detail' object.resume.user.id object.id %}"> {{ object.resume.name }} </a></p>
                 <p class="text-muted mb-3">{{ object.get_status_display }} </p>
-                <p class="mb-1">{{ object.cover_letter|linebreaks|truncatewords:40 }}</p>
+                {% if object.contact_phone %}
+                <p class="mb-0">Контактный телефон:
+                    {{ object.contact_phone|phone_number }}</p>
+                {% endif %}
+                {% if not offer.cover_letter %}<p class="mb-0">Контактное лицо: {{ object.vacancy.contact_person }}.</p>{% endif %}
+                    <p class="mb-1">{{ object.cover_letter|linebreaks|truncatewords:40 }}</p>
                 {% endfor %}
             {% else %}
             <hr>
