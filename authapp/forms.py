@@ -85,7 +85,7 @@ class JobseekerRegisterForm(UserCreationForm):
     city = forms.CharField(label='Город', max_length=64)
     married_status = forms.ChoiceField(label='Статус в браке', choices=Jobseeker.MARRIED_STATUS_CHOICES)
     photo = forms.ImageField(label='Фото', required=False, help_text='Необязательное поле')
-    phone_number = forms.CharField(label='Телефон', widget=forms.NumberInput(), max_length=11)
+    phone_number = forms.CharField(label='Телефон', widget=forms.TextInput(attrs={'data-mask': '0(000)000-00-00'}))
     about = forms.CharField(label='О себе', widget=forms.Textarea, max_length=512)
     password1 = forms.CharField(widget=forms.TextInput(attrs={'type': 'password'}), label='Пароль')
     password2 = forms.CharField(widget=forms.TextInput(attrs={'type': 'password'}), label='Подтвердите пароль')
@@ -133,6 +133,11 @@ class JobseekerRegisterForm(UserCreationForm):
             raise forms.ValidationError(f'Пользователь с такой электронной почтой уже зарегистрирован')
         return data
 
+    def clean_phone_number(self):
+        data = self.cleaned_data['phone_number']
+        data = ''.join([i for i in data if i.isdigit()])
+        return data
+
 
 class UserEditForm(UserChangeForm):
     class Meta:
@@ -157,3 +162,72 @@ class EmployerEditForm(forms.ModelForm):
         super(EmployerEditForm, self).__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+
+class UserJobseekerEditForm(UserChangeForm):
+
+    class Meta:
+        model = User
+        fields = ('username',
+                  'email',
+                  'first_name',
+                  'last_name',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('password')
+        self.fields['username'] = forms.CharField(label='Логин')
+        self.fields['email'] = forms.EmailField(label='Ваш email')
+        self.fields['first_name'] = forms.CharField(label='Имя')
+        self.fields['last_name'] = forms.CharField(label='Фамилия')
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        try:
+            email_db = User.objects.filter(email=data)
+        except User.DoesNotExist:
+            email_db = None
+        try:
+            email_changed_data = self.changed_data.index('email')
+        except ValueError:
+            email_changed_data = None
+        if email_db and email_changed_data is not None:
+            raise forms.ValidationError(f'Пользователь с такой электронной почтой уже зарегистрирован')
+        return data
+
+
+class JobseekerEditForm(forms.ModelForm):
+    phone_number = forms.CharField(label='Телефон', widget=forms.TextInput(attrs={'data-mask': '0(000)000-00-00'}))
+
+    class Meta:
+        model = Jobseeker
+        fields = ('middle_name',
+                  'gender',
+                  'birthday',
+                  'city',
+                  'married_status',
+                  'photo',
+                  'phone_number',
+                  'about',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+    def clean_phone_number(self):
+        data = self.cleaned_data['phone_number']
+        data = ''.join([i for i in data if i.isdigit()])
+        return data
+
+    def clean_birthday(self):
+        data = self.cleaned_data['birthday']
+        cur_date = date.today()
+        age = (cur_date - data).days // 365
+        if age < 18:
+            raise forms.ValidationError("Вы слишком молоды для регистрации в качестве соискателя")
+        return data
+
+

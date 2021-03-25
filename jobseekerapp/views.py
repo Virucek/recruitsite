@@ -3,12 +3,15 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
+from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
 
 from authapp.models import Jobseeker
 from employerapp.models import SendOffers, Favorites
 from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm
 from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience
+from employerapp.models import Vacancy
+from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm, JobseekerOfferForm
+from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer
 
 
 class JobseekerViewMixin:
@@ -57,41 +60,40 @@ class ResumeItemViewMixin(JobseekerViewMixin):
     def form_valid(self, form):
         context = self.get_context_data()
         form.instance.resume = context['resume']
-        self.object = form.save
+        self.object = form.save()
 
         return super().form_valid(form)
 
 
-@login_required
-def jobseeker_cabinet(request):
+class JobseekerDetailView(JobseekerViewMixin, DetailView):
+    model = Resume
+    template_name = 'jobseekerapp/jobseeker_cabinet.html'
     title = 'Личный кабинет работодателя'
-    current_user = request.user.id
-    jobseeker_data = Jobseeker.objects.get(user_id=current_user)
-    resumes = Resume.get_user_resumes(current_user)
-    content = {'title': title, 'jobseeker': jobseeker_data, 'resumes': resumes}
-    return render(request, 'jobseekerapp/jobseeker_cabinet.html', content)
+
+    def get_object(self, queryset=None):
+        return Jobseeker.objects.get(user_id=self.request.user.id)
+
+    def get_context_data(self, **kwargs):
+        context = super(JobseekerDetailView, self).get_context_data()
+        context['resumes'] = Resume.get_user_resumes(self.request.user.id)
+        return context
 
 
 class ResumeCreateView(JobseekerViewMixin, CreateView):
     model = Resume
     template_name = 'jobseekerapp/resume_create.html'
     form_class = ResumeForm
-    success_url = reverse_lazy('jobseeker:cabinet')
     title = 'Создание резюме'
 
     def get_success_url(self):
         data = self.get_context_data()
         return reverse_lazy('jobseeker:resume_detail', kwargs={'pk': data['resume'].id})
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
     def form_valid(self, form):
         form.instance.user = self.request.user
         if 'salary_min' not in form.cleaned_data and 'salary_max' not in form.cleaned_data:
             form.cleaned_data['currency'].pop()
-        self.object = form.save
+        self.object = form.save()
 
         return super(ResumeCreateView, self).form_valid(form)
 
@@ -105,9 +107,12 @@ class ResumeDetailView(JobseekerViewMixin, DetailView):
 class ResumeUpdateView(JobseekerViewMixin, UpdateView):
     model = Resume
     template_name = 'jobseekerapp/resume_create.html'
-    success_url = reverse_lazy('jobseeker:cabinet')
     form_class = ResumeForm
     title = 'Редактирование резюме'
+
+    def get_success_url(self):
+        data = self.get_context_data()
+        return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': data['resume'].id})
 
 
 class ResumeDeleteView(JobseekerViewMixin, DeleteView):
@@ -165,6 +170,42 @@ class ResumeEducationDeleteView(ResumeItemViewMixin, DeleteView):
         return reverse_lazy('jobseeker:resume_detail', kwargs={'pk': resume_id})
 
 
+class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
+    model = Resume
+    template_name = 'jobseekerapp/resume_external_detail.html'
+    title = 'Резюме'
+
+
+class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
+    model = Offer
+    template_name = 'jobseekerapp/offer_create.html'
+    form_class = JobseekerOfferForm
+    title = 'Отправка отклика на вакансию'
+
+    def get_success_url(self):
+        return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': self.kwargs['jobseeker_id']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['jobseeker_id'] = self.request.user.id
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        self.object = form.save(commit=False)
+        self.object.direction = Offer.OUTGOING
+        self.object.vacancy = Vacancy.objects.get(pk=self.kwargs['vacancy_id'])
+        self.object.save()
+
+        return super(JobseekerOfferCreateView, self).form_valid(form)
+
+
+class JobseekerOfferListView(JobseekerViewMixin, ListView):
+    model = Offer
+
+    def get_queryset(self):
+        resumes = Resume.objects.filter(user=self.request.user, is_active=True)
+        return super().get_queryset().filter(resume__in=resumes)
 # class ResumeView(DetailView):
 #     title = 'Резюме'
 #     model = Resume

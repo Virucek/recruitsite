@@ -1,0 +1,25 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col">
+            <p class="h4 font-weight-bold mt-4">Мои отклики</p>
+            {% if object_list %}
+                {% for object in object_list %}
+                <hr>
+                <p class="text-muted mb-3">{{ object.get_direction_display }} </p>
+                <p class="h6 mb-1"><b>{{ object.vacancy.employer.company_name }} ({{ object.vacancy.vacancy_name }})</b></p>
+                <p class="h6 mb-1">{{ object.date }} </p>
+                <p class="h6 mb-1">резюме: <a href="{% url 'jobseeker:resume_detail' object.resume.user.id object.id %}"> {{ object.resume.name }} </a></p>
+                <p class="text-muted mb-3">{{ object.get_status_display }} </p>
+                <p class="mb-1">{{ object.cover_letter|linebreaks|truncatewords:40 }}</p>
+                {% endfor %}
+            {% else %}
+            <hr>
+             <p class="pt-0">Откликов ещё нет</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

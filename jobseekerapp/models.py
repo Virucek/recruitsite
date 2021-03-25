@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from authapp.models import Jobseeker
+from employerapp.models import Vacancy
 
 
 class Resume(models.Model):
@@ -94,3 +95,40 @@ class ResumeExperience(models.Model):
     def __str__(self):
         return f'{self.resume.name} {self.resume.user.first_name} {self.resume.user.last_name} {self.company_name} ' \
                f'{self.job_title}'
+
+
+class Offer(models.Model):
+    date = models.DateField(verbose_name='Дата направления отклика', auto_now_add=True)
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, verbose_name='Вакансия')
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='Резюме')
+    cover_letter = models.TextField(verbose_name='Сопроводительное письмо',
+                                    blank=True, max_length=524, help_text='поле не обязательное')
+    contact_phone = models.CharField(max_length=12, blank=True, help_text='поле не обязательное',
+                                     verbose_name='Контактный телефон')
+
+    OUTGOING = 'O'
+    INCOMING = 'I'
+    DIRECTION_CHOICES = (
+        (OUTGOING, 'исходящий'),
+        (INCOMING, 'входящий'),
+    )
+    direction = models.CharField(verbose_name='Направление отклика (входящее/исходящее)', max_length=1,
+                                 choices=DIRECTION_CHOICES)
+
+    NEW = 'new'
+    READ = 'read'
+    APPROVE = 'approve'
+    FAIL = 'fail'
+    OFFER_STATUSES = (
+        (NEW, 'новое (не прочитано)'),
+        (READ, 'прочитано'),
+        (APPROVE, 'приглашение получено'),
+        (FAIL, 'отклонено')
+    )
+    status = models.CharField(verbose_name='Статус предложения', choices=OFFER_STATUSES, default=NEW, max_length=16)
+
+    class Meta:
+        verbose_name_plural = 'Предложения по вакансиям от соискателей'
+
+    def __str__(self):
+        return f'{self.vacancy.employer.company_name}/{self.vacancy.vacancy_name} ({self.resume.name})'
