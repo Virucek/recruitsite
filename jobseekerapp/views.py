@@ -45,7 +45,8 @@ class ResumeItemViewMixin(JobseekerViewMixin):
 
     def get_success_url(self):
         resume_id = self.kwargs['resume_id']
-        return reverse_lazy('jobseeker:resume_detail', kwargs={'pk': resume_id})
+        jobseeker_id = self.kwargs['jobseeker_id']
+        return reverse_lazy('jobseeker:resume_detail', kwargs={'jobseeker_id': jobseeker_id, 'pk': resume_id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,7 +84,9 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
 
     def get_success_url(self):
         data = self.get_context_data()
-        return reverse_lazy('jobseeker:resume_detail', kwargs={'pk': data['resume'].id})
+        print(data)
+        return reverse_lazy('jobseeker:resume_detail',
+                            kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -108,14 +111,18 @@ class ResumeUpdateView(JobseekerViewMixin, UpdateView):
 
     def get_success_url(self):
         data = self.get_context_data()
-        return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': data['resume'].id})
+        return reverse_lazy('jobseeker:resume_detail',
+                            kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
 
 
 class ResumeDeleteView(JobseekerViewMixin, DeleteView):
     model = Resume
     template_name = 'jobseekerapp/resume_delete.html'
-    success_url = reverse_lazy('jobseeker:cabinet')
     title = 'Удаление резюме'
+
+    def get_success_url(self):
+        data = self.get_context_data()
+        return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': data['object'].user.id})
 
 
 class ResumeExperienceCreateView(ResumeItemViewMixin, CreateView):
@@ -137,10 +144,6 @@ class ResumeExperienceDeleteView(ResumeItemViewMixin, DeleteView):
     template_name = 'jobseekerapp/resume_experience_delete.html'
     title = 'Удаление записи об опыте'
 
-    def get_success_url(self):
-        resume_id = self.kwargs['resume_id']
-        return reverse_lazy('jobseeker:resume_detail', kwargs={'pk': resume_id})
-
 
 class ResumeEducationCreateView(ResumeItemViewMixin, CreateView):
     model = ResumeEducation
@@ -160,10 +163,6 @@ class ResumeEducationDeleteView(ResumeItemViewMixin, DeleteView):
     model = ResumeEducation
     template_name = 'jobseekerapp/resume_education_delete.html'
     title = 'Удаление записи об обучении'
-
-    def get_success_url(self):
-        resume_id = self.kwargs['resume_id']
-        return reverse_lazy('jobseeker:resume_detail', kwargs={'pk': resume_id})
 
 
 class ResumeExternalDetailView(JobseekerViewMixin, DetailView):

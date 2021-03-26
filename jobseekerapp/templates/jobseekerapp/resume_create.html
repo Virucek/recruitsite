@@ -11,9 +11,15 @@
            <button type="submit" value="сохранить" class="btn btn-default btn-round form-control last">сохранить</button>
        </form>
        <button class="btn btn-round form-control last">
+           {% if request.resolver_match.url_name == 'resume_update' %}
+            <a href="{% url 'jobseeker:resume_detail' user.pk resume.id %}">
+                К резюме
+            </a>
+           {% else %}
             <a href="{% url 'jobseeker:cabinet' user.pk %}">
                 К личному кабинету
             </a>
+           {% endif %}
         </button>
    </div>
 

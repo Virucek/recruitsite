@@ -53,6 +53,14 @@ class ResumeEducationForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
+    def clean_to_date(self):
+        to_date = self.cleaned_data['to_date']
+        from_date = self.cleaned_data['from_date']
+        if to_date and from_date:
+            if to_date < from_date:
+                raise forms.ValidationError(f'Дата окончания раньше даты начала.')
+        return to_date
+
 
 class ResumeExperienceForm(forms.ModelForm):
     class Meta:
@@ -65,6 +73,14 @@ class ResumeExperienceForm(forms.ModelForm):
         self.fields['to_date'] = forms.DateField(label='Дата окончания', input_formats=DATE_INPUT_RESUME_FORMATS)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+    def clean_to_date(self):
+        to_date = self.cleaned_data['to_date']
+        from_date = self.cleaned_data['from_date']
+        if to_date and from_date:
+            if to_date < from_date:
+                raise forms.ValidationError(f'Дата окончания раньше даты начала.')
+        return to_date
 
 
 class JobseekerOfferForm(forms.ModelForm):
