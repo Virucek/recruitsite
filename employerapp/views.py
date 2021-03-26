@@ -25,6 +25,7 @@ def employer_cabinet(request, emp_id):
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(
         action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
     content = {
         'title': title,
         'employer': employer,
@@ -33,7 +34,8 @@ def employer_cabinet(request, emp_id):
         'vacancies_hide': vacancies_hide,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
-        'favorites': favorites
+        'favorites': favorites,
+        'responses': responses
     }
     return render(request, 'employerapp/employer_cabinet.html', content)
 
@@ -51,6 +53,7 @@ def vacancy_published(request, emp_id):
         'published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -58,7 +61,8 @@ def vacancy_published(request, emp_id):
         'vacancies_hide': vacancies_hide,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
-        'favorites': favorites
+        'favorites': favorites,
+        'responses': responses
     }
 
     return render(request, 'employerapp/vacancy_published.html', context)
@@ -76,6 +80,7 @@ def vacancy_draft(request, emp_id):
         'published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    responses = Offer.objects.filter(vacancy=employer.pk, direction='O').order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -83,7 +88,8 @@ def vacancy_draft(request, emp_id):
         'vacancies_hide': vacancies_hide,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
-        'favorites': favorites
+        'favorites': favorites,
+        'responses': responses
     }
 
     return render(request, 'employerapp/vacancy_drafts.html', context)
@@ -101,6 +107,7 @@ def vacancy_hide(request, emp_id):
         'published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -108,7 +115,8 @@ def vacancy_hide(request, emp_id):
         'drafts': drafts,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
-        'favorites': favorites
+        'favorites': favorites,
+        'responses': responses
     }
 
     return render(request, 'employerapp/vacancy_hide.html', context)
@@ -126,6 +134,7 @@ def messages(request, emp_id):
     vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False, employer=employer).order_by(
         'published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -133,12 +142,14 @@ def messages(request, emp_id):
         'drafts': drafts,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
-        'favorites': favorites
+        'favorites': favorites,
+        'responses': responses
     }
 
     return render(request, 'employerapp/employer_messages.html', context)
 
 
+@login_required
 def vacancy_create(request, emp_id):
     employer = get_object_or_404(Employer, pk=emp_id)
     title = 'создание вакансии'
@@ -281,6 +292,7 @@ def favorites(request, emp_id):
     vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False,
                                        employer=employer).order_by(
         'published')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -288,7 +300,8 @@ def favorites(request, emp_id):
         'vacancies_hide': vacancies_hide,
         'drafts': drafts,
         'vacancies': vacancies,
-        'vacancies_all': vacancies_all
+        'vacancies_all': vacancies_all,
+        'responses': responses
     }
     return render(request, 'employerapp/favorites.html', context)
 
@@ -333,3 +346,33 @@ def search_resume(request, emp_id, page=None):
     context = {'title': title, 'object_list': search_paginator}
 
     return render(request, 'employerapp/search_resume.html', context)
+
+
+@login_required
+def responses(request, emp_id):
+    title = 'Отклики по вакансиям'
+    employer = get_object_or_404(Employer, pk=emp_id)
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by(
+        'date')
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    vacancies_all = Vacancy.objects.filter(employer=employer).exclude(
+        action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
+    vacancies_hide = Vacancy.objects.filter(hide=True, employer=employer).order_by(
+        'published')
+    drafts = Vacancy.objects.filter(action=employer.DRAFT, hide=False, employer=employer).order_by(
+        'published')
+    vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False,
+                                       employer=employer).order_by(
+        'published')
+    context = {
+        'title': title,
+        'employer': employer,
+        'responses': responses,
+        'favorites': favorites,
+        'vacancies_hide': vacancies_hide,
+        'drafts': drafts,
+        'vacancies': vacancies,
+        'vacancies_all': vacancies_all,
+    }
+
+    return render(request, 'employerapp/employer_responses.html', context)

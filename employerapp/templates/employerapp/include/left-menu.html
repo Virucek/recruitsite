@@ -12,3 +12,7 @@ left-menu-select{% endif %}" role="button" href="{% url 'employer:vacancy_create
     Удаленные/Скрытые вакансии <span class="badge badge-light">{% if vacancies_hide %}{{vacancies_hide|length}}{% endif %}</span></a>
 <a class="btn btn-outline-primary w-100 mb-2 px-3 left-menu {% if request.resolver_match.url_name == 'favorites' %}left-menu-select{% endif %}"
    role="button" href="{% url 'employer:favorites' employer.pk %}">Избранные резюме <span class="badge badge-light">{% if favorites %}{{favorites|length}}{% endif %}</span></a>
+<a class="btn btn-outline-primary w-100 mb-2 px-3 left-menu {% if request.resolver_match.url_name == 'responses' %}left-menu-select{% endif %}"
+   role="button" href="{% url 'employer:responses' employer.pk %}">Отклики по вакансиям <span
+        class="badge badge-light">{% if responses %}{{responses|length}}{% endif %}</span></a>
+

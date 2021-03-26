@@ -10,6 +10,7 @@ urlpatterns = [
     path('<int:emp_id>/published/', views.vacancy_published, name='published'),
     path('<int:emp_id>/messages/', views.messages, name='messages'),
     path('<int:emp_id>/hide/', views.vacancy_hide, name='hide'),
+    path('<int:emp_id>/responses/', views.responses, name='responses'),
     path('<int:emp_id>/vacancy_create/', views.vacancy_create, name='vacancy_create'),
     path('<int:emp_id>/vacancy_draft_edit/<int:pk>/', views.vacancy_edit_draft,
          name='vacancy_edit_draft'),
