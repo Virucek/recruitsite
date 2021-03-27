@@ -10,8 +10,7 @@
                 Portal!</p>
             <p class="mb-5">Статус: Работодатель</p>
             <form action="{% url 'employerapp:search_resume' user.employer.pk %}"
-                  class="mb-5"
-                  method="get">
+                  class="mb-5" method="get">
                 <div class="form-group">
                     <input type="text" class="d-inline form-control col-8 col-sm-6 col-md-4"
                            name="search" placeholder="поиск резюме...">

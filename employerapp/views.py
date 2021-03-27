@@ -321,29 +321,28 @@ def delete_favorite(request, emp_id, pk):
 
 
 @login_required
-def search_resume(request, emp_id, page=None):
-    if page is None:
-        page = 1
+def search_resume(request, emp_id):
     title = 'Поиск резюме'
     employer = get_object_or_404(Employer, pk=emp_id)
     search = request.GET.get('search')
-    object_list = []
+    search_paginator = None
     if search:
         query = []
         results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search)).filter(
             status=Resume.OPENED).order_by('-updated_at')
         query.append(results)
-        object_list = list(chain(*query))
+        query = list(chain(*query))
 
-    paginator = Paginator(object_list, 5)
-    try:
-        search_paginator = paginator.page(page)
-    except PageNotAnInteger:
-        search_paginator = paginator.page(1)
-    except EmptyPage:
-        search_paginator = paginator.page(paginator.num_pages)
+        page = request.GET.get('page')
+        paginator = Paginator(query, 5)
+        try:
+            search_paginator = paginator.page(page)
+        except PageNotAnInteger:
+            search_paginator = paginator.page(1)
+        except EmptyPage:
+            search_paginator = paginator.page(paginator.num_pages)
 
-    context = {'title': title, 'object_list': search_paginator}
+    context = {'title': title, 'object_list': search_paginator, 'search': search}
 
     return render(request, 'employerapp/search_resume.html', context)
 

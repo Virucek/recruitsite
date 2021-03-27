@@ -62,27 +62,26 @@ def news_detail(request, pk):
     return render(request, 'mainapp/news_detail.html', context)
 
 
-def search_news(request, page=None):
-    if page is None:
-        page = 1
+def search_news(request):
     title = 'Поиск новостей'
     search = request.GET.get('search')
-    object_list = []
+    search_paginator = None
     if search:
         query = []
         results = News.objects.filter(Q(title__icontains=search) | Q(description__icontains=search), is_active=True).order_by(
             '-published')
         query.append(results)
-        object_list = list(chain(*query))
+        query = list(chain(*query))
 
-    paginator = Paginator(object_list, 3)
-    try:
-        search_paginator = paginator.page(page)
-    except PageNotAnInteger:
-        search_paginator = paginator.page(1)
-    except EmptyPage:
-        search_paginator = paginator.page(paginator.num_pages)
+        page = request.GET.get('page')
+        paginator = Paginator(query, 3)
+        try:
+            search_paginator = paginator.page(page)
+        except PageNotAnInteger:
+            search_paginator = paginator.page(1)
+        except EmptyPage:
+            search_paginator = paginator.page(paginator.num_pages)
 
-    context = {'title': title, 'object_list': search_paginator}
+    context = {'title': title, 'search_news': search_paginator, 'search': search}
 
     return render(request, 'mainapp/search_news.html', context)

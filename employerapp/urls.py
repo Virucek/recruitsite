@@ -20,5 +20,5 @@ urlpatterns = [
     path('<int:emp_id>/send_offer/<int:pk>', views.send_offer, name='send_offer'),
     path('<int:emp_id>/favorites/', views.favorites, name='favorites'),
     path('<int:emp_id>/favorite_<int:pk>/delete/', views.delete_favorite, name='delete_favorite'),
-    path('<int:emp_id>/search_resume/page/', views.search_resume, name='search_resume')
+    path('<int:emp_id>/search_resume/', views.search_resume, name='search_resume')
 ]

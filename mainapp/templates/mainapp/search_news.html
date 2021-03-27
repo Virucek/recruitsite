@@ -6,9 +6,9 @@
     <h3 class="font-italic text-center mb-5">Результаты поиска</h3>
     <div class="row justify-content-center">
         <div class="col-12 col-sm-10">
-            {% if object_list %}
+            {% if search_news %}
             <a class="h5" href="{% url 'main' 1 %}">&laquo вернуться к поиску</a>
-            {% for object in object_list %}
+            {% for object in search_news %}
             <div class="row mb-3 mt-5" id="{{ object.id }}">
                 <div class="col-2 h5">{{ object.published|date:"d.m.y" }}</div>
                 <div class="col-10 h5">{{ object.title|capfirst }}</div>
@@ -24,19 +24,15 @@
             </div>
             {% endfor %}
             <div class="text-center mt-4 mb-5">
-            {% if object_list.has_previous %}
-                <span>
-                    <a class="h4" href="{% url 'search_news' object_list.previous_page_number %}">&laquo
-                    </a>
-                </span>
+            {% if search_news.has_previous %}
+                <a class="h4" href="?search={{ search }}&page={{ search_news.previous_page_number }}">&laquo
+                </a>
             {% endif %}
-            <span class="px-3 font-italic font-weight-bold">страница {{ object_list.number }}
-                    из {{ object_list.paginator.num_pages }}</span>
-            {% if object_list.has_next %}
-                <span>
-                    <a class="h4" href="{% url 'search_news' object_list.next_page_number %}">
-                        &raquo</a>
-                </span>
+            <span class="px-3 font-italic font-weight-bold">страница {{ search_news.number }}
+                    из {{ search_news.paginator.num_pages }}</span>
+            {% if search_news.has_next %}
+                <a class="h4" href="?search={{ search }}&page={{ search_news.next_page_number }}">
+                    &raquo</a>
             {%endif%}
             </div>
             {% else %}
