@@ -38,7 +38,7 @@
             <div class="d-flex">
                 <a class="btn btn-outline-primary mb-5 px-4" role="button" href="{% url 'main' 1 %}">Назад
                 </a>
-                <a class="btn btn-outline-primary mb-5 px-4 ml-5" role="button" href="#">Откликнуться
+                <a class="btn btn-outline-primary mb-5 px-4 ml-5" role="button" href="{% url 'jobseeker:offer_create' user item.id %}">Откликнуться
                 </a>
             </div>
 

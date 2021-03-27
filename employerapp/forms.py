@@ -1,7 +1,11 @@
+from urllib import request
+
 from django import forms
 
+from django.shortcuts import get_object_or_404
+
 from authapp.models import Employer
-from employerapp.models import Vacancy
+from employerapp.models import Vacancy, SendOffers
 
 
 class VacancyCreationForm(forms.ModelForm):
@@ -34,6 +38,24 @@ class VacancyEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(VacancyEditForm, self).__init__(*args, **kwargs)
-        # blank_choice = (('', '----------'),)
-        # self.fields['currency'] = forms.ChoiceField(label='Валюта', choices=blank_choice +
-        # Vacancy.CURRENCY_CHOICE)
+
+
+class SendOfferForm(forms.ModelForm):
+    class Meta:
+        model = SendOffers
+        fields = ('vacancy', 'cover_letter', 'contact_phone')
+
+    # employer = get_object_or_404(Employer, pk=Employer.pk)
+
+    def __init__(self, *args, **kwargs):
+        if 'employer' in kwargs and kwargs['employer'] is not None:
+            employer = kwargs.pop('employer')
+            qs = Vacancy.objects.filter(action=Employer.MODER_OK, hide=False,
+                                        employer=employer)
+        super(SendOfferForm, self).__init__(*args, **kwargs)
+        # self.fields['vacancy'] = forms.ModelChoiceField(queryset=self.qs, to_field_name=None,
+        # label='выберите вакансию по которой хотите направить предложение соискателю')
+        self.fields['vacancy'].queryset = qs
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+

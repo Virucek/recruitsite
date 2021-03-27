@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/employerapp/forms.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/employerapp/templates/employerapp/employer_cabinet.html">
           <value>
             <Attribute>
@@ -31,7 +38,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/employerapp/templates/employerapp/favorites.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/employerapp/templates/employerapp/include/vacancy_description.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/employerapp/templates/employerapp/search_resume.html">
           <value>
             <Attribute>
               <option name="separator" value=":" />
@@ -59,6 +80,34 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/jobseekerapp/templates/jobseekerapp/offer_list.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/jobseekerapp/templates/jobseekerapp/resume_view.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/jobseekerapp/urls.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/jobseekerapp/views.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/mainapp/templates/mainapp/base.html">
           <value>
             <Attribute>
@@ -77,6 +126,13 @@
           <value>
             <Attribute>
               <option name="separator" value="|" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/mainapp/views.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>

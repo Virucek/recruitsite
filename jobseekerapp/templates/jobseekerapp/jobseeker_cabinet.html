@@ -6,7 +6,7 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-4 col-sm-2">
-            <img class="img-fluid" src="{% static 'img/employers/example.jpg' %}" alt="My image">
+            <img class="img-fluid rounded shadow" src="/media/{{ jobseeker.photo }}" onerror ="this.src='{% static 'img/employers/example.jpg' %}';" alt="My image">
         </div>
         <div class="col-11 col-sm-10">
             <table class="table">
@@ -41,8 +41,8 @@
                 </tr>
                 </thead>
             </table>
-            <a class="btn btn-primary mb-3" href="{% url 'jobseeker:resume' %}">
-                Создать резюме
+            <a class="btn btn-primary mb-3" href="{% url 'auth:edit_jobseeker' jobseeker.pk %}">
+                Редактировать
             </a>
         <h1 class="my-5">Мои резюме</h1>
         <table class="table employer_table">
@@ -65,20 +65,24 @@
                         {% endif %}
                     </td>
                     <td scope="col" class="text-right">
-                        <p><a href="{% url 'jobseeker:resume_detail' object.id %}">просмотреть резюме</a></p>
-                        <p><a class="btn-resume-delete" href="{% url 'jobseeker:resume_delete' object.id %}">удалить резюме</a></p>
+                        <p><a href="{% url 'jobseeker:resume_detail' jobseeker.pk object.id %}">просмотреть резюме</a></p>
+                        <p><a class="btn-resume-delete" href="{% url 'jobseeker:resume_delete' jobseeker.pk object.id %}">удалить резюме</a></p>
                     </td>
                 </tr>
             {% endfor %}
         {% endif %}
             </tbody>
         </table>
+            <a class="btn btn-primary mb-3" href="{% url 'jobseeker:resume' jobseeker.pk %}">
+                Создать резюме
+            </a>
         <h1 class="my-5">Поиск вакансий</h1>
             <p>Здесь будет форма поиска вакасий или переход в раздел поиска </p>
         <h1 class="my-5">Избранные вакасии</h1>
             <p>Здесь будет раздел избранных вакасий</p>
-        <h1 class="my-5">Раздел сообщения</h1>
-            <p>Здесь будет раздел избранных вакасий</p>
+        <h1 class="my-5">Отклики</h1>
+        <a class="btn btn-outline-primary" role="button"
+               href="{% url 'jobseeker:offer_list' jobseeker.pk %}">перейти в раздел</a>
     </div>
 </div>
 </div>
