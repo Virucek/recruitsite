@@ -44,6 +44,9 @@
             <a class="btn btn-primary mb-3" href="{% url 'auth:edit_jobseeker' jobseeker.pk %}">
                 Редактировать
             </a>
+            <a class="btn btn-success mb-3 ml-3" href="{% url 'auth:edit_password' %}">
+                Сменить пароль
+            </a>
         <h1 class="my-5">Мои резюме</h1>
         <table class="table employer_table">
             <tbody>
@@ -79,9 +82,10 @@
         <h1 class="my-5">Поиск вакансий</h1>
             <p>Здесь будет форма поиска вакасий или переход в раздел поиска </p>
         <h1 class="my-5">Избранные вакасии</h1>
-            <p>Здесь будет раздел избранных вакасий</p>
+            <a class="btn btn-outline-primary" role="button"
+               href="{% url 'jobseeker:favorite_list' jobseeker.pk %}">перейти в раздел</a>
         <h1 class="my-5">Отклики</h1>
-        <a class="btn btn-outline-primary" role="button"
+            <a class="btn btn-outline-primary" role="button"
                href="{% url 'jobseeker:offer_list' jobseeker.pk %}">перейти в раздел</a>
     </div>
 </div>

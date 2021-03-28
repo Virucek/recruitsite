@@ -3,14 +3,14 @@ from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from authapp.models import Employer, IndustryType, Jobseeker
 from employerapp.forms import VacancyCreationForm, VacancyEditForm, SendOfferForm
 from employerapp.models import Vacancy, SendOffers, Favorites
-from jobseekerapp.models import Resume, Offer
+from jobseekerapp.models import Resume, Offer, Favorite as FavoriteVacancy
 
 
 @login_required
@@ -243,8 +243,15 @@ def vacancy_view(request, emp_id, pk):
     title = 'Вакансия'
     vacancy = get_object_or_404(Vacancy, pk=pk)
     employer = get_object_or_404(Employer, pk=emp_id)
-
-    context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id}
+    favorite = FavoriteVacancy.objects.filter(user=request.user.id, vacancy=vacancy.id)
+    favorite_id = None
+    is_favorite = False
+    if favorite:
+        is_favorite = True
+        favorite_id = favorite.first().id
+    context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id,
+               'favorite': favorite_id, 'is_favorite': is_favorite}
+    print(context)
 
     return render(request, 'employerapp/vacancy_view.html', context)
 
