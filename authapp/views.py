@@ -12,6 +12,9 @@ from authapp.models import Employer, Jobseeker, IndustryType
 
 
 def login(request):
+    """
+    Функция аутентификации, проверят есть ли правло у пользователя зайти на портал.
+    """
     title = 'вход'
 
     login_form = UserLoginForm(data=request.POST)
@@ -35,11 +38,20 @@ def login(request):
 
 
 def logout(request):
+    """
+    Функция выхода из портала, использует стандартный метод Django.
+    """
     auth.logout(request)
     return HttpResponseRedirect(reverse('main'))
 
 
 def register_employer(request):
+    """
+    Функция регистрации как работодатель. Использует :model:`authapp.Employer`.
+
+    **Template:**
+    :template: `authapp/register_employer.html`
+    """
     title = 'Регистрация работодателя'
 
     if request.method == 'POST':
@@ -75,6 +87,12 @@ def register_employer(request):
 
 
 def register_jobseeker(request):
+    """
+    Функция регистрации как соискателя. Использует :model:`authapp.Jobseeker`.
+
+    **Template:**
+    :template: `authapp/register_jobseeker.html`
+    """
     title = 'Регистрация соискателя'
 
     if request.method == 'POST':
@@ -108,6 +126,12 @@ def register_jobseeker(request):
 
 @login_required
 def edit(request):
+    """
+    Редактирование данных работодателя. Использует модель из forms EmployerEditForm.
+
+     **Template:**
+    :template: `authapp/edit.html`
+    """
     title = 'редактирование работодателя'
     sent = False
     if request.method == 'POST':
@@ -128,6 +152,12 @@ def edit(request):
 
 
 class JobseekerUpdateView(UpdateView):
+    """
+    Редактирование данных соискателя. Использует модель из forms JobseekerEditForm.
+
+    **Template:**
+    :template: `authapp/edit_jobseeker.html`
+    """
     model = Jobseeker
     template_name = 'authapp/edit_jobseeker.html'
     form_class = JobseekerEditForm
