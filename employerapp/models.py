@@ -58,6 +58,12 @@ class Vacancy(models.Model):
             self.published = datetime.now()
         super(Vacancy, self).save(*args, **kwargs)
 
+    def get_favorite_id(self, user_id):
+        favorite = self.favoritevacancies.select_related().filter(user=user_id)
+        if favorite:
+            return favorite.first().id
+        return None
+
 
 class SendOffers(models.Model):
     date = models.DateField(verbose_name='дата направления предложения', default=datetime.now)

@@ -11,4 +11,5 @@ urlpatterns = [
     path('register/jobseeker/', authapp.register_jobseeker, name='register_jobseeker'),
     path('edit/', authapp.edit, name='edit'),
     path('jobseeker/<int:pk>/edit/', authapp.JobseekerUpdateView.as_view(), name='edit_jobseeker'),
+    path('edit/password/', authapp.UpdatePasswordView.as_view(), name='edit_password'),
 ]
