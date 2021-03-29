@@ -246,7 +246,7 @@ class JobseekerFavoriteDeleteView(JobseekerViewMixin, DeleteView):
 def add_favorite(request, jobseeker_id):
     if request.is_ajax():
         vacancy = get_object_or_404(Vacancy, pk=int(request.POST.get('checked')))
-        user = get_object_or_404(pk=jobseeker_id)
+        user = get_object_or_404(Jobseeker, pk=jobseeker_id)
         favorite = Favorite.objects.create(user=user, vacancy=vacancy)
         favorite.save()
         return JsonResponse({'id': favorite.id}, status=201)
