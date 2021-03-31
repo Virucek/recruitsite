@@ -86,7 +86,8 @@ class SendOffers(models.Model):
 class Favorites(models.Model):
     date = models.DateField(verbose_name='дата добавления в избранное', default=datetime.now)
     employer = models.ForeignKey(Employer, on_delete=models.CASCADE)
-    resume = models.ForeignKey('jobseekerapp.Resume', on_delete=models.CASCADE, verbose_name='избранное резюме')
+    resume = models.ForeignKey('jobseekerapp.Resume', on_delete=models.CASCADE, verbose_name='избранное резюме',
+                               related_name='favoriteresumes')
 
     class Meta:
         verbose_name_plural = 'Избранные резюме'

@@ -17,5 +17,8 @@ def _phone_number(phone):
 
 
 @register.simple_tag
-def get_favorite_id_(vacancy, user):
-    return vacancy.get_favorite_id(user)
+def get_favorite_id_(object, user):
+    """
+    object: vacancy or resume
+    """
+    return object.get_favorite_id(user)
