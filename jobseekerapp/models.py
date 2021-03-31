@@ -39,6 +39,12 @@ class Resume(models.Model):
     def get_user_resumes(user_id):
         return Resume.objects.filter(is_active=True, user_id=user_id)
 
+    def get_favorite_id(self, user_id):
+        favorite = self.favoriteresumes.select_related().filter(employer=user_id)
+        if favorite:
+            return favorite.first().id
+        return None
+
 
 class ResumeEducation(models.Model):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, verbose_name='Резюме', related_name='educationitems')

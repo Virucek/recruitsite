@@ -21,11 +21,12 @@ window.onload = function() {
                 $(target).removeClass('add-favorite').addClass('delete-favorite');
                 $(target).find('button').removeClass('add-favorite').addClass('delete-favorite');
                 action_arr = action.split('/')
-                if (action_arr.includes('jobseeker')){
-                    if (data){
-                        new_url = '/jobseeker/' + action_arr[2] + '/favorite/' + data.id + '/delete';
-                        $(target).attr('action', new_url);
-                    }
+                if (data){
+                    if (action_arr.includes('jobseeker'))
+                        new_url = '/jobseeker/' + action_arr[2] + '/favorite/' + data.id + '/delete/';
+                    else if (action_arr.includes('employer'))
+                        new_url = '/employer/' + action_arr[2] + '/favorite_' + data.id + '/delete/';
+                    $(target).attr('action', new_url);
                 }
                 console.log('created successfully');
             }
@@ -50,10 +51,11 @@ window.onload = function() {
                     $(target).removeClass('delete-favorite').addClass('add-favorite');
                     $(target).find('button').removeClass('delete-favorite').addClass('add-favorite');
                     action_arr = action.split('/')
-                    if (action_arr.includes('jobseeker')){
-                        new_url = '/jobseeker/' + action_arr[2] + '/favorite/create';
-                        $(target).attr('action', new_url);
-                    }
+                    if (action_arr.includes('jobseeker'))
+                        new_url = '/jobseeker/' + action_arr[2] + '/favorite/create/';
+                    else if (action_arr.includes('employer'))
+                        new_url = '/employer/' + action_arr[2] + '/favorite/create/';
+                    $(target).attr('action', new_url);
                     console.log('deleted favorite');
                 }
             });

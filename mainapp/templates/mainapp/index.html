@@ -1,6 +1,6 @@
 {% extends 'mainapp/base.html' %}
 {% load static %}
-
+{% load custom_tags %}
 {% block content %}
 {% if user.is_authenticated and user.employer %}
 <div class="container my-5">
@@ -24,7 +24,7 @@
                         {{ resume.user.jobseeker.middle_name }}</a></h4>
                     <p class="ml-5">
                     {% if not resume.is_favorite %}
-                    <form action="{% url 'main' 1 %}"
+                    <form action="{% url 'employer:create_favorite' user.employer.pk %}"
                               method="post" class="add-favorite">{% csrf_token %}
                             <input type="hidden" name="checked" value="{{ resume.pk }}">
                             <button class="btn btn-clear add-favorite" type="submit">
@@ -34,7 +34,8 @@
                             </svg></button>
                         </form>
                     {% else %}
-                    <form action="{% url 'main' 1 %}"
+                    {% get_favorite_id_ resume user.id as favorite_id %}
+                    <form action="{% url 'employer:delete_favorite' user.employer.pk favorite_id %}"
                               method="post" class="delete-favorite">{% csrf_token %}
                             <input type="hidden" name="checked" value="{{ resume.pk }}">
                             <button class="btn btn-clear delete-favorite" type="submit">

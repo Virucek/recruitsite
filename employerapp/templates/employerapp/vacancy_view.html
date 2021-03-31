@@ -7,7 +7,7 @@
         <div class="col">
             <div class="d-flex">
                 <h4 style="color: #007bff;">{{ item.vacancy_name }}</h4>
-                    {% if item.is_favorite == False %}
+                    {% if not is_favorite %}
                     <form action="{% url 'jobseeker:favorite_create' user %}"
                               method="post" class="ml-2 add-favorite">{% csrf_token %}
                             <input type="hidden" name="checked" value="{{ item.pk }}">

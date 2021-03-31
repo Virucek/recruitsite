@@ -45,17 +45,6 @@ def main(request, page=None):
     except EmptyPage:
         news_paginator = paginator.page(paginator.num_pages)
 
-    favorites = Favorites()
-    if request.method == 'POST' and request.user.employer:
-        resume = jobseek_model.Resume.objects.get(pk=int(request.POST.get('checked')))
-        favorites.resume = resume
-        favorites.employer = request.user.employer
-        favorite_db = Favorites.objects.filter(resume=resume, employer=request.user.employer).first()
-        if not favorite_db:
-            favorites.save()
-        else:
-            favorite_db.delete()
-
     context = {
         'title': title,
         'news': news_paginator,

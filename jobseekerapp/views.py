@@ -171,15 +171,16 @@ class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
     template_name = 'jobseekerapp/resume_external_detail.html'
     title = 'Резюме'
 
-    def post(self, request, *args, **kwargs):
-        favorites = Favorites()
-        self.object = self.get_object()
-        context = self.get_context_data(**kwargs)
-        favorites.resume = context['resume']
-        favorites.employer = request.user.employer
-        if not Favorites.objects.filter(resume=context['resume'], employer=request.user.employer).first():
-            favorites.save()
-        return self.render_to_response(context=context)
+    def get_object(self, queryset=None):
+        object = super(ResumeExternalDetailView, self).get_object()
+        is_favorite = False
+        favorite = Favorites.objects.filter(resume=object.pk, employer=self.request.user.employer).first()
+        if favorite:
+            is_favorite = True
+            favorite = favorite.id
+        setattr(object, 'is_favorite', is_favorite)
+        setattr(object, 'favorite', favorite)
+        return object
 
 
 class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
