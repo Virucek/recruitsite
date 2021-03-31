@@ -32,6 +32,9 @@
 				  <li class="nav-item">
 					<a class="nav-link" href="{% url 'auth:logout' %}">выход</a>
 				  </li>
+				  <li class="nav-item">
+					<a class="nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}" href="{% url 'news' 1 %}">новости</a>
+				  </li>
 			  	{% elif user.is_authenticated and user.jobseeker %}
 				  <li class="nav-item">
 					<a class="nav-link" href="{% url 'jobseeker:offer_list' user.pk %}">Мои отклики</a>
@@ -45,8 +48,9 @@
 				  <li class="nav-item">
 					<a class="nav-link" href="{% url 'auth:logout' %}">Выход</a>
 				  </li>
-			  	{% else %}
-
+				  <li class="nav-item">
+					<a class="nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}" href="{% url 'news' 1 %}">новости</a>
+				  </li>
 			  	{% endif %}
 			  </ul>
 			</div>

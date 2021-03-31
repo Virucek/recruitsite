@@ -85,3 +85,19 @@ def search_news(request):
     context = {'title': title, 'search_news': search_paginator, 'search': search}
 
     return render(request, 'mainapp/search_news.html', context)
+
+
+def news(request, page=1):
+    title = 'Новости'
+    news = News.objects.filter(is_active=True).order_by('-published')
+    paginator = Paginator(news, 4)
+    try:
+        news_paginator = paginator.page(page)
+    except PageNotAnInteger:
+        news_paginator = paginator.page(1)
+    except EmptyPage:
+        news_paginator = paginator.page(paginator.num_pages)
+
+    context = {'title': title, 'news': news_paginator}
+
+    return render(request, 'mainapp/news.html', context)
