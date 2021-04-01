@@ -46,3 +46,8 @@ $('.bi-sliders').on('click', function() {
     $('#from_date').attr('required', 'required');
     $('#till_date').attr('required', 'required');
 })
+
+$('.share').on('click', function() {
+    $('.share-icons').toggleClass("active");
+});
+

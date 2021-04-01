@@ -234,3 +234,22 @@ label[for=search-field] {
 ul.errorlist {
     color: red;
 }
+a .bi-twitter:hover, a .bi-share-fill:hover, a .bi-envelope:hover, a
+.bi-facebook:hover, a .bi-telegram:hover {
+    color: #007bff;
+}
+a .bi-twitter, a .bi-share-fill, a .bi-envelope, a .bi-facebook, a .bi-telegram {
+    color: black;
+}
+.share-icons {
+    opacity = 0;
+    transform-origin: left;
+	transform: scale(0);
+	transition-duration: .5s;
+}
+.share-icons.active {
+    transform: scale(1);
+    opacity = 1;
+    transition-duration: .5s;
+}
+
