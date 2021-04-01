@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from authapp.models import Jobseeker
+
 
 class Resume(models.Model):
     DRAFT = 'draft'
@@ -36,6 +38,12 @@ class Resume(models.Model):
     @staticmethod
     def get_user_resumes(user_id):
         return Resume.objects.filter(is_active=True, user_id=user_id)
+
+    def get_favorite_id(self, user_id):
+        favorite = self.favoriteresumes.select_related().filter(employer=user_id)
+        if favorite:
+            return favorite.first().id
+        return None
 
 
 class ResumeEducation(models.Model):
@@ -127,3 +135,15 @@ class Offer(models.Model):
 
     def __str__(self):
         return f'{self.vacancy.employer.company_name}/{self.vacancy.vacancy_name} ({self.resume.name})'
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(Jobseeker, on_delete=models.CASCADE)
+    vacancy = models.ForeignKey('employerapp.Vacancy', on_delete=models.CASCADE, related_name='favoritevacancies',
+                                verbose_name='Вакансия')
+    add_date = models.DateField(verbose_name='Дата добавления в избранное', auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'vacancy',)
+        verbose_name_plural = 'Избранные вакансии'
+        verbose_name = 'Избранная вакансия'

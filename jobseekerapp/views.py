@@ -1,13 +1,14 @@
+from django import forms
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
-
-from authapp.models import Jobseeker
-from employerapp.models import Favorites
-from employerapp.models import Vacancy
+from django.db.models import Q
+from authapp.models import Jobseeker, Employer
+from employerapp.models import Favorites, Vacancy
 from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm, JobseekerOfferForm
-from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer
+from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer, Favorite
 
 
 class JobseekerViewMixin:
@@ -16,7 +17,6 @@ class JobseekerViewMixin:
         try:
             context['title'] = getattr(self, 'title')
         except AttributeError:
-            print("title for view isn't set")
             context['title'] = 'Untitled page'
 
         return context
@@ -84,7 +84,6 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
 
     def get_success_url(self):
         data = self.get_context_data()
-        print(data)
         return reverse_lazy('jobseeker:resume_detail',
                             kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
 
@@ -170,15 +169,16 @@ class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
     template_name = 'jobseekerapp/resume_external_detail.html'
     title = 'Резюме'
 
-    def post(self, request, *args, **kwargs):
-        favorites = Favorites()
-        self.object = self.get_object()
-        context = self.get_context_data(**kwargs)
-        favorites.resume = context['resume']
-        favorites.employer = request.user.employer
-        if not Favorites.objects.filter(resume=context['resume'], employer=request.user.employer).first():
-            favorites.save()
-        return self.render_to_response(context=context)
+    def get_object(self, queryset=None):
+        object = super(ResumeExternalDetailView, self).get_object()
+        is_favorite = False
+        favorite = Favorites.objects.filter(resume=object.pk, employer=self.request.user.employer).first()
+        if favorite:
+            is_favorite = True
+            favorite = favorite.id
+        setattr(object, 'is_favorite', is_favorite)
+        setattr(object, 'favorite', favorite)
+        return object
 
 
 class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
@@ -212,3 +212,101 @@ class JobseekerOfferListView(JobseekerViewMixin, ListView):
     def get_queryset(self):
         resumes = Resume.objects.filter(user=self.request.user, is_active=True)
         return super().get_queryset().filter(resume__in=resumes)
+
+
+class JobseekerFavoriteListView(JobseekerViewMixin, ListView):
+    model = Favorite
+    title = 'Избранное'
+
+    def get_queryset(self):
+        vacancies = Vacancy.objects.filter(action=Employer.MODER_OK, hide=False)
+        return super().get_queryset().filter(user=self.request.user.id, vacancy__in=vacancies).order_by(
+            'add_date')
+
+
+class JobseekerFavoriteDeleteView(JobseekerViewMixin, DeleteView):
+    model = Favorite
+    template_name = 'jobseekerapp/favorite_delete.html'
+    title = 'Удаление вакансии из избранного'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        if request.is_ajax():
+            return JsonResponse({}, status=204)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        jobseeker_id = self.kwargs['jobseeker_id']
+        return reverse_lazy('jobseeker:favorite_list', kwargs={'jobseeker_id': jobseeker_id})
+
+
+def add_favorite(request, jobseeker_id):
+    if request.is_ajax():
+        vacancy = get_object_or_404(Vacancy, pk=int(request.POST.get('checked')))
+        user = get_object_or_404(Jobseeker, pk=jobseeker_id)
+        favorite = Favorite.objects.create(user=user, vacancy=vacancy)
+        favorite.save()
+        return JsonResponse({'id': favorite.id}, status=201)
+
+
+class SearchVacancyListView(JobseekerViewMixin, ListView):
+    model = Vacancy
+    title = 'Поиск вакансии'
+    template_name = 'jobseekerapp/search_vacancy.html'
+    paginate_by = 5
+
+    def get_queryset(self):
+        search = self.request.GET.get('search')
+        company_name = self.request.GET.get('company_name')
+        city = self.request.GET.get('city')
+        min_salary = self.request.GET.get('min_salary')
+        max_salary = self.request.GET.get('max_salary')
+        vacancy_type = self.request.GET.get('vacancy_type')
+        currency = self.request.GET.get('currency')
+        from_date = self.request.GET.get('from_date')
+        till_date = self.request.GET.get('till_date')
+        sort = self.request.GET.get('sort')
+        order = self.request.GET.get('order')
+
+        query = Vacancy.objects.filter(action=Employer.MODER_OK, hide=False)
+
+        if search:
+            query = query.filter(Q(vacancy_name__icontains=search) | Q(description__icontains=search))
+
+        if company_name:
+            query = query.filter(employer=Employer.objects.filter(company_name=company_name).first())
+
+        if city:
+            query = query.filter(city=city)
+
+        if min_salary or max_salary:
+            if min_salary and max_salary:
+                if max_salary > min_salary:
+                    query = query.filter(min_salary__gte=min_salary, max_salary__lte=max_salary)
+                elif max_salary < min_salary:  # TODO по идее надо сделать соответствующее уведомление на форме, а не подмену
+                    query = query.filter(min_salary__gte=min_salary, max_salary__lte=max_salary)
+            elif min_salary:
+                query = query.filter(min_salary__gte=min_salary)
+            elif max_salary:
+                query = query.filter(max_salary__lte=max_salary)
+
+        if currency != "---":
+            query = query.filter(currency=Vacancy.__dict__[f"{currency}"])
+
+        if vacancy_type != "---":
+            query = query.filter(vacancy_type=Vacancy.__dict__[f"{vacancy_type}"])
+
+        if from_date or till_date:
+            if from_date and till_date:
+                if till_date > from_date:
+                    query = query.filter(published__gte=from_date, published__lte=till_date)
+                elif till_date < from_date:  # TODO по идее надо сделать соответствующее уведомление на форме, а не подмену
+                    query = query.filter(published__gte=till_date, published__lte=from_date)
+            elif from_date:
+                query = query.filter(published__gte=from_date)
+            elif till_date:
+                query = query.filter(published__lte=till_date)
+
+        return query.order_by(f"{order}{sort}")
