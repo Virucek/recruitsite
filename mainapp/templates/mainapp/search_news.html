@@ -38,7 +38,7 @@
             </div>
             {% else %}
             <p>Поиск не дал результатов. Попробуйте изменить поиск.</p>
-            <a href="{% url 'main' 1 %}">вернуться к поиску</a>
+            <a href="{% if user.is_authenticated %}{% url 'news' 1 %}{% else %}{% url 'main' 1 %}{% endif %}">вернуться к поиску</a>
             {% endif %}
         </div>
     </div>

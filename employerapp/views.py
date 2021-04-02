@@ -247,8 +247,8 @@ def vacancy_delete(request, emp_id, pk):
 @login_required
 def vacancy_view(request, emp_id, pk):
     title = 'Вакансия'
-    vacancy = get_object_or_404(Vacancy, pk=pk)
     employer = get_object_or_404(Employer, pk=emp_id)
+    vacancy = get_object_or_404(Vacancy, pk=pk)
 
     context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id}
 

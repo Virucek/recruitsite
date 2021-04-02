@@ -146,6 +146,7 @@ class UserEditForm(UserChangeForm):
 
     def __init__(self, *args, **kwargs):
         super(UserEditForm, self).__init__(*args, **kwargs)
+        self.fields.pop('password')
         self.fields['username'] = forms.CharField(label='Логин')
         self.fields['email'] = forms.EmailField(label='Ваш email')
         for field_name, field in self.fields.items():
@@ -230,4 +231,23 @@ class JobseekerEditForm(forms.ModelForm):
             raise forms.ValidationError("Вы слишком молоды для регистрации в качестве соискателя")
         return data
 
+
+class SetPasswordForm(forms.Form):
+
+    new_password1 = forms.CharField(label='Введите новый пароль', widget=forms.PasswordInput)
+    new_password2 = forms.CharField(label='Повторите пароль', widget=forms.PasswordInput)
+
+    def __init__(self, *args, **kwargs):
+        super(SetPasswordForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+    def clean_new_password2(self):
+        password1 = self.cleaned_data.get('new_password1')
+        password2 = self.cleaned_data.get('new_password2')
+
+        if password1 != password2:
+            raise forms.ValidationError('Пароли не совпадают')
+
+        return password2
 

@@ -1,5 +1,7 @@
 from django.contrib import auth
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -7,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView
 
 from authapp.forms import UserLoginForm, EmployerRegisterForm, JobseekerRegisterForm, UserEditForm, \
-    EmployerEditForm, JobseekerEditForm, UserJobseekerEditForm
+    EmployerEditForm, JobseekerEditForm, UserJobseekerEditForm, SetPasswordForm
 from authapp.models import Employer, Jobseeker, IndustryType
 
 
@@ -110,19 +112,26 @@ def register_jobseeker(request):
 def edit(request):
     title = 'редактирование работодателя'
     sent = False
+    user = User.objects.get(id=request.user.id)
     if request.method == 'POST':
         edit_form = UserEditForm(request.POST, instance=request.user)
         employer_form = EmployerEditForm(request.POST, request.FILES,
                                          instance=request.user.employer)
-        if edit_form.is_valid() and employer_form.is_valid():
+        password_form = SetPasswordForm(request.POST)
+        if edit_form.is_valid() and employer_form.is_valid() and password_form.is_valid():
             edit_form.save()
             employer_form.save()
+            user.set_password(password_form.cleaned_data['new_password1'])
+            user.save()
+            update_session_auth_hash(request, user)
             sent = True
     else:
         edit_form = UserEditForm(instance=request.user)
         employer_form = EmployerEditForm(instance=request.user.employer)
+        password_form = SetPasswordForm()
 
-    content = {'title': title, 'edit_form': edit_form, 'employer_form': employer_form, 'sent': sent}
+    content = {'title': title, 'edit_form': edit_form, 'employer_form': employer_form,
+               'sent': sent, 'pass_form': password_form}
 
     return render(request, 'authapp/edit.html', content)
 
