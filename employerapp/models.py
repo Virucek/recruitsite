@@ -58,6 +58,12 @@ class Vacancy(models.Model):
             self.published = datetime.now()
         super(Vacancy, self).save(*args, **kwargs)
 
+    def get_favorite_id(self, user_id):
+        favorite = self.favoritevacancies.select_related().filter(user=user_id)
+        if favorite:
+            return favorite.first().id
+        return None
+
 
 class SendOffers(models.Model):
     date = models.DateField(verbose_name='дата направления предложения', default=datetime.now)
@@ -80,7 +86,8 @@ class SendOffers(models.Model):
 class Favorites(models.Model):
     date = models.DateField(verbose_name='дата добавления в избранное', default=datetime.now)
     employer = models.ForeignKey(Employer, on_delete=models.CASCADE)
-    resume = models.ForeignKey('jobseekerapp.Resume', on_delete=models.CASCADE, verbose_name='избранное резюме')
+    resume = models.ForeignKey('jobseekerapp.Resume', on_delete=models.CASCADE, verbose_name='избранное резюме',
+                               related_name='favoriteresumes')
 
     class Meta:
         verbose_name_plural = 'Избранные резюме'

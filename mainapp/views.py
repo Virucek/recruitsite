@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 
 from authapp.models import Employer
 from employerapp.models import Vacancy
-from jobseekerapp.models import Resume
+import jobseekerapp.models as jobseek_model
 from mainapp.models import News
 
 
@@ -24,7 +24,19 @@ def main(request, page=None):
     news = News.objects.filter(is_active=True).order_by('-published')
     employers = Employer.objects.filter(is_active=True, status=Employer.MODER_OK).order_by('?')[:6]
     vacancies = Vacancy.objects.filter(action='moderation_ok')
-    resume_all = Resume.objects.all().filter(status='opened').order_by('updated_at')
+    if vacancies:
+        for vacancy in vacancies:
+            is_favorite = jobseek_model.Favorite.objects.filter(user=request.user.id,
+                                                                vacancy=vacancy.id).first()
+            setattr(vacancy, "is_favorite", True if is_favorite else False)
+            print(vacancy.is_favorite)
+    resume_all = jobseek_model.Resume.objects.all().filter(status='opened').order_by('updated_at')
+    if resume_all and request.user.is_authenticated and getattr(request.user, 'employer', None):
+        for resume in resume_all:
+            is_favorite = Favorites.objects.filter(employer=request.user.employer,
+                                                   resume=resume.id).first()
+            setattr(resume, "is_favorite", True if is_favorite else False)
+            print(resume.is_favorite)
     paginator = Paginator(news, 4)
     try:
         news_paginator = paginator.page(page)
@@ -32,15 +44,6 @@ def main(request, page=None):
         news_paginator = paginator.page(1)
     except EmptyPage:
         news_paginator = paginator.page(paginator.num_pages)
-
-    favorites = Favorites()
-    if request.method == 'POST' and request.user.employer:
-        resume = Resume.objects.get(pk=int(request.POST.get('checked')))
-        favorites.resume = resume
-        favorites.employer = request.user.employer
-        if not Favorites.objects.filter(resume=resume,
-                                        employer=request.user.employer).first():
-            favorites.save()
 
     context = {
         'title': title,
@@ -68,7 +71,8 @@ def search_news(request):
     search_paginator = None
     if search:
         query = []
-        results = News.objects.filter(Q(title__icontains=search) | Q(description__icontains=search), is_active=True).order_by(
+        results = News.objects.filter(Q(title__icontains=search) | Q(description__icontains=search),
+                                      is_active=True).order_by(
             '-published')
         query.append(results)
         query = list(chain(*query))

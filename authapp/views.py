@@ -1,5 +1,7 @@
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.views import PasswordChangeView
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -187,3 +189,14 @@ class JobseekerUpdateView(UpdateView):
                 user_form.save()
 
         return super().form_valid(form)
+
+
+class UpdatePasswordView(PasswordChangeView):
+    form_class = PasswordChangeForm
+    template_name = 'authapp/edit_password.html'
+
+    def get_success_url(self):
+        if getattr(self.request.user, 'employer', None):
+            return reverse_lazy('employer:main', kwargs={'emp_id': self.request.user.id})
+        else:
+            return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': self.request.user.id})

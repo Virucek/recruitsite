@@ -1,13 +1,14 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
 
-from authapp.models import Jobseeker
+from authapp.models import Jobseeker, Employer
 from employerapp.models import Favorites
 from employerapp.models import Vacancy
 from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm, JobseekerOfferForm
-from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer
+from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer, Favorite
 
 
 class JobseekerViewMixin:
@@ -271,15 +272,16 @@ class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
     template_name = 'jobseekerapp/resume_external_detail.html'
     title = 'Резюме'
 
-    def post(self, request, *args, **kwargs):
-        favorites = Favorites()
-        self.object = self.get_object()
-        context = self.get_context_data(**kwargs)
-        favorites.resume = context['resume']
-        favorites.employer = request.user.employer
-        if not Favorites.objects.filter(resume=context['resume'], employer=request.user.employer).first():
-            favorites.save()
-        return self.render_to_response(context=context)
+    def get_object(self, queryset=None):
+        object = super(ResumeExternalDetailView, self).get_object()
+        is_favorite = False
+        favorite = Favorites.objects.filter(resume=object.pk, employer=self.request.user.employer).first()
+        if favorite:
+            is_favorite = True
+            favorite = favorite.id
+        setattr(object, 'is_favorite', is_favorite)
+        setattr(object, 'favorite', favorite)
+        return object
 
 
 class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
@@ -328,3 +330,40 @@ class JobseekerOfferListView(JobseekerViewMixin, ListView):
     def get_queryset(self):
         resumes = Resume.objects.filter(user=self.request.user, is_active=True)
         return super().get_queryset().filter(resume__in=resumes)
+
+
+class JobseekerFavoriteListView(JobseekerViewMixin, ListView):
+    model = Favorite
+    title = 'Избранное'
+
+    def get_queryset(self):
+        vacancies = Vacancy.objects.filter(action=Employer.MODER_OK, hide=False)
+        return super().get_queryset().filter(user=self.request.user.id, vacancy__in=vacancies).order_by(
+            'add_date')
+
+
+class JobseekerFavoriteDeleteView(JobseekerViewMixin, DeleteView):
+    model = Favorite
+    template_name = 'jobseekerapp/favorite_delete.html'
+    title = 'Удаление вакансии из избранного'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        if request.is_ajax():
+            return JsonResponse({}, status=204)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        jobseeker_id = self.kwargs['jobseeker_id']
+        return reverse_lazy('jobseeker:favorite_list', kwargs={'jobseeker_id': jobseeker_id})
+
+
+def add_favorite(request, jobseeker_id):
+    if request.is_ajax():
+        vacancy = get_object_or_404(Vacancy, pk=int(request.POST.get('checked')))
+        user = get_object_or_404(Jobseeker, pk=jobseeker_id)
+        favorite = Favorite.objects.create(user=user, vacancy=vacancy)
+        favorite.save()
+        return JsonResponse({'id': favorite.id}, status=201)

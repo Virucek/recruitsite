@@ -14,3 +14,11 @@ def _phone_number(phone):
     fourth = phone[7:9]
     fifth = phone[9:11]
     return f'{first} ({second}) {third}-{fourth}-{fifth}'
+
+
+@register.simple_tag
+def get_favorite_id_(object, user):
+    """
+    object: vacancy or resume
+    """
+    return object.get_favorite_id(user)
