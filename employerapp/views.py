@@ -3,6 +3,7 @@ from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
+from django.http import HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -10,7 +11,7 @@ from django.urls import reverse
 from authapp.models import Employer, IndustryType, Jobseeker
 from employerapp.forms import VacancyCreationForm, VacancyEditForm, SendOfferForm
 from employerapp.models import Vacancy, SendOffers, Favorites
-from jobseekerapp.models import Resume, Offer
+from jobseekerapp.models import Resume, Offer, Favorite as FavoriteVacancy
 
 
 @login_required
@@ -251,6 +252,15 @@ def vacancy_view(request, emp_id, pk):
     vacancy = get_object_or_404(Vacancy, pk=pk)
 
     context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id}
+    favorite = FavoriteVacancy.objects.filter(user=request.user.id, vacancy=vacancy.id)
+    favorite_id = None
+    is_favorite = False
+    if favorite:
+        is_favorite = True
+        favorite_id = favorite.first().id
+    context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id,
+               'favorite': favorite_id, 'is_favorite': is_favorite}
+    print(context)
 
     return render(request, 'employerapp/vacancy_view.html', context)
 
@@ -313,10 +323,24 @@ def favorites(request, emp_id):
 
 
 @login_required
+def add_favorite(request, emp_id):
+    if request.is_ajax():
+        resume = get_object_or_404(Resume, pk=int(request.POST.get('checked')))
+        employer = get_object_or_404(Employer, pk=emp_id)
+        favorite = Favorites.objects.create(employer=employer, resume=resume)
+        favorite.save()
+        return JsonResponse({'id': favorite.id}, status=201)
+
+
+@login_required
 def delete_favorite(request, emp_id, pk):
     title = 'Удаление избранных резюме'
     employer = get_object_or_404(Employer, pk=emp_id)
     favorite = get_object_or_404(Favorites, pk=pk)
+    if request.is_ajax():
+        favorite.delete()
+        return JsonResponse({}, status=204)
+
     if request.method == 'POST':
         favorite.delete()
         return HttpResponseRedirect(reverse('employer:favorites', args=[employer.pk]))
