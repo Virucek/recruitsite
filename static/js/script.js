@@ -62,16 +62,8 @@ window.onload = function() {
         }
         e.preventDefault();
     });
-}
-    })
-    e.preventDefault();
-});
 
-$('.add-favorite').on('click', function() {
-    if($(this).find('svg').css('fill') != 'blue') {
-        $(this).find('svg').css('fill', 'blue');
-    }
-})
+};
 
 $('.bi-sliders').on('click', function() {
     $('.extend').css('display', 'block');
