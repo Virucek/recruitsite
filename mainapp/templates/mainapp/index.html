@@ -1,6 +1,6 @@
 {% extends 'mainapp/base.html' %}
 {% load static %}
-
+{% load custom_tags %}
 {% block content %}
 {% if user.is_authenticated and user.employer %}
 <div class="container my-5">
@@ -10,28 +10,78 @@
                 Portal!</p>
             <p class="mb-5">Статус: Работодатель</p>
             <form action="{% url 'employerapp:search_resume' user.employer.pk %}"
-                  class="mb-5" method="get">
+                  class="mb-5 search-form" method="get">
                 <div class="form-group">
-                    <input type="text" class="d-inline form-control col-8 col-sm-6 col-md-4"
-                           name="search" placeholder="поиск резюме...">
-                    <button id="search_resume" class="btn btn-primary px-4" type="submit">поиск</button>
+                    <label class="pl-0 col-2" for="search-field">Ключевые слова</label>
+                    <input id="search-field" type="text" class="d-inline form-control col-8 col-sm-6 col-md-4"
+                           name="search" placeholder="должность или навык...">
+                    <span title="расширенный поиск"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                         height="16" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3h9.05zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8h2.05zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1h9.05z"/>
+                    </svg></span>
+                    <div class="extend my-3">
+                        <label class="pl-0 col-2" for="city">Город</label>
+                        <input class="mb-3 col-8 col-sm-6 col-md-4 form-control d-inline"
+                               type="text" name="city" id="city"><br>
+                        <label class="pl-0 col-2" for="sex">Выберите пол</label>
+                        <select name="sex" id="sex"
+                                class="mb-3 col-8 col-sm-6 col-md-4 form-control d-inline">
+                            <option value="none"></option>
+                            <option value="m">мужской</option>
+                            <option value="f">женский</option>
+                        </select><br>
+                        <div class="d-flex pl-0 col-10 col-sm-8 col-md-6">
+                            <label class="mb-3 col-4 pl-0" for="salary">Уровень дохода</label>
+                            <input type="number" name="salary" id="salary"
+                                   class="mb-3 ml-2 form-control d-inline col-5">
+                            <select name="currency" id="" class="ml-3 col-3 form-control d-inline">
+                                <option value="RUB">руб.</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+                        </div>
+                        <div class="d-flex pl-0 col-10 col-sm-8 col-md-6">
+                            <span class="col-4 px-0 col-form-label">За период от </span><input
+                                class="ml-2 form-control d-inline px-1 col-5" type="date"
+                                name="from_date" id="from_date">
+                            <span class="px-3 col-form-label">до</span><input
+                                class="form-control d-inline px-1 col-5" type="date" name="till_date" id="till_date">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary px-4 button-search" type="submit">поиск
+                    </button>
                 </div>
             </form>
             {% for resume in resume_all %}
             <div class="mb-5">
-                <div class="d-flex">
+                <div class="d-flex align-items-center">
                     <h4 style="color: blue;"><a href="{% url 'jobseeker:resume_external_detail' resume.id %}">{{ resume.user.last_name }} {{ resume.user.first_name }}
                         {{ resume.user.jobseeker.middle_name }}</a></h4>
+                    <div class="ml-5">
+                        <form action="{% url 'main' 1 %}" method="post" class="favorite">{% csrf_token %}
                     <p class="ml-5">
-                        <form action="{% url 'main' 1 %}"
-                              method="post" class="favorite">{% csrf_token %}
+                    {% if not resume.is_favorite %}
+                    <form action="{% url 'employer:create_favorite' user.employer.pk %}"
+                              method="post" class="add-favorite">{% csrf_token %}
                             <input type="hidden" name="checked" value="{{ resume.pk }}">
                             <button class="btn btn-clear add-favorite" type="submit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                 fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
+                                 fill="currentColor" class="bi bi-star" viewBox="0 0 16 16" style="fill:blue;">
                             <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
                             </svg></button>
                         </form>
+                    </div>
+                    {% else %}
+                    {% get_favorite_id_ resume user.id as favorite_id %}
+                    <form action="{% url 'employer:delete_favorite' user.employer.pk favorite_id %}"
+                              method="post" class="delete-favorite">{% csrf_token %}
+                            <input type="hidden" name="checked" value="{{ resume.pk }}">
+                            <button class="btn btn-clear delete-favorite" type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                 fill="currentColor" class="bi bi-star" viewBox="0 0 16 16" style="fill:blue;">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg></button>
+                    </form>
+                    {% endif %}
                     </p>
                     <p class="h5 ml-5" style="color:black;">Уровень з/п:
                         {% if resume.salary_min and resume.salary_max %}{{ resume.salary_min }} -
@@ -43,10 +93,17 @@
                     </p>
                 </div>
                 <p class="small text-muted mb-0">{{ resume.user.jobseeker.city }}</p>
-                <p class="text-muted mb-3">Дата рождения: {{resume.user.jobseeker.birthday|date:"d.m.Y"}}
-                <span class="mb-3 ml-5">Семейный статус:
-                    {{resume.user.jobseeker.get_married_status_display}}</span></p>
-                <p>Желаемая должность: {{ resume.name }}</p>
+                <div class="d-flex pl-0 col-12 col-sm-7 justify-content-between mb-0">
+                    <p class="text-muted mb-0">Дата рождения:
+                    {{resume.user.jobseeker.birthday|date:"d.m.Y"}}</p>
+                    <p class="text-muted mb-0">Семейный статус:
+                    {{resume.user.jobseeker.get_married_status_display}}</p>
+                </div>
+                <div class="d-flex pl-0 col-12 col-sm-7 justify-content-between">
+                    <p class="text-muted">тел: {{ resume.user.jobseeker.phone_number }}</p>
+                    <p class="text-muted">email: {{ resume.user.email }}</p>
+                </div>
+                <p><span class="font-weight-bold">Желаемая должность:</span> {{ resume.name }}</p>
                 <div class="d-flex">
                     <strong>Навыки:</strong> <span class="ml-3">{{resume.key_skills|linebreaks|truncatewords:20}}</span>
                 </div>
@@ -63,57 +120,13 @@
     </div>
 </div>
 {% elif user.is_authenticated and user.jobseeker %}
-<div class="container my-5">
-    <div class="row">
-        <div class="col">
-            <p class="h4 font-italic">Добро пожаловать {{user.first_name}} {{ user.last_name }}
-               на портал IT Portal!</p>
-            <p class="mb-5">Статус: Соискатель</p>
-            <form action="get" class="mb-5">
-                <div class="form-group">
-                    <input type="text" class="d-inline form-control col-8 col-sm-6 col-md-4"
-                           placeholder="поиск вакансий...">
-                    <button id="search_vacancy" class="btn btn-primary px-4" type="submit">поиск
-                    </button>
-                </div>
-            </form>
-            {% for vacancy in vacancies %}
-            <div class="mb-5">
-                <div class="d-flex">
-                    <h4 style="color: blue;"><a href="{% url 'employer:vacancy_view' vacancy.employer.pk vacancy.pk %}">{{ vacancy.vacancy_name }}</a></h4>
-                    <p class="ml-5"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
-                      <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
-                    </svg></p>
-                    <p class="h5 ml-5" style="color:black;">Уровень з/п:
-                        {% if vacancy.min_salary and vacancy.max_salary %}{{ vacancy.min_salary }} -
-                        {{ vacancy.max_salary }} {{ vacancy.currency }}
-                        {% elif vacancy.min_salary %} от {{ vacancy.min_salary }} {{ vacancy.currency }}
-                        {% elif vacancy.max_salary %} до {{ vacancy.max_salary }} {{ vacancy.currency }}
-                        {% else %} не указана
-                        {% endif %}
-                    </p>
-                </div>
-                <p class="small text-muted mb-0">{{ vacancy.city }} / {{ vacancy.vacancy_type }}</p>
-                <p class="text-muted mb-3">"{{vacancy.employer.company_name}}"
-                <span class="mb-3 ml-5">{% if vacancy.employer.site %}<a class="small" href="#">{{vacancy.employer.site }}</a>{% endif %}</span></p>
-                <p class="font-weight-bold mb-0">Описание вакансии:</p>
-                <p class="mt-0">{{ vacancy.description|linebreaks|truncatewords:30 }}</p>
-                <div class="d-flex">
-                    <p>Дата публикации: {{vacancy.published|date:"d.m.Y" }}</p>
-                    <a class="btn btn-outline-primary px-4 ml-5" role="button" href="{% url 'jobseeker:offer_create' user.id vacancy.id %}">Откликнуться
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
+    {% include 'jobseekerapp/main.html' %}
 {% else %}
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-12 col-sm-8 col-md-9 about_h1">
             <h1 class="text-center font-italic mb-5">Новости IT Portal</h1>
-            <form action="{% url 'search_news' %}" class="mb-5" method="get">
+            <form action="{% url 'search_news' %}" class="mb-5 search-form" method="get">
                 <div class="form-group">
                     <input type="text" class="d-inline form-control col-8 col-sm-6 col-md-4"
                            name="search" placeholder="поиск новостей...">
