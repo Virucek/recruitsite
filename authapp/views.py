@@ -1,5 +1,7 @@
 from django.contrib import auth
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import PasswordChangeView
 from django.db import transaction
@@ -9,11 +11,14 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView
 
 from authapp.forms import UserLoginForm, EmployerRegisterForm, JobseekerRegisterForm, UserEditForm, \
-    EmployerEditForm, JobseekerEditForm, UserJobseekerEditForm
+    EmployerEditForm, JobseekerEditForm, UserJobseekerEditForm, SetPasswordForm
 from authapp.models import Employer, Jobseeker, IndustryType
 
 
 def login(request):
+    """
+    Функция аутентификации, проверят есть ли правло у пользователя зайти на портал.
+    """
     title = 'вход'
 
     login_form = UserLoginForm(data=request.POST)
@@ -37,11 +42,20 @@ def login(request):
 
 
 def logout(request):
+    """
+    Функция выхода из портала, использует стандартный метод Django.
+    """
     auth.logout(request)
     return HttpResponseRedirect(reverse('main'))
 
 
 def register_employer(request):
+    """
+    Функция регистрации как работодатель. Использует :model:`authapp.Employer`.
+
+    **Template:**
+    :template: `authapp/register_employer.html`
+    """
     title = 'Регистрация работодателя'
 
     if request.method == 'POST':
@@ -77,6 +91,12 @@ def register_employer(request):
 
 
 def register_jobseeker(request):
+    """
+    Функция регистрации как соискателя. Использует :model:`authapp.Jobseeker`.
+
+    **Template:**
+    :template: `authapp/register_jobseeker.html`
+    """
     title = 'Регистрация соискателя'
 
     if request.method == 'POST':
@@ -110,26 +130,45 @@ def register_jobseeker(request):
 
 @login_required
 def edit(request):
+    """
+    Редактирование данных работодателя. Использует модель из forms EmployerEditForm.
+
+     **Template:**
+    :template: `authapp/edit.html`
+    """
     title = 'редактирование работодателя'
     sent = False
+    user = User.objects.get(id=request.user.id)
     if request.method == 'POST':
         edit_form = UserEditForm(request.POST, instance=request.user)
         employer_form = EmployerEditForm(request.POST, request.FILES,
                                          instance=request.user.employer)
-        if edit_form.is_valid() and employer_form.is_valid():
+        password_form = SetPasswordForm(request.POST)
+        if edit_form.is_valid() and employer_form.is_valid() and password_form.is_valid():
             edit_form.save()
             employer_form.save()
+            user.set_password(password_form.cleaned_data['new_password1'])
+            user.save()
+            update_session_auth_hash(request, user)
             sent = True
     else:
         edit_form = UserEditForm(instance=request.user)
         employer_form = EmployerEditForm(instance=request.user.employer)
+        password_form = SetPasswordForm()
 
-    content = {'title': title, 'edit_form': edit_form, 'employer_form': employer_form, 'sent': sent}
+    content = {'title': title, 'edit_form': edit_form, 'employer_form': employer_form,
+               'sent': sent, 'pass_form': password_form}
 
     return render(request, 'authapp/edit.html', content)
 
 
 class JobseekerUpdateView(UpdateView):
+    """
+    Редактирование данных соискателя. Использует модель из forms JobseekerEditForm.
+
+    **Template:**
+    :template: `authapp/edit_jobseeker.html`
+    """
     model = Jobseeker
     template_name = 'authapp/edit_jobseeker.html'
     form_class = JobseekerEditForm

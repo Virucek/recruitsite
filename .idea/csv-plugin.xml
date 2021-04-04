@@ -129,6 +129,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/mainapp/templates/mainapp/search_news.html">
+          <value>
+            <Attribute>
+              <option name="separator" value="|" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/mainapp/views.py">
           <value>
             <Attribute>

@@ -5,7 +5,7 @@ from employerapp import views
 app_name = 'employerapp'
 
 urlpatterns = [
-    path('<int:emp_id>/', views.employer_cabinet, name='main'),
+    path('<int:emp_id>/', views.employer_cabinet, name='main_cabinet'),
     path('<int:emp_id>/drafts/', views.vacancy_draft, name='drafts'),
     path('<int:emp_id>/published/', views.vacancy_published, name='published'),
     path('<int:emp_id>/messages/', views.messages, name='messages'),

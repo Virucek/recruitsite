@@ -191,6 +191,24 @@ footer a:hover {
     color: #ff0000;
 }
 
+.search-form {
+    position: relative;
+    z-index: 1;
+}
+
+.bi-sliders {
+    position: relative;
+    cursor: pointer;
+    z-index: 2;
+    right: 26px;
+}
+.bi-sliders:hover {
+    color: #007bff;
+}
+.button-search {
+    position: relative;
+    right: 1.6rem;
+}
 .resume-salary {
     width:20%;
     display:inline;
@@ -206,3 +224,32 @@ button.add-favorite::-moz-focus-outer {
 .star {
     fill: blue;
 }
+
+.extend {
+    display: none;
+}
+label[for=search-field] {
+    display: none;
+}
+ul.errorlist {
+    color: red;
+}
+a .bi-twitter:hover, a .bi-share-fill:hover, a .bi-envelope:hover, a
+.bi-facebook:hover, a .bi-telegram:hover {
+    color: #007bff;
+}
+a .bi-twitter, a .bi-share-fill, a .bi-envelope, a .bi-facebook, a .bi-telegram {
+    color: black;
+}
+.share-icons {
+    opacity = 0;
+    transform-origin: left;
+	transform: scale(0);
+	transition-duration: .5s;
+}
+.share-icons.active {
+    transform: scale(1);
+    opacity = 1;
+    transition-duration: .5s;
+}
+
