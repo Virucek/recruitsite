@@ -7,7 +7,8 @@
     <div class="row justify-content-center">
         <div class="col-12 col-sm-10">
             {% if search_news %}
-            <a class="h5" href="{% url 'main' 1 %}">&laquo вернуться к поиску</a>
+            <a class="h5" href="{% if user.is_authenticated %}{% url 'news' 1 %}{% else %}{% url 'main' 1 %}{% endif %}">&laquo
+                вернуться к поиску</a>
             {% for object in search_news %}
             <div class="row mb-3 mt-5" id="{{ object.id }}">
                 <div class="col-2 h5">{{ object.published|date:"d.m.y" }}</div>
@@ -37,7 +38,7 @@
             </div>
             {% else %}
             <p>Поиск не дал результатов. Попробуйте изменить поиск.</p>
-            <a href="{% url 'main' 1 %}">вернуться к поиску</a>
+            <a href="{% if user.is_authenticated %}{% url 'news' 1 %}{% else %}{% url 'main' 1 %}{% endif %}">вернуться к поиску</a>
             {% endif %}
         </div>
     </div>

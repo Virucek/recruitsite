@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
@@ -230,15 +231,18 @@ def vacancy_edit_draft(request, emp_id, pk):
     vacancy = get_object_or_404(Vacancy, pk=pk)
     employer = get_object_or_404(Employer, pk=emp_id)
     sent = False
+    action = None
     if request.method == 'POST':
         form = VacancyCreationForm(request.POST, instance=vacancy)
         if form.is_valid():
             form.save()
             sent = True
+            action = vacancy.action
     else:
         form = VacancyCreationForm(instance=vacancy)
 
-    context = {'title': title, 'form': form, 'sent': sent, 'employer': employer, 'vacancy': vacancy}
+    context = {'title': title, 'form': form, 'sent': sent, 'employer': employer, 'vacancy':
+        vacancy, 'action': action}
 
     return render(request, 'employerapp/vacancy_edit.html', context)
 
@@ -255,15 +259,18 @@ def vacancy_edit(request, emp_id, pk):
     vacancy = get_object_or_404(Vacancy, pk=pk)
     employer = get_object_or_404(Employer, pk=emp_id)
     sent = False
+    action = None
     if request.method == 'POST':
         form = VacancyEditForm(request.POST, instance=vacancy)
-        if form.is_valid():
-            form.save()
-            sent = True
+        vacancy.action = employer.NEED_MODER
+        form.save()
+        vacancy.save()
+        sent = True
     else:
         form = VacancyEditForm(instance=vacancy)
 
-    context = {'title': title, 'form': form, 'sent': sent, 'employer': employer, 'vacancy': vacancy}
+    context = {'title': title, 'form': form, 'sent': sent, 'employer': employer, 'vacancy':
+        vacancy, 'action': action}
 
     return render(request, 'employerapp/vacancy_edit.html', context)
 
@@ -301,8 +308,10 @@ def vacancy_view(request, emp_id, pk):
     :template:`employerapp/vacancy_view.html`
     """
     title = 'Вакансия'
-    vacancy = get_object_or_404(Vacancy, pk=pk)
     employer = get_object_or_404(Employer, pk=emp_id)
+    vacancy = get_object_or_404(Vacancy, pk=pk)
+
+    context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id}
     favorite = FavoriteVacancy.objects.filter(user=request.user.id, vacancy=vacancy.id)
     favorite_id = None
     is_favorite = False
@@ -430,22 +439,41 @@ def search_resume(request, emp_id):
     title = 'Поиск резюме'
     employer = get_object_or_404(Employer, pk=emp_id)
     search = request.GET.get('search')
-    search_paginator = None
+    search_city = request.GET.get('city')
+    search_salary = request.GET.get('salary')
+    # search_currency = request.GET.get('currency')
+    search_sex = request.GET.get('sex')
+    from_date = request.GET.get('from_date')
+    till_date = request.GET.get('till_date')
+    query_set = []
     if search:
         query = []
-        results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search)).filter(
-            status=Resume.OPENED).order_by('-updated_at')
+        results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search)).filter(status=Resume.OPENED).order_by('-updated_at')
+        print('results_search=', results)
         query.append(results)
-        query = list(chain(*query))
+        print('query_1', query)
+        query_set = list(chain(*query))
 
-        page = request.GET.get('page')
-        paginator = Paginator(query, 5)
-        try:
-            search_paginator = paginator.page(page)
-        except PageNotAnInteger:
-            search_paginator = paginator.page(1)
-        except EmptyPage:
-            search_paginator = paginator.page(paginator.num_pages)
+    if search and search_city and search_salary and search_sex and from_date and till_date:
+        query = []
+        results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search), user__jobseeker__city=search_city,
+            user__jobseeker__gender=search_sex).filter(Q(salary_min=None) | Q(salary_min__lte=search_salary), updated_at__gte=from_date,
+            updated_at__lte=till_date).filter(status=Resume.OPENED).order_by('-updated_at')
+        query.append(results)
+        print('query_2', query)
+        query_set = list(chain(*query))
+
+    if not search:
+        query = []
+
+    page = request.GET.get('page')
+    paginator = Paginator(query_set, 5)
+    try:
+        search_paginator = paginator.page(page)
+    except PageNotAnInteger:
+        search_paginator = paginator.page(1)
+    except EmptyPage:
+        search_paginator = paginator.page(paginator.num_pages)
 
     context = {'title': title, 'object_list': search_paginator, 'search': search}
 

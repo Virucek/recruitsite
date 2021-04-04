@@ -58,9 +58,11 @@ def main(request, page=None):
 def news_detail(request, pk):
     one_news = News.objects.get(pk=pk)
     title = one_news.pk
+    url = f'http://127.0.0.1:8000{request.path}'
     context = {
         'title': title,
-        'one_news': one_news
+        'one_news': one_news,
+        'url': url
     }
     return render(request, 'mainapp/news_detail.html', context)
 
@@ -89,3 +91,19 @@ def search_news(request):
     context = {'title': title, 'search_news': search_paginator, 'search': search}
 
     return render(request, 'mainapp/search_news.html', context)
+
+
+def news(request, page=1):
+    title = 'Новости'
+    news = News.objects.filter(is_active=True).order_by('-published')
+    paginator = Paginator(news, 4)
+    try:
+        news_paginator = paginator.page(page)
+    except PageNotAnInteger:
+        news_paginator = paginator.page(1)
+    except EmptyPage:
+        news_paginator = paginator.page(paginator.num_pages)
+
+    context = {'title': title, 'news': news_paginator}
+
+    return render(request, 'mainapp/news.html', context)

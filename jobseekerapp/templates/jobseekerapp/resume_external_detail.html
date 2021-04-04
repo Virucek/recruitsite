@@ -50,9 +50,9 @@
             <hr>
             <p class="pt-0 mb-3 mt-3" style="color:black;">{{ object.name }}</p>
             <p class="pt-0 mb-3 mt-3" style="color:black;">Уровень з/п:
-            {% if object.min_salary and object.max_salary %}{{ object.min_salary }} - {{ object.max_salary }} {{ object.currency }}
-            {% elif object.min_salary %} от {{ object.min_salary }} {{ object.currency }}
-            {% elif object.max_salary %} до {{ object.max_salary }} {{ object.currency }}
+            {% if resume.salary_min and resume.salary_max %}{{ resume.salary_min }} - {{ resume.salary_max }} {{ resume.currency }}
+            {% elif resume.salary_min %} от {{ resume.salary_min }} {{ resume.currency }}
+            {% elif resume.salary_max %} до {{ resume.salary_max }} {{ resume.currency }}
             {% else %} не указана
             {% endif %}
             </p>
