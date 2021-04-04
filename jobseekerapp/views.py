@@ -66,7 +66,7 @@ class ResumeItemViewMixin(JobseekerViewMixin):
 class JobseekerDetailView(JobseekerViewMixin, DetailView):
     model = Resume
     template_name = 'jobseekerapp/jobseeker_cabinet.html'
-    title = 'Личный кабинет работодателя'
+    title = 'Личный кабинет соискателя'
 
     def get_object(self, queryset=None):
         return Jobseeker.objects.get(user_id=self.request.user.id)
@@ -78,6 +78,16 @@ class JobseekerDetailView(JobseekerViewMixin, DetailView):
 
 
 class ResumeCreateView(JobseekerViewMixin, CreateView):
+    """
+    Создание резюме.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_create.html`
+    """
+
     model = Resume
     template_name = 'jobseekerapp/resume_create.html'
     form_class = ResumeForm
@@ -99,12 +109,31 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
 
 
 class ResumeDetailView(JobseekerViewMixin, DetailView):
+    """
+    Просмотр резюме.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_detail.html`
+    """
+
     model = Resume
     template_name = 'jobseekerapp/resume_detail.html'
     title = 'Резюме'
 
 
 class ResumeUpdateView(JobseekerViewMixin, UpdateView):
+    """
+    Редактирование резюме.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_create.html`
+    """
     model = Resume
     template_name = 'jobseekerapp/resume_create.html'
     form_class = ResumeForm
@@ -117,6 +146,15 @@ class ResumeUpdateView(JobseekerViewMixin, UpdateView):
 
 
 class ResumeDeleteView(JobseekerViewMixin, DeleteView):
+    """
+    Удаление резюме.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_delete.html`
+    """
     model = Resume
     template_name = 'jobseekerapp/resume_delete.html'
     title = 'Удаление резюме'
@@ -127,6 +165,15 @@ class ResumeDeleteView(JobseekerViewMixin, DeleteView):
 
 
 class ResumeExperienceCreateView(ResumeItemViewMixin, CreateView):
+    """
+    Добавление данных об опытке.
+
+    *Model*
+    :model:`jobseekerapp.ResumeExperience`
+
+    *Template*
+    :template:`jobseekerapp/resume_experience_create.html`
+    """
     model = ResumeExperience
     template_name = 'jobseekerapp/resume_experience_create.html'
     form_class = ResumeExperienceForm
@@ -134,6 +181,15 @@ class ResumeExperienceCreateView(ResumeItemViewMixin, CreateView):
 
 
 class ResumeExperienceUpdateView(ResumeItemViewMixin, UpdateView):
+    """
+    Редактирование данных об опыте.
+
+    *Model*
+    :model:`jobseekerapp.ResumeExperience`
+
+    *Template*
+    :template:`jobseekerapp/resume_experience_create.html`
+    """
     model = ResumeExperience
     template_name = 'jobseekerapp/resume_experience_create.html'
     form_class = ResumeExperienceForm
@@ -141,12 +197,30 @@ class ResumeExperienceUpdateView(ResumeItemViewMixin, UpdateView):
 
 
 class ResumeExperienceDeleteView(ResumeItemViewMixin, DeleteView):
+    """
+    Удаление записи об опытке.
+
+    *Model*
+    :model:`jobseekerapp.ResumeExperience`
+
+    *Template*
+    :template:`jobseekerapp/resume_experience_delete.html`
+    """
     model = ResumeExperience
     template_name = 'jobseekerapp/resume_experience_delete.html'
     title = 'Удаление записи об опыте'
 
 
 class ResumeEducationCreateView(ResumeItemViewMixin, CreateView):
+    """
+    Добавление записи об обучении.
+
+    *Model*
+    :model:`jobseekerapp.ResumeEducation`
+
+    *Template*
+    :template:`jobseekerapp/resume_education_create.html`
+    """
     model = ResumeEducation
     template_name = 'jobseekerapp/resume_education_create.html'
     form_class = ResumeEducationForm
@@ -154,6 +228,15 @@ class ResumeEducationCreateView(ResumeItemViewMixin, CreateView):
 
 
 class ResumeEducationUpdateView(ResumeItemViewMixin, UpdateView):
+    """
+    Редактирование записи об обучении.
+
+    *Model*
+    :model:`jobseekerapp.ResumeEducation`
+
+    *Template*
+    :template:`jobseekerapp/resume_education_create.html`
+    """
     model = ResumeEducation
     template_name = 'jobseekerapp/resume_education_create.html'
     form_class = ResumeEducationForm
@@ -161,12 +244,30 @@ class ResumeEducationUpdateView(ResumeItemViewMixin, UpdateView):
 
 
 class ResumeEducationDeleteView(ResumeItemViewMixin, DeleteView):
+    """
+    Удаление записи об обучении.
+
+    *Model*
+    :model:`jobseekerapp.ResumeEducation`
+
+    *Template*
+    :template:`jobseekerapp/resume_education_delete.html`
+    """
     model = ResumeEducation
     template_name = 'jobseekerapp/resume_education_delete.html'
     title = 'Удаление записи об обучении'
 
 
 class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
+    """
+    Резюме расширенный просмотр.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_external_detail.html`
+    """
     model = Resume
     template_name = 'jobseekerapp/resume_external_detail.html'
     title = 'Резюме'
@@ -184,6 +285,15 @@ class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
 
 
 class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
+    """
+    Отправка отклика на вакансию.
+
+    *Model*
+    :model:`jobseekerapp.Offer`
+
+    *Template*
+    :template:`jobseekerapp/offer_create.html`
+    """
     model = Offer
     template_name = 'jobseekerapp/offer_create.html'
     form_class = JobseekerOfferForm
@@ -208,6 +318,12 @@ class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
 
 
 class JobseekerOfferListView(JobseekerViewMixin, ListView):
+    """
+    Просмотр отклика на вакансию.
+
+    *Model*
+    :model:`jobseekerapp.Offer`
+    """
     model = Offer
     title = 'Мои отклики'
 
