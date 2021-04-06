@@ -3,10 +3,9 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
-
+from django.db.models import Q
 from authapp.models import Jobseeker, Employer
-from employerapp.models import Favorites
-from employerapp.models import Vacancy
+from employerapp.models import Favorites, Vacancy
 from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm, JobseekerOfferForm
 from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer, Favorite
 
@@ -367,3 +366,64 @@ def add_favorite(request, jobseeker_id):
         favorite = Favorite.objects.create(user=user, vacancy=vacancy)
         favorite.save()
         return JsonResponse({'id': favorite.id}, status=201)
+
+
+class SearchVacancyListView(JobseekerViewMixin, ListView):
+    model = Vacancy
+    title = 'Поиск вакансии'
+    template_name = 'jobseekerapp/search_vacancy.html'
+    paginate_by = 5
+
+    def get_queryset(self):
+        search = self.request.GET.get('search')
+        company_name = self.request.GET.get('company_name')
+        city = self.request.GET.get('city')
+        min_salary = self.request.GET.get('min_salary')
+        max_salary = self.request.GET.get('max_salary')
+        vacancy_type = self.request.GET.get('vacancy_type')
+        currency = self.request.GET.get('currency')
+        from_date = self.request.GET.get('from_date')
+        till_date = self.request.GET.get('till_date')
+        sort = self.request.GET.get('sort')
+        order = self.request.GET.get('order')
+
+        query = Vacancy.objects.filter(action=Employer.MODER_OK, hide=False)
+
+        if search:
+            query = query.filter(Q(vacancy_name__icontains=search) | Q(description__icontains=search))
+
+        if company_name:
+            query = query.filter(employer=Employer.objects.filter(company_name=company_name).first())
+
+        if city:
+            query = query.filter(city=city)
+
+        if min_salary or max_salary:
+            if min_salary and max_salary:
+                if max_salary > min_salary:
+                    query = query.filter(min_salary__gte=min_salary, max_salary__lte=max_salary)
+                elif max_salary < min_salary:  # TODO по идее надо сделать соответствующее уведомление на форме, а не подмену
+                    query = query.filter(min_salary__gte=min_salary, max_salary__lte=max_salary)
+            elif min_salary:
+                query = query.filter(min_salary__gte=min_salary)
+            elif max_salary:
+                query = query.filter(max_salary__lte=max_salary)
+
+        if currency != "---":
+            query = query.filter(currency=Vacancy.__dict__[f"{currency}"])
+
+        if vacancy_type != "---":
+            query = query.filter(vacancy_type=Vacancy.__dict__[f"{vacancy_type}"])
+
+        if from_date or till_date:
+            if from_date and till_date:
+                if till_date > from_date:
+                    query = query.filter(published__gte=from_date, published__lte=till_date)
+                elif till_date < from_date:  # TODO по идее надо сделать соответствующее уведомление на форме, а не подмену
+                    query = query.filter(published__gte=till_date, published__lte=from_date)
+            elif from_date:
+                query = query.filter(published__gte=from_date)
+            elif till_date:
+                query = query.filter(published__lte=till_date)
+
+        return query.order_by(f"{order}{sort}")
