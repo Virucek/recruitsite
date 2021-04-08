@@ -319,7 +319,6 @@ def vacancy_view(request, emp_id, pk):
         favorite_id = favorite.first().id
     context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id,
                'favorite': favorite_id, 'is_favorite': is_favorite}
-    print(context)
 
     return render(request, 'employerapp/vacancy_view.html', context)
 
@@ -448,9 +447,7 @@ def search_resume(request, emp_id):
     if search:
         query = []
         results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search)).filter(status=Resume.OPENED).order_by('-updated_at')
-        print('results_search=', results)
         query.append(results)
-        print('query_1', query)
         query_set = list(chain(*query))
 
     if search and search_city and search_salary and search_sex and from_date and till_date:
@@ -459,7 +456,6 @@ def search_resume(request, emp_id):
             user__jobseeker__gender=search_sex).filter(Q(salary_min=None) | Q(salary_min__lte=search_salary), updated_at__gte=from_date,
             updated_at__lte=till_date).filter(status=Resume.OPENED).order_by('-updated_at')
         query.append(results)
-        print('query_2', query)
         query_set = list(chain(*query))
 
     if not search:

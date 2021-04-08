@@ -16,7 +16,6 @@ class JobseekerViewMixin:
         try:
             context['title'] = getattr(self, 'title')
         except AttributeError:
-            print("title for view isn't set")
             context['title'] = 'Untitled page'
 
         return context
@@ -94,7 +93,6 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
 
     def get_success_url(self):
         data = self.get_context_data()
-        print(data)
         return reverse_lazy('jobseeker:resume_detail',
                             kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
 
