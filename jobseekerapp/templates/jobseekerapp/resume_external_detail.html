@@ -92,8 +92,8 @@
             {% endif %}
             <p class="mb-5">Дата последнего обновления: {{ object.updated_at|date:"d.m.Y" }}</p>
             <div class="d-flex">
-                <a class="btn btn-outline-primary mb-5 px-4" role="button" href="{% url 'main' 1 %}">К списку резюме
-                </a>
+                <a class="btn btn-outline-primary mb-5 px-4" role="button" href="javascript:history.go(-1)">Назад</a>
+                <a class="btn btn-outline-primary mb-5 px-4 ml-5" role="button" href="{% url 'main' 1 %}">К списку резюме</a>
                 <a class="btn btn-outline-primary mb-5 px-4 ml-5" role="button" href="{% url 'employer:send_offer' user.employer.pk resume.pk %}">Направить
                     предложение
                 </a>
