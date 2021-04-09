@@ -27,6 +27,7 @@ def employer_cabinet(request, emp_id):
         action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     content = {
         'title': title,
         'employer': employer,
@@ -36,7 +37,8 @@ def employer_cabinet(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
     return render(request, 'employerapp/employer_cabinet.html', content)
 
@@ -55,6 +57,7 @@ def vacancy_published(request, emp_id):
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -63,7 +66,8 @@ def vacancy_published(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
 
     return render(request, 'employerapp/vacancy_published.html', context)
@@ -81,7 +85,8 @@ def vacancy_draft(request, emp_id):
         'published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
-    responses = Offer.objects.filter(vacancy=employer.pk, direction='O').order_by('date')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -90,7 +95,8 @@ def vacancy_draft(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
 
     return render(request, 'employerapp/vacancy_drafts.html', context)
@@ -109,6 +115,7 @@ def vacancy_hide(request, emp_id):
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -117,7 +124,8 @@ def vacancy_hide(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
 
     return render(request, 'employerapp/vacancy_hide.html', context)
@@ -136,6 +144,7 @@ def messages(request, emp_id):
         'published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -144,10 +153,42 @@ def messages(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
 
     return render(request, 'employerapp/employer_messages.html', context)
+
+
+@login_required
+def my_offers(request, emp_id):
+    title = 'Направленные предложения'
+    employer = get_object_or_404(Employer, pk=emp_id)
+    vacancies_all = Vacancy.objects.filter(employer=employer).exclude(
+        action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
+    vacancies_hide = Vacancy.objects.filter(hide=True, employer=employer).order_by(
+        'published')
+    drafts = Vacancy.objects.filter(action=employer.DRAFT, hide=False, employer=employer).order_by(
+        'published')
+    vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False,
+                                       employer=employer).order_by(
+        'published')
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
+    context = {
+        'title': title,
+        'employer': employer,
+        'vacancies_hide': vacancies_hide,
+        'drafts': drafts,
+        'vacancies': vacancies,
+        'vacancies_all': vacancies_all,
+        'favorites': favorites,
+        'responses': responses,
+        'offers': offers
+    }
+
+    return render(request, 'employerapp/employer_offers.html', context)
 
 
 @login_required
@@ -250,8 +291,6 @@ def vacancy_view(request, emp_id, pk):
     title = 'Вакансия'
     employer = get_object_or_404(Employer, pk=emp_id)
     vacancy = get_object_or_404(Vacancy, pk=pk)
-
-    context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id}
     favorite = FavoriteVacancy.objects.filter(user=request.user.id, vacancy=vacancy.id)
     favorite_id = None
     is_favorite = False
@@ -260,7 +299,6 @@ def vacancy_view(request, emp_id, pk):
         favorite_id = favorite.first().id
     context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id,
                'favorite': favorite_id, 'is_favorite': is_favorite}
-    print(context)
 
     return render(request, 'employerapp/vacancy_view.html', context)
 
@@ -309,6 +347,7 @@ def favorites(request, emp_id):
                                        employer=employer).order_by(
         'published')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -317,7 +356,8 @@ def favorites(request, emp_id):
         'drafts': drafts,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
     return render(request, 'employerapp/favorites.html', context)
 
@@ -357,30 +397,58 @@ def search_resume(request, emp_id):
     search = request.GET.get('search')
     search_city = request.GET.get('city')
     search_salary = request.GET.get('salary')
-    # search_currency = request.GET.get('currency')
-    search_sex = request.GET.get('sex')
+    sex = request.GET.get('sex')
     from_date = request.GET.get('from_date')
     till_date = request.GET.get('till_date')
     query_set = []
-    if search:
+    # query = []
+    results = None
+    if search != '':
         query = []
         results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search)).filter(status=Resume.OPENED).order_by('-updated_at')
-        print('results_search=', results)
         query.append(results)
-        print('query_1', query)
         query_set = list(chain(*query))
-
-    if search and search_city and search_salary and search_sex and from_date and till_date:
+    if search_city != '':
         query = []
-        results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search), user__jobseeker__city=search_city,
-            user__jobseeker__gender=search_sex).filter(Q(salary_min=None) | Q(salary_min__lte=search_salary), updated_at__gte=from_date,
-            updated_at__lte=till_date).filter(status=Resume.OPENED).order_by('-updated_at')
+        if results:
+            results = results.filter(user__jobseeker__city=search_city)
+        else:
+            results = Resume.objects.filter(user__jobseeker__city=search_city).filter(status=Resume.OPENED).order_by('-updated_at')
         query.append(results)
-        print('query_2', query)
         query_set = list(chain(*query))
-
-    if not search:
+    # if sex != '':
+    #     query = []
+    #     if results:
+    #         results = results.filter(user__jobseeker__gender__contains=sex)
+    #     else:
+    #         results = Resume.objects.filter(user__jobseeker__gender__contains=sex).filter(
+    #             status=Resume.OPENED).order_by('-updated_at')
+    #     query.append(results)
+    #     query_set = list(chain(*query))
+    if search_salary != '':
         query = []
+        if results:
+            results = results.filter(salary_min__lte=search_salary)
+        else:
+            results = Resume.objects.filter(salary_min__lte=search_salary).filter(status=Resume.OPENED).order_by('-updated_at')
+        query.append(results)
+        query_set = list(chain(*query))
+    if from_date != '':
+        query = []
+        if results:
+            results = results.filter(updated_at__gte=from_date)
+        else:
+            results = Resume.objects.filter(updated_at__gte=from_date).filter(status=Resume.OPENED).order_by('-updated_at')
+        query.append(results)
+        query_set = list(chain(*query))
+    if till_date != '':
+        query = []
+        if results:
+            results = results.filter(updated_at__lte=till_date)
+        else:
+            results = Resume.objects.filter(updated_at__lte=till_date).filter(status=Resume.OPENED).order_by('-updated_at')
+        query.append(results)
+        query_set = list(chain(*query))
 
     page = request.GET.get('page')
     paginator = Paginator(query_set, 5)
@@ -391,7 +459,8 @@ def search_resume(request, emp_id):
     except EmptyPage:
         search_paginator = paginator.page(paginator.num_pages)
 
-    context = {'title': title, 'object_list': search_paginator, 'search': search}
+    context = {'title': title, 'object_list': search_paginator, 'search': search,
+               'city': search_city, 'salary': search_salary, 'from': from_date, 'till': till_date}
 
     return render(request, 'employerapp/search_resume.html', context)
 
@@ -412,6 +481,7 @@ def responses(request, emp_id):
     vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False,
                                        employer=employer).order_by(
         'published')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -421,6 +491,7 @@ def responses(request, emp_id):
         'drafts': drafts,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
+        'offers': offers
     }
 
     return render(request, 'employerapp/employer_responses.html', context)

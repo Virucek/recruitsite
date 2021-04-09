@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -18,10 +20,10 @@ class Employer(models.Model):
     MODER_OK = 'moderation_ok'
     MODER_REJECT = 'moderation_reject'
     EMPLOYER_STATUS_CHOICES = (
-        (DRAFT, 'черновик'),
         (NEED_MODER, 'требуется модерация'),
         (MODER_OK, 'модерация пройдена успешно'),
         (MODER_REJECT, 'отклонено модератором'),
+        (DRAFT, 'черновик')
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     company_name = models.CharField(verbose_name='название компании', max_length=256, unique=True)
@@ -33,8 +35,19 @@ class Employer(models.Model):
     logo = models.ImageField(upload_to='company_logo', blank=True)
     city = models.CharField(verbose_name='город расположения компании', max_length=64, blank=True)
     is_active = models.BooleanField(default=True)
-    status = models.CharField(verbose_name='статус компании на сайте', choices=EMPLOYER_STATUS_CHOICES, default=DRAFT,
+    status = models.CharField(verbose_name='статус компании на сайте',
+                              choices=EMPLOYER_STATUS_CHOICES, default=NEED_MODER,
                               max_length=32)
+    failed_moderation = models.CharField(max_length=512, blank=True, verbose_name='поле '
+                        'заполняется в случае отклонения модерации')
+    activation_key = models.CharField(max_length=128, blank=True)
+    activation_key_expires = models.DateTimeField(default=(datetime.now() + timedelta(hours=24)))
+
+    def is_activation_key_expired(self):
+        if datetime.now() > self.activation_key_expires:
+            return True
+        else:
+            return False
 
     class Meta:
         verbose_name_plural = 'Работодатели'
@@ -44,6 +57,16 @@ class Employer(models.Model):
 
 
 class Jobseeker(models.Model):
+    DRAFT = 'draft'
+    NEED_MODER = 'need_moderation'
+    MODER_OK = 'moderation_ok'
+    MODER_REJECT = 'moderation_reject'
+    JOBSEEKER_STATUS_CHOICES = (
+        (NEED_MODER, 'требуется модерация'),
+        (MODER_OK, 'модерация пройдена успешно'),
+        (MODER_REJECT, 'отклонено модератором'),
+        (DRAFT, 'черновик')
+    )
     GENDER_CHOICES = (
         ('m', 'мужской'),
         ('f', 'женский'),
@@ -62,9 +85,21 @@ class Jobseeker(models.Model):
     photo = models.ImageField(upload_to='jobseeker_photo', blank=True)
     phone_number = models.CharField(verbose_name='телефон', max_length=11)
     about = models.TextField(verbose_name='о себе', max_length=512, blank=True)
+    status = models.CharField(verbose_name='статус компании на сайте',
+                choices=JOBSEEKER_STATUS_CHOICES, default=NEED_MODER, max_length=32)
+    failed_moderation = models.CharField(max_length=512, blank=True, verbose_name='поле '
+                                            'заполняется в случае отклонения модерации')
+    activation_key = models.CharField(max_length=128, blank=True)
+    activation_key_expires = models.DateTimeField(default=(datetime.now() + timedelta(hours=24)))
+
+    def is_activation_key_expired(self):
+        if datetime.now() > self.activation_key_expires:
+            return True
+        else:
+            return False
 
     class Meta:
         verbose_name_plural = 'Соискатели'
 
     def __str__(self):
-        return f'{self.user.first_name} {self.user.last_name}'
+        return f'{self.user.first_name} {self.user.last_name} (статус: {self.status})'

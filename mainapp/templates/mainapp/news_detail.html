@@ -1,11 +1,11 @@
 {% extends 'mainapp/base.html' %}
 {% load static %}
 
-<title>{% block title %}News №{{ title }}{% endblock %}</title>
+<title>{% block title %}Новость №{{ title }}{% endblock %}</title>
 
 {% block content %}
 <div class="container my-5">
-    <nav class="mx-5 mb-5" aria-label="breadcrumb">
+    <nav class="mb-5" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 {% if user.is_authenticated %}

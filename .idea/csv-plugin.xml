@@ -3,7 +3,21 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/authapp/admin.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/authapp/templates/authapp/edit.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/authapp/views.py">
           <value>
             <Attribute>
               <option name="separator" value=":" />
@@ -32,6 +46,20 @@
           </value>
         </entry>
         <entry key="/employerapp/templates/employerapp/employer_messages.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/employerapp/templates/employerapp/employer_offers.html">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/employerapp/templates/employerapp/employer_responses.html">
           <value>
             <Attribute>
               <option name="separator" value=":" />
@@ -119,6 +147,13 @@
           <value>
             <Attribute>
               <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/mainapp/templates/mainapp/news.html">
+          <value>
+            <Attribute>
+              <option name="separator" value="|" />
             </Attribute>
           </value>
         </entry>

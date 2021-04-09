@@ -69,16 +69,17 @@ $('.bi-sliders').on('click', function() {
     $('.extend').css('display', 'block');
     $('label[for=search-field]').css('display', 'inline');
     $(this).css('opacity', 0);
-    $('#search-field').attr('required', 'required');
+//    $('#search-field').attr('required', 'required');
     $('.button-search').css('margin-left', '1.3rem');
-    $('#city').attr('required', 'required');
-    $('#sex').attr('required', 'required');
-    $('#salary').attr('required', 'required');
-    $('#from_date').attr('required', 'required');
-    $('#till_date').attr('required', 'required');
+//    $('#city').attr('required', 'required');
+//    $('#sex').attr('required', 'required');
+//    $('#salary').attr('required', 'required');
+//    $('#from_date').attr('required', 'required');
+//    $('#till_date').attr('required', 'required');
 })
 
 $('.share').on('click', function() {
     $('.share-icons').toggleClass("active");
+    return false;
 });
 
