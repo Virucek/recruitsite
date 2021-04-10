@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 import authapp.views as authapp
 
@@ -12,4 +12,9 @@ urlpatterns = [
     path('edit/', authapp.edit, name='edit'),
     path('jobseeker/<int:pk>/edit/', authapp.JobseekerUpdateView.as_view(), name='edit_jobseeker'),
     path('edit/password/', authapp.UpdatePasswordView.as_view(), name='edit_password'),
+    re_path(r'^verify/(?P<email>.+)/(?P<activation_key>\w+)/$', authapp.verify, name='verify'),
+    re_path(r'^seeker_verify/(?P<email>.+)/(?P<activation_key>\w+)/$', authapp.seeker_verify, name='seeker_verify'),
+    path('email_verify/', authapp.email_verify, name='email_verify'),
+    path('edit/employer_password/', authapp.employer_change_password,
+         name='employer_change_password')
 ]

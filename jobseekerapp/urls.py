@@ -30,4 +30,6 @@ urlpatterns = [
     path('<int:jobseeker_id>/favorite/<int:pk>/delete/', views.JobseekerFavoriteDeleteView.as_view(),
          name='favorite_delete'),
     path('<int:jobseeker_id>/favorite/create/', views.add_favorite, name='favorite_create'),
+    path('<int:jobseeker_id>/search_vacancy/',
+         views.SearchVacancyListView.as_view(), name='search_vacancy'),
 ]

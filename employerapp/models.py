@@ -6,11 +6,13 @@ from authapp.models import Employer
 
 
 class Vacancy(models.Model):
-    RUB = 'руб.'
+    RUB = 'RUB'
     USD = 'USD'
+    EUR = 'EUR'
     CURRENCY_CHOICE = (
-        (RUB, 'руб.'),
-        (USD, 'USD')
+        (RUB, 'RUB'),
+        (USD, 'USD'),
+        (EUR, 'EUR')
     )
     FULL = 'полная занятость'
     PART = 'частичная занятость'
@@ -66,6 +68,12 @@ class Vacancy(models.Model):
 
 
 class SendOffers(models.Model):
+    NEW = 'new'
+    READ = 'read'
+    OFFER_STATUS = (
+        (NEW, 'новое (не прочитано)'),
+        (READ, 'прочитано'),
+    )
     date = models.DateField(verbose_name='дата направления предложения', default=datetime.now)
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, verbose_name='выберите '
                             'вакансию по которой хотите направить предложение соискателю')
@@ -75,6 +83,8 @@ class SendOffers(models.Model):
                 'вакансии', blank=True, max_length=524, help_text='поле не обязательное')
     contact_phone = models.CharField(max_length=12, blank=True, help_text='поле не обязательное',
                                      verbose_name='конт. тел с кем связываться по вакансии')
+    status = models.CharField(verbose_name='статус предложения', max_length=32,
+                              choices=OFFER_STATUS, default=NEW)
 
     class Meta:
         verbose_name_plural = 'Предложения для соискателей'

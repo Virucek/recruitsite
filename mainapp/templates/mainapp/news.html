@@ -23,9 +23,10 @@
                 <div class="col mb-0 text_news">
                     {% if item.description|wordcount > 40 %}
                     {{ item.description|linebreaks|truncatewords:40 }}
-                    <p class="mb-2"><a href="{% url 'news_detail' item.pk%}"><small class="text-muted">
-                        подробнее...</small></a></p>{% else %} {{ item.description|linebreaks }}
+                    {% else %} {{ item.description|linebreaks }}
                     {% endif %}
+                    <p class="mb-2"><a href="{% url 'news_detail' item.pk%}"><small class="text-muted">
+                        подробнее...</small></a></p>
                 </div>
             </div>
             {% endfor %}

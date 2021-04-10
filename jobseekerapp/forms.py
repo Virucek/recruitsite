@@ -10,9 +10,11 @@ DATE_INPUT_RESUME_FORMATS = [
 ]
 RUB = 'RUB'
 EUR = 'EUR'
+USD = 'USD'
 CURRENCY_CHOICES = (
-    (RUB, 'руб.'),
-    (EUR, 'EUR')
+    (RUB, 'RUB'),
+    (EUR, 'EUR'),
+    (USD, 'USD')
 )
 
 

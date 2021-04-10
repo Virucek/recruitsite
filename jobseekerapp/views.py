@@ -3,10 +3,9 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
-
+from django.db.models import Q
 from authapp.models import Jobseeker, Employer
-from employerapp.models import Favorites
-from employerapp.models import Vacancy
+from employerapp.models import Favorites, Vacancy
 from jobseekerapp.forms import ResumeEducationForm, ResumeExperienceForm, ResumeForm, JobseekerOfferForm
 from jobseekerapp.models import Resume, ResumeEducation, ResumeExperience, Offer, Favorite
 
@@ -17,7 +16,6 @@ class JobseekerViewMixin:
         try:
             context['title'] = getattr(self, 'title')
         except AttributeError:
-            print("title for view isn't set")
             context['title'] = 'Untitled page'
 
         return context
@@ -64,9 +62,18 @@ class ResumeItemViewMixin(JobseekerViewMixin):
 
 
 class JobseekerDetailView(JobseekerViewMixin, DetailView):
+    """
+    Личный кабинет соискателя
+
+    *Model*
+    :model: `jobseekerapp.Resume`
+
+    *Template*
+    :template: `jobseekerapp/jobseeker_cabinet.html`
+    """
     model = Resume
     template_name = 'jobseekerapp/jobseeker_cabinet.html'
-    title = 'Личный кабинет работодателя'
+    title = 'Личный кабинет соискателя'
 
     def get_object(self, queryset=None):
         return Jobseeker.objects.get(user_id=self.request.user.id)
@@ -78,6 +85,16 @@ class JobseekerDetailView(JobseekerViewMixin, DetailView):
 
 
 class ResumeCreateView(JobseekerViewMixin, CreateView):
+    """
+    Создание резюме.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_create.html`
+    """
+
     model = Resume
     template_name = 'jobseekerapp/resume_create.html'
     form_class = ResumeForm
@@ -85,7 +102,6 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
 
     def get_success_url(self):
         data = self.get_context_data()
-        print(data)
         return reverse_lazy('jobseeker:resume_detail',
                             kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
 
@@ -99,12 +115,31 @@ class ResumeCreateView(JobseekerViewMixin, CreateView):
 
 
 class ResumeDetailView(JobseekerViewMixin, DetailView):
+    """
+    Просмотр резюме.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_detail.html`
+    """
+
     model = Resume
     template_name = 'jobseekerapp/resume_detail.html'
     title = 'Резюме'
 
 
 class ResumeUpdateView(JobseekerViewMixin, UpdateView):
+    """
+    Редактирование резюме.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_create.html`
+    """
     model = Resume
     template_name = 'jobseekerapp/resume_create.html'
     form_class = ResumeForm
@@ -117,6 +152,15 @@ class ResumeUpdateView(JobseekerViewMixin, UpdateView):
 
 
 class ResumeDeleteView(JobseekerViewMixin, DeleteView):
+    """
+    Удаление резюме.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_delete.html`
+    """
     model = Resume
     template_name = 'jobseekerapp/resume_delete.html'
     title = 'Удаление резюме'
@@ -127,6 +171,15 @@ class ResumeDeleteView(JobseekerViewMixin, DeleteView):
 
 
 class ResumeExperienceCreateView(ResumeItemViewMixin, CreateView):
+    """
+    Добавление данных об опытке.
+
+    *Model*
+    :model:`jobseekerapp.ResumeExperience`
+
+    *Template*
+    :template:`jobseekerapp/resume_experience_create.html`
+    """
     model = ResumeExperience
     template_name = 'jobseekerapp/resume_experience_create.html'
     form_class = ResumeExperienceForm
@@ -134,6 +187,15 @@ class ResumeExperienceCreateView(ResumeItemViewMixin, CreateView):
 
 
 class ResumeExperienceUpdateView(ResumeItemViewMixin, UpdateView):
+    """
+    Редактирование данных об опыте.
+
+    *Model*
+    :model:`jobseekerapp.ResumeExperience`
+
+    *Template*
+    :template:`jobseekerapp/resume_experience_create.html`
+    """
     model = ResumeExperience
     template_name = 'jobseekerapp/resume_experience_create.html'
     form_class = ResumeExperienceForm
@@ -141,12 +203,30 @@ class ResumeExperienceUpdateView(ResumeItemViewMixin, UpdateView):
 
 
 class ResumeExperienceDeleteView(ResumeItemViewMixin, DeleteView):
+    """
+    Удаление записи об опытке.
+
+    *Model*
+    :model:`jobseekerapp.ResumeExperience`
+
+    *Template*
+    :template:`jobseekerapp/resume_experience_delete.html`
+    """
     model = ResumeExperience
     template_name = 'jobseekerapp/resume_experience_delete.html'
     title = 'Удаление записи об опыте'
 
 
 class ResumeEducationCreateView(ResumeItemViewMixin, CreateView):
+    """
+    Добавление записи об обучении.
+
+    *Model*
+    :model:`jobseekerapp.ResumeEducation`
+
+    *Template*
+    :template:`jobseekerapp/resume_education_create.html`
+    """
     model = ResumeEducation
     template_name = 'jobseekerapp/resume_education_create.html'
     form_class = ResumeEducationForm
@@ -154,6 +234,15 @@ class ResumeEducationCreateView(ResumeItemViewMixin, CreateView):
 
 
 class ResumeEducationUpdateView(ResumeItemViewMixin, UpdateView):
+    """
+    Редактирование записи об обучении.
+
+    *Model*
+    :model:`jobseekerapp.ResumeEducation`
+
+    *Template*
+    :template:`jobseekerapp/resume_education_create.html`
+    """
     model = ResumeEducation
     template_name = 'jobseekerapp/resume_education_create.html'
     form_class = ResumeEducationForm
@@ -161,12 +250,30 @@ class ResumeEducationUpdateView(ResumeItemViewMixin, UpdateView):
 
 
 class ResumeEducationDeleteView(ResumeItemViewMixin, DeleteView):
+    """
+    Удаление записи об обучении.
+
+    *Model*
+    :model:`jobseekerapp.ResumeEducation`
+
+    *Template*
+    :template:`jobseekerapp/resume_education_delete.html`
+    """
     model = ResumeEducation
     template_name = 'jobseekerapp/resume_education_delete.html'
     title = 'Удаление записи об обучении'
 
 
 class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
+    """
+    Резюме расширенный просмотр.
+
+    *Model*
+    :model:`jobseekerapp.Resume`
+
+    *Template*
+    :template:`jobseekerapp/resume_external_detail.html`
+    """
     model = Resume
     template_name = 'jobseekerapp/resume_external_detail.html'
     title = 'Резюме'
@@ -184,6 +291,15 @@ class ResumeExternalDetailView(JobseekerViewMixin, DetailView):
 
 
 class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
+    """
+    Отправка отклика на вакансию.
+
+    *Model*
+    :model:`jobseekerapp.Offer`
+
+    *Template*
+    :template:`jobseekerapp/offer_create.html`
+    """
     model = Offer
     template_name = 'jobseekerapp/offer_create.html'
     form_class = JobseekerOfferForm
@@ -208,6 +324,12 @@ class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
 
 
 class JobseekerOfferListView(JobseekerViewMixin, ListView):
+    """
+    Просмотр отклика на вакансию.
+
+    *Model*
+    :model:`jobseekerapp.Offer`
+    """
     model = Offer
     title = 'Мои отклики'
 
@@ -217,6 +339,13 @@ class JobseekerOfferListView(JobseekerViewMixin, ListView):
 
 
 class JobseekerFavoriteListView(JobseekerViewMixin, ListView):
+    """
+    Просмотр избранных вакансий.
+
+    *Model*
+    :model:`jobseekerapp.Favorite`
+
+    """
     model = Favorite
     title = 'Избранное'
 
@@ -227,6 +356,16 @@ class JobseekerFavoriteListView(JobseekerViewMixin, ListView):
 
 
 class JobseekerFavoriteDeleteView(JobseekerViewMixin, DeleteView):
+    """
+    Удаление избранных вакансий.
+
+    *Model*
+    :model:`jobseekerapp.Favorite`
+
+    *Template*
+    :template: `jobseekerapp/favorite_delete.html`
+    """
+
     model = Favorite
     template_name = 'jobseekerapp/favorite_delete.html'
     title = 'Удаление вакансии из избранного'
@@ -245,9 +384,82 @@ class JobseekerFavoriteDeleteView(JobseekerViewMixin, DeleteView):
 
 
 def add_favorite(request, jobseeker_id):
+    """
+    Добавление вакансии в избранное
+    """
     if request.is_ajax():
         vacancy = get_object_or_404(Vacancy, pk=int(request.POST.get('checked')))
         user = get_object_or_404(Jobseeker, pk=jobseeker_id)
         favorite = Favorite.objects.create(user=user, vacancy=vacancy)
         favorite.save()
         return JsonResponse({'id': favorite.id}, status=201)
+
+
+class SearchVacancyListView(JobseekerViewMixin, ListView):
+    """
+    Поиск вакансий
+
+    *Model*
+    :model: `jobseekerapp.Vacancy`
+
+    *Template*
+    :template: `jobseekerapp/search_vacancy.html`
+    """
+    model = Vacancy
+    title = 'Поиск вакансии'
+    template_name = 'jobseekerapp/search_vacancy.html'
+    paginate_by = 5
+
+    def get_queryset(self):
+        search = self.request.GET.get('search')
+        company_name = self.request.GET.get('company_name')
+        city = self.request.GET.get('city')
+        min_salary = self.request.GET.get('min_salary')
+        max_salary = self.request.GET.get('max_salary')
+        vacancy_type = self.request.GET.get('vacancy_type')
+        currency = self.request.GET.get('currency')
+        from_date = self.request.GET.get('from_date')
+        till_date = self.request.GET.get('till_date')
+        sort = self.request.GET.get('sort')
+        order = self.request.GET.get('order')
+
+        query = Vacancy.objects.filter(action=Employer.MODER_OK, hide=False)
+
+        if search:
+            query = query.filter(Q(vacancy_name__icontains=search) | Q(description__icontains=search))
+
+        if company_name:
+            query = query.filter(employer=Employer.objects.filter(company_name=company_name).first())
+
+        if city:
+            query = query.filter(city=city)
+
+        if min_salary or max_salary:
+            if min_salary and max_salary:
+                if max_salary > min_salary:
+                    query = query.filter(min_salary__gte=min_salary, max_salary__lte=max_salary)
+                elif max_salary < min_salary:  # TODO по идее надо сделать соответствующее уведомление на форме, а не подмену
+                    query = query.filter(min_salary__gte=min_salary, max_salary__lte=max_salary)
+            elif min_salary:
+                query = query.filter(min_salary__gte=min_salary)
+            elif max_salary:
+                query = query.filter(max_salary__lte=max_salary)
+
+        if currency != "---":
+            query = query.filter(currency=Vacancy.__dict__[f"{currency}"])
+
+        if vacancy_type != "---":
+            query = query.filter(vacancy_type=Vacancy.__dict__[f"{vacancy_type}"])
+
+        if from_date or till_date:
+            if from_date and till_date:
+                if till_date > from_date:
+                    query = query.filter(published__gte=from_date, published__lte=till_date)
+                elif till_date < from_date:  # TODO по идее надо сделать соответствующее уведомление на форме, а не подмену
+                    query = query.filter(published__gte=till_date, published__lte=from_date)
+            elif from_date:
+                query = query.filter(published__gte=from_date)
+            elif till_date:
+                query = query.filter(published__lte=till_date)
+
+        return query.order_by(f"{order}{sort}")

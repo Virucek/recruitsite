@@ -3,8 +3,7 @@ from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
-from django.http import HttpResponseRedirect, JsonResponse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
@@ -16,6 +15,12 @@ from jobseekerapp.models import Resume, Offer, Favorite as FavoriteVacancy
 
 @login_required
 def employer_cabinet(request, emp_id):
+    """
+    Собираются данные о работадатели из базы данных, для их отображения в личном кабинете.
+
+    *Template*
+    :template:`employerapp/employer_cabinet.html`
+    """
     title = 'Личный кабинет работодателя'
     employer = get_object_or_404(Employer, pk=emp_id)
     industry_type = IndustryType.objects.get(id=employer.industry_type_id)
@@ -27,6 +32,7 @@ def employer_cabinet(request, emp_id):
         action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     content = {
         'title': title,
         'employer': employer,
@@ -36,13 +42,20 @@ def employer_cabinet(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
     return render(request, 'employerapp/employer_cabinet.html', content)
 
 
 @login_required
 def vacancy_published(request, emp_id):
+    """
+    Собирает из базы данных вакансии в статусе не скрытые (поле hide=False) и выводит их на странице.
+
+    *Template*
+    :template:`employerapp/vacancy_published.html`
+    """
     title = 'Опубликованные вакансии'
     employer = get_object_or_404(Employer, pk=emp_id)
     drafts = Vacancy.objects.filter(action=employer.DRAFT, hide=False, employer=employer).order_by(
@@ -55,6 +68,7 @@ def vacancy_published(request, emp_id):
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -63,7 +77,8 @@ def vacancy_published(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
 
     return render(request, 'employerapp/vacancy_published.html', context)
@@ -71,6 +86,12 @@ def vacancy_published(request, emp_id):
 
 @login_required
 def vacancy_draft(request, emp_id):
+    """
+    Собирает из базы данных вакансии в статусе draft и выводит их на странице.
+
+    *Template*
+    :template:`employerapp/vacancy_drafts.html`
+    """
     employer = get_object_or_404(Employer, pk=emp_id)
     title = 'Черновики'
     drafts = Vacancy.objects.filter(action=employer.DRAFT, hide=False, employer=employer).order_by(
@@ -81,7 +102,8 @@ def vacancy_draft(request, emp_id):
         'published')
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
-    responses = Offer.objects.filter(vacancy=employer.pk, direction='O').order_by('date')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -90,7 +112,8 @@ def vacancy_draft(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
 
     return render(request, 'employerapp/vacancy_drafts.html', context)
@@ -98,6 +121,12 @@ def vacancy_draft(request, emp_id):
 
 @login_required
 def vacancy_hide(request, emp_id):
+    """
+    Собирает из базы данных вакансии в статусе скрытые (поле hide=True) и выводит их на странице.
+
+    *Template*
+    :template:`employerapp/vacancy_hide.html`
+    """
     employer = get_object_or_404(Employer, pk=emp_id)
     title = 'Удаленные вакансии'
     vacancies_hide = Vacancy.objects.filter(hide=True, employer=employer).order_by(
@@ -109,6 +138,7 @@ def vacancy_hide(request, emp_id):
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -117,7 +147,8 @@ def vacancy_hide(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
 
     return render(request, 'employerapp/vacancy_hide.html', context)
@@ -125,6 +156,12 @@ def vacancy_hide(request, emp_id):
 
 @login_required
 def messages(request, emp_id):
+    """
+    Собирает из базы данных сообщения от администратора портала, по результатм модерации вакансий.
+
+    *Template*
+    :template:`employerapp/employer_messages.html`
+    """
     title = 'Сообщения от админа портала'
     employer = get_object_or_404(Employer, pk=emp_id)
     vacancies_all = Vacancy.objects.filter(employer=employer).exclude(action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
@@ -136,6 +173,7 @@ def messages(request, emp_id):
         'published')
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -144,14 +182,52 @@ def messages(request, emp_id):
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
         'favorites': favorites,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
 
     return render(request, 'employerapp/employer_messages.html', context)
 
 
 @login_required
+def my_offers(request, emp_id):
+    title = 'Направленные предложения'
+    employer = get_object_or_404(Employer, pk=emp_id)
+    vacancies_all = Vacancy.objects.filter(employer=employer).exclude(
+        action=employer.NEED_MODER).exclude(action=employer.DRAFT).order_by('published')
+    vacancies_hide = Vacancy.objects.filter(hide=True, employer=employer).order_by(
+        'published')
+    drafts = Vacancy.objects.filter(action=employer.DRAFT, hide=False, employer=employer).order_by(
+        'published')
+    vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False,
+                                       employer=employer).order_by(
+        'published')
+    favorites = Favorites.objects.filter(employer=employer).order_by('date')
+    responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
+    context = {
+        'title': title,
+        'employer': employer,
+        'vacancies_hide': vacancies_hide,
+        'drafts': drafts,
+        'vacancies': vacancies,
+        'vacancies_all': vacancies_all,
+        'favorites': favorites,
+        'responses': responses,
+        'offers': offers
+    }
+
+    return render(request, 'employerapp/employer_offers.html', context)
+
+
+@login_required
 def vacancy_create(request, emp_id):
+    """
+    Создании вакансий.
+
+    *Template*
+    :template:`employerapp/employer_messages.html`
+    """
     employer = get_object_or_404(Employer, pk=emp_id)
     title = 'создание вакансии'
     sent = False
@@ -185,6 +261,12 @@ def vacancy_create(request, emp_id):
 
 @login_required
 def vacancy_edit_draft(request, emp_id, pk):
+    """
+    Редактирование черновика вакансии.
+
+    *Template*
+    :template:`employerapp/vacancy_edit.html`
+    """
     title = 'Редактирование вакансии'
     vacancy = get_object_or_404(Vacancy, pk=pk)
     employer = get_object_or_404(Employer, pk=emp_id)
@@ -207,6 +289,12 @@ def vacancy_edit_draft(request, emp_id, pk):
 
 @login_required
 def vacancy_edit(request, emp_id, pk):
+    """
+    Редактирование вакансии
+
+    *Template*
+    :template:`employerapp/vacancy_edit.html`
+    """
     title = 'Редактирование вакансии'
     vacancy = get_object_or_404(Vacancy, pk=pk)
     employer = get_object_or_404(Employer, pk=emp_id)
@@ -229,6 +317,12 @@ def vacancy_edit(request, emp_id, pk):
 
 @login_required
 def vacancy_delete(request, emp_id, pk):
+    """
+    Удаление вакансии
+
+    *Template*
+    :template:`employerapp/vacancy_delete.html`
+    """
     title = 'Удаление вакансии'
     employer = get_object_or_404(Employer, pk=emp_id)
     vacancy = get_object_or_404(Vacancy, pk=pk)
@@ -247,11 +341,15 @@ def vacancy_delete(request, emp_id, pk):
 
 @login_required
 def vacancy_view(request, emp_id, pk):
+    """
+    Просмотр вакансии
+
+    *Template*
+    :template:`employerapp/vacancy_view.html`
+    """
     title = 'Вакансия'
     employer = get_object_or_404(Employer, pk=emp_id)
     vacancy = get_object_or_404(Vacancy, pk=pk)
-
-    context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id}
     favorite = FavoriteVacancy.objects.filter(user=request.user.id, vacancy=vacancy.id)
     favorite_id = None
     is_favorite = False
@@ -260,13 +358,18 @@ def vacancy_view(request, emp_id, pk):
         favorite_id = favorite.first().id
     context = {'title': title, 'item': vacancy, 'employer': employer, 'user': request.user.id,
                'favorite': favorite_id, 'is_favorite': is_favorite}
-    print(context)
 
     return render(request, 'employerapp/vacancy_view.html', context)
 
 
 @login_required
 def send_offer(request, emp_id, pk):
+    """
+    Выслать предложение на работу.
+
+    *Template*
+    :template:`employerapp/send_offer.html`
+    """
     title = 'Предложение по работе'
     employer = get_object_or_404(Employer, pk=emp_id)
     resume = get_object_or_404(Resume, pk=pk)
@@ -296,6 +399,12 @@ def send_offer(request, emp_id, pk):
 
 @login_required
 def favorites(request, emp_id):
+    """
+    Просмотр избранных резюме
+
+    *Template*
+    :template:`employerapp/favorites.html`
+    """
     title = 'Избранные резюме'
     employer = get_object_or_404(Employer, pk=emp_id)
     favorites = Favorites.objects.filter(employer=employer).order_by('date')
@@ -309,6 +418,7 @@ def favorites(request, emp_id):
                                        employer=employer).order_by(
         'published')
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by('date')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -317,13 +427,17 @@ def favorites(request, emp_id):
         'drafts': drafts,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
-        'responses': responses
+        'responses': responses,
+        'offers': offers
     }
     return render(request, 'employerapp/favorites.html', context)
 
 
 @login_required
 def add_favorite(request, emp_id):
+    """
+    Добавление резюме в избранное
+    """
     if request.is_ajax():
         resume = get_object_or_404(Resume, pk=int(request.POST.get('checked')))
         employer = get_object_or_404(Employer, pk=emp_id)
@@ -334,6 +448,12 @@ def add_favorite(request, emp_id):
 
 @login_required
 def delete_favorite(request, emp_id, pk):
+    """
+    Удаление избранных резюме
+
+    *Template*
+    :template:`employerapp/delete_favorite.html`
+    """
     title = 'Удаление избранных резюме'
     employer = get_object_or_404(Employer, pk=emp_id)
     favorite = get_object_or_404(Favorites, pk=pk)
@@ -352,35 +472,69 @@ def delete_favorite(request, emp_id, pk):
 
 @login_required
 def search_resume(request, emp_id):
+    """
+    Поиск резюме
+
+    *Template*
+    :template:`employerapp/search_resume.html`
+    """
     title = 'Поиск резюме'
     employer = get_object_or_404(Employer, pk=emp_id)
     search = request.GET.get('search')
     search_city = request.GET.get('city')
     search_salary = request.GET.get('salary')
-    # search_currency = request.GET.get('currency')
-    search_sex = request.GET.get('sex')
+    sex = request.GET.get('sex')
     from_date = request.GET.get('from_date')
     till_date = request.GET.get('till_date')
     query_set = []
-    if search:
+    # query = []
+    results = None
+    if search != '':
         query = []
         results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search)).filter(status=Resume.OPENED).order_by('-updated_at')
-        print('results_search=', results)
         query.append(results)
-        print('query_1', query)
         query_set = list(chain(*query))
-
-    if search and search_city and search_salary and search_sex and from_date and till_date:
+    if search_city != '':
         query = []
-        results = Resume.objects.filter(Q(name__icontains=search) | Q(key_skills__icontains=search), user__jobseeker__city=search_city,
-            user__jobseeker__gender=search_sex).filter(Q(salary_min=None) | Q(salary_min__lte=search_salary), updated_at__gte=from_date,
-            updated_at__lte=till_date).filter(status=Resume.OPENED).order_by('-updated_at')
+        if results:
+            results = results.filter(user__jobseeker__city=search_city)
+        else:
+            results = Resume.objects.filter(user__jobseeker__city=search_city).filter(status=Resume.OPENED).order_by('-updated_at')
         query.append(results)
-        print('query_2', query)
         query_set = list(chain(*query))
-
-    if not search:
+    # if sex != '':
+    #     query = []
+    #     if results:
+    #         results = results.filter(user__jobseeker__gender__contains=sex)
+    #     else:
+    #         results = Resume.objects.filter(user__jobseeker__gender__contains=sex).filter(
+    #             status=Resume.OPENED).order_by('-updated_at')
+    #     query.append(results)
+    #     query_set = list(chain(*query))
+    if search_salary != '':
         query = []
+        if results:
+            results = results.filter(salary_min__lte=search_salary)
+        else:
+            results = Resume.objects.filter(salary_min__lte=search_salary).filter(status=Resume.OPENED).order_by('-updated_at')
+        query.append(results)
+        query_set = list(chain(*query))
+    if from_date != '':
+        query = []
+        if results:
+            results = results.filter(updated_at__gte=from_date)
+        else:
+            results = Resume.objects.filter(updated_at__gte=from_date).filter(status=Resume.OPENED).order_by('-updated_at')
+        query.append(results)
+        query_set = list(chain(*query))
+    if till_date != '':
+        query = []
+        if results:
+            results = results.filter(updated_at__lte=till_date)
+        else:
+            results = Resume.objects.filter(updated_at__lte=till_date).filter(status=Resume.OPENED).order_by('-updated_at')
+        query.append(results)
+        query_set = list(chain(*query))
 
     page = request.GET.get('page')
     paginator = Paginator(query_set, 5)
@@ -391,13 +545,20 @@ def search_resume(request, emp_id):
     except EmptyPage:
         search_paginator = paginator.page(paginator.num_pages)
 
-    context = {'title': title, 'object_list': search_paginator, 'search': search}
+    context = {'title': title, 'object_list': search_paginator, 'search': search,
+               'city': search_city, 'salary': search_salary, 'from': from_date, 'till': till_date}
 
     return render(request, 'employerapp/search_resume.html', context)
 
 
 @login_required
 def responses(request, emp_id):
+    """
+    Просомотр откликов на вакансии
+
+    *Template*
+    :template:`employerapp/employer_responses.html`
+    """
     title = 'Отклики по вакансиям'
     employer = get_object_or_404(Employer, pk=emp_id)
     responses = Offer.objects.filter(vacancy__employer=employer.pk, direction='O').order_by(
@@ -412,6 +573,7 @@ def responses(request, emp_id):
     vacancies = Vacancy.objects.filter(action=employer.MODER_OK, hide=False,
                                        employer=employer).order_by(
         'published')
+    offers = SendOffers.objects.filter(vacancy__employer=employer.pk).order_by('date')
     context = {
         'title': title,
         'employer': employer,
@@ -421,6 +583,7 @@ def responses(request, emp_id):
         'drafts': drafts,
         'vacancies': vacancies,
         'vacancies_all': vacancies_all,
+        'offers': offers
     }
 
     return render(request, 'employerapp/employer_responses.html', context)
