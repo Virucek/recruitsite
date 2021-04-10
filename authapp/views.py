@@ -201,6 +201,13 @@ class JobseekerUpdateView(UpdateView):
 
 
 class UpdatePasswordView(PasswordChangeView):
+    """
+    Обновление пароля
+
+    *Template*
+    :template: `authapp/edit_password.html`
+    """
+
     form_class = PasswordChangeForm
     template_name = 'authapp/edit_password.html'
 

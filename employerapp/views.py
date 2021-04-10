@@ -394,6 +394,9 @@ def favorites(request, emp_id):
 
 @login_required
 def add_favorite(request, emp_id):
+    """
+    Добавление резюме в избранное
+    """
     if request.is_ajax():
         resume = get_object_or_404(Resume, pk=int(request.POST.get('checked')))
         employer = get_object_or_404(Employer, pk=emp_id)

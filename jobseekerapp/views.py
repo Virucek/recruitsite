@@ -62,6 +62,15 @@ class ResumeItemViewMixin(JobseekerViewMixin):
 
 
 class JobseekerDetailView(JobseekerViewMixin, DetailView):
+    """
+    Личный кабинет соискателя
+
+    *Model*
+    :model: `jobseekerapp.Resume`
+
+    *Template*
+    :template: `jobseekerapp/jobseeker_cabinet.html`
+    """
     model = Resume
     template_name = 'jobseekerapp/jobseeker_cabinet.html'
     title = 'Личный кабинет соискателя'
@@ -330,6 +339,13 @@ class JobseekerOfferListView(JobseekerViewMixin, ListView):
 
 
 class JobseekerFavoriteListView(JobseekerViewMixin, ListView):
+    """
+    Просмотр избранных вакансий.
+
+    *Model*
+    :model:`jobseekerapp.Favorite`
+
+    """
     model = Favorite
     title = 'Избранное'
 
@@ -340,6 +356,16 @@ class JobseekerFavoriteListView(JobseekerViewMixin, ListView):
 
 
 class JobseekerFavoriteDeleteView(JobseekerViewMixin, DeleteView):
+    """
+    Удаление избранных вакансий.
+
+    *Model*
+    :model:`jobseekerapp.Favorite`
+
+    *Template*
+    :template: `jobseekerapp/favorite_delete.html`
+    """
+
     model = Favorite
     template_name = 'jobseekerapp/favorite_delete.html'
     title = 'Удаление вакансии из избранного'
@@ -358,6 +384,9 @@ class JobseekerFavoriteDeleteView(JobseekerViewMixin, DeleteView):
 
 
 def add_favorite(request, jobseeker_id):
+    """
+    Добавление вакансии в избранное
+    """
     if request.is_ajax():
         vacancy = get_object_or_404(Vacancy, pk=int(request.POST.get('checked')))
         user = get_object_or_404(Jobseeker, pk=jobseeker_id)
@@ -367,6 +396,15 @@ def add_favorite(request, jobseeker_id):
 
 
 class SearchVacancyListView(JobseekerViewMixin, ListView):
+    """
+    Поиск вакансий
+
+    *Model*
+    :model: `jobseekerapp.Vacancy`
+
+    *Template*
+    :template: `jobseekerapp/search_vacancy.html`
+    """
     model = Vacancy
     title = 'Поиск вакансии'
     template_name = 'jobseekerapp/search_vacancy.html'
