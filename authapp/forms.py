@@ -32,7 +32,7 @@ class EmployerRegisterForm(UserCreationForm):
     email = forms.EmailField(label='Контактный e-mail')
     tax_number = forms.CharField(label='ИНН компании', widget=forms.NumberInput(), max_length=16)
     phone_number = forms.CharField(label='Телефон компании', widget=forms.NumberInput(), max_length=11)
-    site = forms.CharField(label='Сайт компании')
+    site = forms.CharField(label='Сайт компании', required=False, help_text='поле необязательное')
     industry_type = forms.ChoiceField(label='Отрасль компании', choices=INDUSTRY_TYPE_CHOICES)
     short_description = forms.CharField(label='Краткое описание вашей компании', widget=forms.Textarea)
     logo = forms.ImageField(label='Ваш логотип', required=False, help_text='Необязательное поле')

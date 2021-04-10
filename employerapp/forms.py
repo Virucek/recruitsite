@@ -80,6 +80,10 @@ class SendOfferForm(forms.ModelForm):
         # self.fields['vacancy'] = forms.ModelChoiceField(queryset=self.qs, to_field_name=None,
         # label='выберите вакансию по которой хотите направить предложение соискателю')
         self.fields['vacancy'].queryset = qs
+        self.fields['contact_phone'] = forms.CharField(label='контактный тел.',
+            validators=[RegexValidator(regex='^8[0-9]{10}$', message='Допускаются только цифры '
+            'начиная с 8-ки, например 84952354422 или 89147900000. ')],
+                            help_text='поле необязательно к заполнению', required=False)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 

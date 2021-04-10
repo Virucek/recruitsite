@@ -64,7 +64,7 @@
             {% if object_list.has_previous %}
                 <span>
                     <a class="h4"
-                       href="?search={{ search }}&page={{ object_list.previous_page_number }}">&laquo
+                       href="?search=&city=&salary=&from=&till={{ search }}&page={{ object_list.previous_page_number }}">&laquo
                     </a>
                 </span>
             {% endif %}
@@ -72,7 +72,7 @@
                     из {{ object_list.paginator.num_pages }}</span>
             {% if object_list.has_next %}
                 <span>
-                    <a class="h4" href="?search={{ search }}&page={{ object_list.next_page_number }}">
+                    <a class="h4" href="?search=&city=&salary=&from=&till={{ search }}&page={{ object_list.next_page_number }}">
                         &raquo</a>
                 </span>
             {%endif%}

@@ -1,11 +1,15 @@
+import hashlib
+import random
+
 from django.contrib import auth
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import PasswordChangeView
+from django.core.mail import send_mail
 from django.db import transaction
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView
@@ -13,6 +17,57 @@ from django.views.generic import UpdateView
 from authapp.forms import UserLoginForm, EmployerRegisterForm, JobseekerRegisterForm, UserEditForm, \
     EmployerEditForm, JobseekerEditForm, UserJobseekerEditForm, SetPasswordForm
 from authapp.models import Employer, Jobseeker, IndustryType
+from recruitsite import settings
+
+
+def send_verify_mail(user):
+    if user.employer:
+        verify_link = reverse('auth:verify', args=[user.email, user.employer.activation_key])
+        title = f'Подтверждение почты {user.email}'
+        message = f'Сообщение с сайта IT Recrut\nПросим вас в течении 24-х часов  с момента получения ' \
+                  f'данного письма подтвердить адрес своей электронной почты\nПросим пройти по ссылке {settings.DOMAIN_NAME}{verify_link}'
+
+        return send_mail(title, message, 'it.portal.gb@gmail.com', [user.email], fail_silently=False)
+    else:
+        print('user has no object employer')
+
+
+def send_verify_mail_seeker(user):
+    if user.jobseeker:
+        verify_link = reverse('auth:seeker_verify', args=[user.email, user.jobseeker.activation_key])
+        title = f'Подтверждение почты {user.email}'
+        message = f'Сообщение с сайта IT Recrut\nПросим вас в течении 24-х часов  с момента получения ' \
+                  f'данного письма подтвердить адрес своей электронной почты\nПросим пройти по ссылке {settings.DOMAIN_NAME}{verify_link}'
+
+        return send_mail(title, message, 'it.portal.gb@gmail.com', [user.email], fail_silently=False)
+    else:
+        print('user has no object seeker')
+
+
+def verify(request, email, activation_key):
+    title = 'Подтверждение регистрации'
+    user = User.objects.get(email=email)
+    if user.employer.activation_key == activation_key and not \
+            user.employer.is_activation_key_expired():
+        user.is_active = True
+        user.save()
+        return render(request, 'authapp/verification.html', {'user': user, 'title': title})
+
+
+def seeker_verify(request, email, activation_key):
+    title = 'Подтверждение регистрации'
+    user = User.objects.get(email=email)
+    if user.jobseeker.activation_key == activation_key and not \
+            user.jobseeker.is_activation_key_expired():
+        user.is_active = True
+        user.save()
+        return render(request, 'authapp/verification.html', {'user': user, 'title': title})
+
+
+def email_verify(request):
+    title = 'подтверждение почты'
+    context = {'title': title}
+    return render(request, 'authapp/email_verify.html', context)
 
 
 def login(request):
@@ -63,6 +118,8 @@ def register_employer(request):
 
         if register_form.is_valid():
             user = register_form.save()
+            user.is_active = False
+            user.save()
             employer = Employer.objects.create(user=user)
             employer.company_name = register_form.cleaned_data.get('company_name')
             employer.tax_number = register_form.cleaned_data.get('tax_number')
@@ -75,10 +132,13 @@ def register_employer(request):
             employer.logo = register_form.cleaned_data.get('logo')
             employer.city = register_form.cleaned_data.get('city')
             employer.status = Employer.NEED_MODER
-
+            salt = hashlib.sha1(str(random.random()).encode('utf8')).hexdigest()[:6]
+            employer.activation_key = hashlib.sha1((user.email + salt).encode('utf8')).hexdigest()
             employer.save()
-
-            return HttpResponseRedirect(reverse('auth:login'))
+            if send_verify_mail(user):
+                return HttpResponseRedirect(reverse('auth:email_verify'))
+            else:
+                return HttpResponse('ошибка отправки сообщения о регистрации')
 
     else:
         register_form = EmployerRegisterForm()
@@ -104,6 +164,8 @@ def register_jobseeker(request):
 
         if register_form.is_valid():
             user = register_form.save()
+            user.is_active = False
+            user.save()
             jobseeker = Jobseeker.objects.create(user=user)
             jobseeker.middle_name = register_form.cleaned_data.get('middle_name')
             jobseeker.gender = register_form.cleaned_data.get('gender')
@@ -113,10 +175,14 @@ def register_jobseeker(request):
             jobseeker.about = register_form.cleaned_data.get('about')
             jobseeker.photo = register_form.cleaned_data.get('photo')
             jobseeker.city = register_form.cleaned_data.get('city')
-
+            salt = hashlib.sha1(str(random.random()).encode('utf8')).hexdigest()[:6]
+            jobseeker.activation_key = hashlib.sha1((user.email + salt).encode('utf8')).hexdigest()
             jobseeker.save()
+            if send_verify_mail_seeker(user):
+                return HttpResponseRedirect(reverse('auth:email_verify'))
 
-            return HttpResponseRedirect(reverse('auth:login'))
+            else:
+                return HttpResponse('ошибка отправки сообщения о регистрации')
 
     else:
         register_form = JobseekerRegisterForm()
@@ -143,23 +209,39 @@ def edit(request):
         edit_form = UserEditForm(request.POST, instance=request.user)
         employer_form = EmployerEditForm(request.POST, request.FILES,
                                          instance=request.user.employer)
-        password_form = SetPasswordForm(request.POST)
-        if edit_form.is_valid() and employer_form.is_valid() and password_form.is_valid():
+        if edit_form.is_valid() and employer_form.is_valid():
             edit_form.save()
             employer_form.save()
+            user.employer.status = user.employer.NEED_MODER
+            user.employer.failed_moderation = ''
+            user.employer.save()
+            sent = True
+    else:
+        edit_form = UserEditForm(instance=request.user)
+        employer_form = EmployerEditForm(instance=request.user.employer)
+
+    content = {'title': title, 'edit_form': edit_form, 'employer_form': employer_form,
+               'sent': sent}
+
+    return render(request, 'authapp/edit.html', content)
+
+
+@login_required
+def employer_change_password(request):
+    title = 'Смена пароля'
+    sent = False
+    user = User.objects.get(id=request.user.id)
+    if request.method == 'POST':
+        password_form = SetPasswordForm(request.POST)
+        if password_form.is_valid():
             user.set_password(password_form.cleaned_data['new_password1'])
             user.save()
             update_session_auth_hash(request, user)
             sent = True
     else:
-        edit_form = UserEditForm(instance=request.user)
-        employer_form = EmployerEditForm(instance=request.user.employer)
         password_form = SetPasswordForm()
-
-    content = {'title': title, 'edit_form': edit_form, 'employer_form': employer_form,
-               'sent': sent, 'pass_form': password_form}
-
-    return render(request, 'authapp/edit.html', content)
+    context = {'title': title, 'form': password_form, 'user': user, 'sent': sent}
+    return render(request, 'authapp/employer_change_password.html', context)
 
 
 class JobseekerUpdateView(UpdateView):
@@ -179,6 +261,7 @@ class JobseekerUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Редактирование'
+        context['sent'] = False
         if self.request.POST:
             context['user_form'] = UserJobseekerEditForm(self.request.POST, self.request.FILES,
                                                          instance=self.request.user)
@@ -196,6 +279,10 @@ class JobseekerUpdateView(UpdateView):
             if user_form.is_valid():
                 user_form.instance = self.object.user
                 user_form.save()
+                self.object.status = Jobseeker.NEED_MODER
+                self.object.failed_moderation = ''
+                self.object.save()
+                context['sent'] = True
 
         return super().form_valid(form)
 

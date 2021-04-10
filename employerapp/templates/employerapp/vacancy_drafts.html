@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container my-5">
-    <h3 class="font-italic mb-5 text-center">Личный кабинет: "{{ employer.company_name }}" </h3>
+    <h3 class="font-italic mb-5 text-center">Личный кабинет: {{ employer.company_name }} </h3>
     <div class="row justify-content-around">
         <div class="col-6 col-sm-4 col-md-3 pr-4 mb-5">
             {% include 'employerapp/include/left-menu.html' %}
