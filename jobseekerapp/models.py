@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -7,12 +9,16 @@ from authapp.models import Jobseeker
 class Resume(models.Model):
     DRAFT = 'draft'
     OPENED = 'opened'
+    NEED_MODER = 'need_moderation'
+    MODER_REJECT = 'moderation_reject'
     RESUME_STATUS_CHOICES = (
         (DRAFT, 'черновик'),
-        (OPENED, 'открыт'),
+        (OPENED, 'модерация пройдена успешно'),
+        (NEED_MODER, 'требуется модерация'),
+        (MODER_REJECT, 'модерация отклонена')
     )
     name = models.CharField(verbose_name='Желаемая должность', max_length=128)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Jobseeker, on_delete=models.CASCADE)
     salary_min = models.IntegerField(verbose_name='Минимальная зарплата', blank=True, null=True)
     salary_max = models.IntegerField(verbose_name='Максимальная зарплата', blank=True, null=True)
     currency = models.CharField(verbose_name='Валюта', max_length=3, blank=True, null=True)
@@ -20,14 +26,22 @@ class Resume(models.Model):
     updated_at = models.DateTimeField(verbose_name='Время обновления резюме', auto_now=True)
     key_skills = models.TextField(verbose_name='Ключевые навыки', blank=True, null=True)
     about = models.TextField(verbose_name='О себе', blank=True, null=True)
-    status = models.CharField(verbose_name='Статус', choices=RESUME_STATUS_CHOICES, max_length=16, default=OPENED)
+    status = models.CharField(verbose_name='Статус', choices=RESUME_STATUS_CHOICES,
+                              max_length=32)
+    failed_moderation = models.TextField(verbose_name='Сообщение в случае непрохождения '
+                                                'модерации резюме', max_length=254, blank=True)
     is_active = models.BooleanField(verbose_name='Активный', default=True)
 
     class Meta:
         verbose_name_plural = verbose_name = 'Резюме'
 
     def __str__(self):
-        return f'{self.name} {self.user.first_name} {self.user.last_name}'
+        return f'{self.name} {self.user.user.first_name} {self.user.user.last_name}'
+
+    def save(self, *args, **kwargs):
+        if self.status == 'opened' or self.status == 'moderation_reject':
+            self.updated_at = datetime.now()
+        super(Resume, self).save(*args, **kwargs)
 
     def get_experience_items(self):
         return self.experienceitems.select_related().filter(is_active=True)

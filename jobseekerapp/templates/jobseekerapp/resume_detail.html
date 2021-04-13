@@ -47,7 +47,7 @@
                 </tbody>
             </table>
        <button class="btn btn-round form-control last text-left btn-resume-detail">
-            <a href="{% url 'jobseeker:resume_update' user.pk object.id %}">
+            <a href="{% url 'jobseeker:resume_update' object.user.pk object.id %}">
                 Редактировать Основную информацию
             </a>
        </button>

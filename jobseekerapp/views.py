@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
 from django.db.models import Q
@@ -80,57 +80,67 @@ class JobseekerDetailView(JobseekerViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(JobseekerDetailView, self).get_context_data()
-        context['resumes'] = Resume.get_user_resumes(self.request.user.id)
+        context['resumes'] = Resume.objects.filter(status='opened').order_by('updated_at')
+        context['drafts'] = Resume.objects.filter(status='draft').order_by('updated_at')
+        context['messages'] = Resume.objects.filter(Q(status='opened') | Q(
+            status='moderation_reject'))
+        context['offers'] = Offer.objects.filter(resume__user=self.object.pk)
+        context['favorites'] = Favorite.objects.filter(user=self.object)
         return context
 
 
-class ResumeCreateView(JobseekerViewMixin, CreateView):
-    """
-    Создание резюме.
-
-    *Model*
-    :model:`jobseekerapp.Resume`
-
-    *Template*
-    :template:`jobseekerapp/resume_create.html`
-    """
-
-    model = Resume
-    template_name = 'jobseekerapp/resume_create.html'
-    form_class = ResumeForm
+def create_resume(request, jobseeker_id):
     title = 'Создание резюме'
+    jobseeker = get_object_or_404(Jobseeker, pk=jobseeker_id)
+    sent = False
+    action = None
+    if request.method == 'POST':
+        form = ResumeForm(request.POST)
+        if form.is_valid():
+            resume = form.save(commit=False)
+            resume.name = form.cleaned_data.get('name')
+            resume.salary_min = form.cleaned_data.get('salary_min')
+            resume.salary_max = form.cleaned_data.get('salary_max')
+            resume.kye_skills = form.cleaned_data.get('key_skills')
+            resume.currency = form.cleaned_data.get('currency')
+            resume.about = form.cleaned_data.get('about')
+            resume.status = form.cleaned_data.get('status')
+            resume.user = jobseeker
+            resume.save()
+            sent = True
+            action = resume.status
+    else:
+        form = ResumeForm()
+    context = {'title': title, 'sent': sent, 'action': action, 'form': form, 'jobseeker':
+        jobseeker}
+    return render(request, 'jobseekerapp/resume_create.html', context)
 
-    def get_success_url(self):
-        data = self.get_context_data()
-        return reverse_lazy('jobseeker:resume_detail',
-                            kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
 
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        if 'salary_min' not in form.cleaned_data and 'salary_max' not in form.cleaned_data:
-            form.cleaned_data['currency'].pop()
-        self.object = form.save()
-
-        return super(ResumeCreateView, self).form_valid(form)
+@login_required
+def messages(request, seeker_id):
+    title = 'Сообщения'
+    jobseeker = get_object_or_404(Jobseeker, pk=seeker_id)
+    resume_list = Resume.objects.all().exclude(status='draft').order_by('updated_at')
+    context = {'title': title, 'resume_list': resume_list, 'jobseeker': jobseeker}
+    return render(request, 'jobseekerapp/messages.html', context)
 
 
-class ResumeDetailView(JobseekerViewMixin, DetailView):
+class ResumeDetailView(DetailView):
     """
     Просмотр резюме.
-
     *Model*
     :model:`jobseekerapp.Resume`
 
     *Template*
     :template:`jobseekerapp/resume_detail.html`
     """
-
     model = Resume
     template_name = 'jobseekerapp/resume_detail.html'
-    title = 'Резюме'
+    extra_context = {'title': 'Резюме'}
 
 
-class ResumeUpdateView(JobseekerViewMixin, UpdateView):
+@login_required
+def resume_update(request, jobseeker_id, pk):
     """
     Редактирование резюме.
 
@@ -140,15 +150,24 @@ class ResumeUpdateView(JobseekerViewMixin, UpdateView):
     *Template*
     :template:`jobseekerapp/resume_create.html`
     """
-    model = Resume
-    template_name = 'jobseekerapp/resume_create.html'
-    form_class = ResumeForm
     title = 'Редактирование резюме'
-
-    def get_success_url(self):
-        data = self.get_context_data()
-        return reverse_lazy('jobseeker:resume_detail',
-                            kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
+    jobseeker = get_object_or_404(Jobseeker, pk=jobseeker_id)
+    resume = get_object_or_404(Resume, pk=pk)
+    sent = False
+    action = None
+    if request.method == 'POST':
+        form = ResumeForm(request.POST, instance=resume)
+        if form.is_valid():
+            form.save()
+            resume.failed_moderation = ''
+            resume.save()
+            sent = True
+            action = resume.status
+    else:
+        form = ResumeForm(instance=resume)
+    context = {'title': title, 'jobseeker': jobseeker, 'resume': resume, 'sent': sent, 'action':
+        action, 'form': form}
+    return render(request, 'jobseekerapp/resume_create.html', context)
 
 
 class ResumeDeleteView(JobseekerViewMixin, DeleteView):
@@ -323,19 +342,32 @@ class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
         return super(JobseekerOfferCreateView, self).form_valid(form)
 
 
-class JobseekerOfferListView(JobseekerViewMixin, ListView):
+# class JobseekerOfferListView(JobseekerViewMixin, ListView):
+#     """
+#     Просмотр отклика на вакансию.
+#
+#     *Model*
+#     :model:`jobseekerapp.Offer`
+#     """
+#     model = Offer
+#     title = 'Мои отклики'
+#
+#     def get_queryset(self):
+#         jobseeker = Jobseeker.objects.get(user=self.request.user)
+#         resumes = Resume.objects.filter(user=jobseeker, is_active=True)
+#         return super().get_queryset().filter(resume__in=resumes)
+@login_required
+def offer_list(request, jobseeker_id):
     """
-    Просмотр отклика на вакансию.
-
-    *Model*
-    :model:`jobseekerapp.Offer`
-    """
-    model = Offer
+        Просмотр отклика на вакансию.
+        *Model*
+        :model:`jobseekerapp.Offer`
+        """
     title = 'Мои отклики'
-
-    def get_queryset(self):
-        resumes = Resume.objects.filter(user=self.request.user, is_active=True)
-        return super().get_queryset().filter(resume__in=resumes)
+    jobseeker = get_object_or_404(Jobseeker, pk=jobseeker_id)
+    offer_list = Offer.objects.filter(resume__user=jobseeker.pk).order_by('date')
+    context = {'title': title, 'object_list': offer_list, 'jobseeker': jobseeker}
+    return render(request, 'jobseekerapp/offer_list.html', context)
 
 
 class JobseekerFavoriteListView(JobseekerViewMixin, ListView):

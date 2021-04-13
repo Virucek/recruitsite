@@ -37,9 +37,6 @@
 				  </li>
 			  	{% elif user.is_authenticated and user.jobseeker %}
 				  <li class="nav-item">
-					<a class="nav-link {% if request.resolver_match.url_name == 'offer_list' %}active{% endif %}" href="{% url 'jobseeker:offer_list' user.pk %}">Отклики</a>
-				  </li>
-				  <li class="nav-item">
 					<a class="nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}" href="{% url 'news' 1 %}">Новости</a>
 				  </li>
 				  <li class="nav-item">

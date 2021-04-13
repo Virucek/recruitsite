@@ -226,7 +226,7 @@ def vacancy_create(request, emp_id):
     Создании вакансий.
 
     *Template*
-    :template:`employerapp/employer_messages.html`
+    :template:`employerapp/vacancy_creation.html`
     """
     employer = get_object_or_404(Employer, pk=emp_id)
     title = 'создание вакансии'

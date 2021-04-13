@@ -21,15 +21,23 @@ CURRENCY_CHOICES = (
 class ResumeForm(forms.ModelForm):
     class Meta:
         model = Resume
-        exclude = ('user', 'is_active', 'status',)
+        exclude = ('user', 'is_active', 'failed_moderation')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        blank_choice = (('', '----------'),)
+        status_choice = (
+            (Resume.DRAFT, 'сохранить черновик'),
+            (Resume.NEED_MODER, 'опубликовать на портале')
+        )
         self.fields['currency'] = forms.ChoiceField(label='Валюта', choices=CURRENCY_CHOICES)
+        self.fields['status'] = forms.ChoiceField(label='Выберите действие',
+                                                  choices=blank_choice + status_choice)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
-            if field_name in ('salary_min', 'salary_max', 'currency'):
-                field.widget.attrs['style'] = 'width: 20%; display: inline;'
+            # if field_name in ('salary_min', 'salary_max', 'currency'):
+                # field.widget.attrs['style'] = 'width: 20%; display: inline;'
+
 
     def clean_salary_max(self):
         salary_max = self.cleaned_data['salary_max']
