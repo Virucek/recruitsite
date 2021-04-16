@@ -92,7 +92,7 @@ class ResumeEducation(models.Model):
         verbose_name_plural = 'Места обучения для резюме'
 
     def __str__(self):
-        return f'{self.resume.name} {self.resume.user.first_name} {self.resume.user.last_name} ' \
+        return f'{self.resume.name} {self.resume.user.user.first_name} {self.resume.user.user.last_name} ' \
                f'({self.get_edu_type_display()}, {self.get_degree_display()})'
 
 
@@ -110,7 +110,8 @@ class ResumeExperience(models.Model):
         verbose_name_plural = 'Места опыта для резюме'
 
     def __str__(self):
-        return f'{self.resume.name} {self.resume.user.first_name} {self.resume.user.last_name} {self.company_name} ' \
+        return f'{self.resume.name} {self.resume.user.user.first_name}' \
+               f' {self.resume.user.user.last_name} {self.company_name} ' \
                f'{self.job_title}'
 
 
