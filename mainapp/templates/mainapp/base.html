@@ -25,13 +25,18 @@
 				  <li class="nav-item">
 					<a class="nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}" href="{% url 'news' 1 %}">Новости</a>
 				  </li>
-				  <li class="nav-item">
 				  	{% if user.employer.status == 'moderation_reject' or user.employer.status == 'need_moderation'%}
+				  	<li class="nav-item">
 						<a class="nav-link {% if request.resolver_match.url_name == 'edit' %}active{% endif %}" href="{% url 'auth:edit' %}">Редактирование профиля</a>
-					{% else %}
+					</li>
+				  	<li class="nav-item">
 						<a class="nav-link {% if request.resolver_match.url_name == 'main_cabinet' %}active{% endif %}" href="{% url 'employer:main_cabinet' user.employer.pk %}">Личный кабинет</a>
+					</li>
+				  	{% else %}
+				  	<li class="nav-item">
+						<a class="nav-link {% if request.resolver_match.url_name == 'main_cabinet' %}active{% endif %}" href="{% url 'employer:main_cabinet' user.employer.pk %}">Личный кабинет</a>
+					</li>
 					{% endif %}
-				  </li>
 				  <li class="nav-item">
 					<a class="nav-link" href="{% url 'auth:logout' %}">Выход</a>
 				  </li>
@@ -39,13 +44,19 @@
 				  <li class="nav-item">
 					<a class="nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}" href="{% url 'news' 1 %}">Новости</a>
 				  </li>
-				  <li class="nav-item">
+
 				   {% if user.jobseeker.status == 'moderation_reject'  or user.jobseeker.status == 'need_moderation' %}
+				  	<li class="nav-item">
 					  	<a class="nav-link {% if request.resolver_match.url_name == 'edit_jobseeker' %}active{% endif %}" href="{% url 'auth:edit_jobseeker' user.pk %}">Редактировать профиль</a>
-				  	{% else %}
+					</li>
+				  	<li class="nav-item">
 						<a class="nav-link {% if request.resolver_match.url_name == 'cabinet' %}active{% endif %}" href="{% url 'jobseeker:cabinet' user.pk %}">Личный кабинет</a>
-				  	{% endif %}
-				  </li>
+				  	</li>
+				  	{% else %}
+				  	<li class="nav-item">
+						<a class="nav-link {% if request.resolver_match.url_name == 'cabinet' %}active{% endif %}" href="{% url 'jobseeker:cabinet' user.pk %}">Личный кабинет</a>
+				  	</li>
+					{% endif %}
 				  <li class="nav-item">
 					<a class="nav-link" href="{% url 'auth:logout' %}">Выход</a>
 				  </li>

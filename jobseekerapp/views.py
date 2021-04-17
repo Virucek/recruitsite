@@ -81,12 +81,13 @@ class JobseekerDetailView(JobseekerViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(JobseekerDetailView, self).get_context_data()
-        context['resumes'] = Resume.objects.filter(status='opened', is_active=True).order_by(
+        context['resumes'] = Resume.objects.filter(status='opened', is_active=True,
+                                                   user=self.object).order_by(
             'updated_at')
-        context['drafts'] = Resume.objects.filter(status='draft', is_active=True).order_by(
+        context['drafts'] = Resume.objects.filter(status='draft', is_active=True, user=self.object).order_by(
             'updated_at')
         context['messages'] = Resume.objects.filter(Q(status='opened') | Q(
-            status='moderation_reject'))
+            status='moderation_reject'), user=self.object)
         context['offers'] = Offer.objects.filter(resume__user=self.object.pk)
         context['favorites'] = Favorite.objects.filter(user=self.object)
         return context
