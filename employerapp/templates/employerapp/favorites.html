@@ -14,7 +14,8 @@
             {% for item in favorites %}
             <p class="font-italic small font-weight-bold">Добавлено в избранное: {{ item.date|date:'d.m.Y.' }}</p>
             <div class="d-flex">
-                <h4 style="color: blue;"><a href="{% url 'jobseeker:resume_external_detail' item.resume.pk %}">{{ item.resume.user.user.last_name }} {{ item.resume.user.user.first_name }}
+                <h4 class="pl-0 col-7" style="color: blue;">
+                    <a href="{% url 'jobseeker:resume_external_detail' item.resume.pk %}">{{ item.resume.user.user.last_name }} {{ item.resume.user.user.first_name }}
                     {{ item.resume.user.middle_name }}</a></h4>
                 <p class="h5 ml-5" style="color:black;">Уровень з/п:
                     {% if item.resume.salary_min and item.resume.salary_max %}{{ item.resume.salary_min }} - {{ item.resume.salary_max }} {{ item.resume.currency }}

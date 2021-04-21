@@ -60,8 +60,9 @@
             <hr>
             <p class="h6 mb-1"><b>{{ item.company_name }}</b></p>
             <p class="h6 mb-1">{{ item.job_title }} </p>
-            <p class="mb-2">{{ item.from_date|date:'M Y' }} - {{ item.to_date|date:'M Y' }}</p>
-            <p class="mb-1">{{ item.description|linebreaks }}</p>
+            <p class="mb-2">{{ item.start_date|date:'M Y' }} - {% if item.finish_date %}
+                {{ item.finish_date|date:'M Y' }}{% else %}по настоящее время{% endif %}</p>
+            <p class="mb-1">{{ item.job_description|linebreaks }}</p>
             {% endfor %}
             {% else %}
             <hr>

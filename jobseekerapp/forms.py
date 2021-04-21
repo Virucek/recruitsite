@@ -34,9 +34,10 @@ class ResumeForm(forms.ModelForm):
         self.fields['status'] = forms.ChoiceField(label='Выберите действие',
                                                   choices=blank_choice + status_choice)
         self.fields['key_skills'] = forms.CharField(label='Ключевые навыки', max_length=512,
-                                                    widget=forms.Textarea(attrs={'rows': 4}))
+                                                    widget=forms.Textarea(attrs={'rows': 4}),
+                                                    )
         self.fields['about'] = forms.CharField(label='О себе', max_length=512,
-                                                    widget=forms.Textarea(attrs={'rows': 4}))
+                                               widget=forms.Textarea(attrs={'rows': 4}))
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
@@ -55,7 +56,8 @@ class ResumeForm(forms.ModelForm):
 class ResumeEducationForm(forms.ModelForm):
     class Meta:
         model = ResumeEducation
-        exclude = ('is_active', 'resume',)
+        fields = ('edu_type', 'degree', 'institution_name', 'from_date', 'to_date', 'course_name',
+                  'edu_description')
 
         class DateInput(forms.DateInput):
             input_type = 'date'
@@ -73,30 +75,19 @@ class ResumeEducationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         blank_choice = (('', '----------'),)
-        # self.fields['from_date'] = forms.DateField(label='Дата начала',
-        #                                            input_formats=DATE_INPUT_RESUME_FORMATS)
-        # self.fields['to_date'] = forms.DateField(label='Дата окончания', input_formats=DATE_INPUT_RESUME_FORMATS)
         self.fields['edu_type'] = forms.ChoiceField(label='Тип образования',
                                                     choices=blank_choice+ResumeEducation.EDU_TYPE_CHOICES)
         self.fields['degree'] = forms.ChoiceField(label='Уровень',
                                                   choices=blank_choice+ResumeEducation.DEGREE_CHOICES)
-        self.fields['description'] = forms.CharField(label='Описание', max_length=512,
-                                                    widget=forms.Textarea(attrs={'rows': 4}),
-                                                     required=False)
+        self.fields['edu_description'] = forms.CharField(label='Описание', max_length=512,
+            widget=forms.Textarea(attrs={'rows': 4}), required=False, help_text='поле '
+                                                                                'необязательное')
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
-
-    def clean_from_date(self):
-        from_date = self.cleaned_data['from_date']
-        if not from_date:
-            raise forms.ValidationError('Введите дату начала обучения')
-        return from_date
 
     def clean_to_date(self):
         to_date = self.cleaned_data['to_date']
         from_date = self.cleaned_data['from_date']
-        if not to_date:
-            raise forms.ValidationError('Введите дату окончания обучения')
         if to_date and from_date:
             if to_date < from_date:
                 raise forms.ValidationError(f'Дата окончания раньше даты начала.')
@@ -112,37 +103,30 @@ class ResumeExperienceForm(forms.ModelForm):
             input_type = 'date'
 
         widgets = {
-            'from_date': DateInput(),
-            'to_date': DateInput()
+            'start_date': DateInput(),
+            'finish_date': DateInput()
         }
 
         labels = {
-            'from_date': 'Дата начала',
-            'to_date': 'Дата окончания'
+            'start_date': 'Дата начала работы',
+            'finish_date': 'Дата окончания работы'
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.fields['from_date'] = forms.DateField(label='Дата начала', input_formats=DATE_INPUT_RESUME_FORMATS)
-        # self.fields['to_date'] = forms.DateField(label='Дата окончания', input_formats=DATE_INPUT_RESUME_FORMATS)
-        self.fields['description'] = forms.CharField(label='Описание', max_length=512,
-                                                     widget=forms.Textarea(attrs={'rows': 4}))
+        self.fields['job_description'] = forms.CharField(label='Описание обязанностей',
+                max_length=512, widget=forms.Textarea(attrs={'rows': 4}), help_text='Поле '
+                                                                                    'необязательное', required=False)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
-    def clean_from_date(self):
-        from_date = self.cleaned_data['from_date']
-        if not from_date:
-            raise forms.ValidationError('Введите дату начала работы')
-        return from_date
-
-    def clean_to_date(self):
-        to_date = self.cleaned_data['to_date']
-        from_date = self.cleaned_data['from_date']
-        if to_date and from_date:
-            if to_date < from_date:
+    def clean_finish_date(self):
+        finish_date = self.cleaned_data['finish_date']
+        start_date = self.cleaned_data['start_date']
+        if start_date and finish_date:
+            if finish_date < start_date:
                 raise forms.ValidationError(f'Дата окончания раньше даты начала.')
-        return to_date
+        return finish_date
 
 
 class JobseekerOfferForm(forms.ModelForm):

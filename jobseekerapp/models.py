@@ -19,13 +19,17 @@ class Resume(models.Model):
     )
     name = models.CharField(verbose_name='Желаемая должность', max_length=128)
     user = models.ForeignKey(Jobseeker, on_delete=models.CASCADE)
-    salary_min = models.IntegerField(verbose_name='Минимальная зарплата', blank=True, null=True)
-    salary_max = models.IntegerField(verbose_name='Максимальная зарплата', blank=True, null=True)
+    salary_min = models.IntegerField(verbose_name='Минимальная зарплата', blank=True, null=True,
+                                     help_text='поле необязательное')
+    salary_max = models.IntegerField(verbose_name='Максимальная зарплата', blank=True, null=True,
+                                     help_text='поле необязательное')
     currency = models.CharField(verbose_name='Валюта', max_length=3, blank=True, null=True)
     added_at = models.DateTimeField(verbose_name='Время добавления резюме', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Время обновления резюме', auto_now=True)
-    key_skills = models.TextField(verbose_name='Ключевые навыки', blank=True, null=True)
-    about = models.TextField(verbose_name='О себе', blank=True, null=True)
+    key_skills = models.TextField(verbose_name='Ключевые навыки', blank=True,
+                                  help_text='поле необязательное', default='')
+    about = models.TextField(verbose_name='О себе', blank=True, default='', help_text='поле '
+                                                                                     'необязательное')
     status = models.CharField(verbose_name='Статус', choices=RESUME_STATUS_CHOICES,
                               max_length=32)
     failed_moderation = models.TextField(verbose_name='Сообщение в случае непрохождения '
@@ -76,7 +80,7 @@ class ResumeEducation(models.Model):
     DEGREE_CHOICES = (
         (MASTER, 'магистр'),
         (BACHELOR, 'бакалавр'),
-        (SPECIALIST, 'специлист'),
+        (SPECIALIST, 'специалист'),
         (SERTIFICATE, 'сертификат'),
     )
     degree = models.CharField(verbose_name='Уровень', max_length=64, null=True, choices=DEGREE_CHOICES, blank=False, default=MASTER)
@@ -84,7 +88,7 @@ class ResumeEducation(models.Model):
     from_date = models.DateField(verbose_name='Начало периода', blank=True, null=True)
     to_date = models.DateField(verbose_name='Конец периода(фактическая или планируемая)')
     course_name = models.CharField(verbose_name='Название курса/кафедры', max_length=256)
-    description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    edu_description = models.TextField(verbose_name='Описание', blank=True, null=True)
     is_active = models.BooleanField(verbose_name='Активный', default=True)
 
     class Meta:
@@ -100,9 +104,10 @@ class ResumeExperience(models.Model):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='experienceitems')
     company_name = models.CharField(verbose_name='Название компании', max_length=128)
     job_title = models.CharField(verbose_name='Название вакансии', max_length=128)
-    from_date = models.DateField(verbose_name='Начало работы')
-    to_date = models.DateField(verbose_name='Конец работы', blank=True, null=True)
-    description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    start_date = models.DateField(verbose_name='Начало работы')
+    finish_date = models.DateField(verbose_name='Конец работы', blank=True, null=True,
+                               help_text='оставьте пустым если работаете по настоящее время')
+    job_description = models.TextField(verbose_name='Описание', blank=True, null=True)
     is_active = models.BooleanField(verbose_name='Активный', default=True)
 
     class Meta:

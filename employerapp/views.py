@@ -332,7 +332,7 @@ def vacancy_delete(request, emp_id, pk):
         else:
             vacancy.hide = False
         vacancy.save()
-        return HttpResponseRedirect(reverse('employer:main', args=[vacancy.employer.pk]))
+        return HttpResponseRedirect(reverse('employer:main_cabinet', args=[vacancy.employer.pk]))
 
     context = {'title': title, 'vacancy_delete': vacancy, 'employer': employer}
 
@@ -483,6 +483,7 @@ def search_resume(request, emp_id):
     search = request.GET.get('search')
     search_city = request.GET.get('city')
     search_salary = request.GET.get('salary')
+    search_currency = request.GET.get('currency')
     sex = request.GET.get('sex')
     from_date = request.GET.get('from_date')
     till_date = request.GET.get('till_date')
@@ -497,9 +498,9 @@ def search_resume(request, emp_id):
     if search_city != '':
         query = []
         if results:
-            results = results.filter(user__jobseeker__city=search_city)
+            results = results.filter(user__city=search_city)
         else:
-            results = Resume.objects.filter(user__jobseeker__city=search_city).filter(status=Resume.OPENED).order_by('-updated_at')
+            results = Resume.objects.filter(user__city=search_city).filter(status=Resume.OPENED).order_by('-updated_at')
         query.append(results)
         query_set = list(chain(*query))
     # if sex != '':
@@ -514,9 +515,10 @@ def search_resume(request, emp_id):
     if search_salary != '':
         query = []
         if results:
-            results = results.filter(salary_min__lte=search_salary)
+            results = results.filter(salary_min__lte=search_salary, currency=search_currency)
         else:
-            results = Resume.objects.filter(salary_min__lte=search_salary).filter(status=Resume.OPENED).order_by('-updated_at')
+            results = Resume.objects.filter(salary_min__lte=search_salary, currency=search_currency).filter(
+                status=Resume.OPENED).order_by('-updated_at')
         query.append(results)
         query_set = list(chain(*query))
     if from_date != '':

@@ -12,8 +12,8 @@
             <div class="mb-5">
                 <div class="d-flex align-items-center">
                     <h4 style="color: blue;"><a
-                            href="{% url 'jobseeker:resume_external_detail' object.id %}">{{ object.user.last_name }} {{ object.user.first_name }}
-                        {{ object.user.jobseeker.middle_name }}</a></h4>
+                            href="{% url 'jobseeker:resume_external_detail' object.id %}">{{ object.user.user.last_name }} {{ object.user.user.first_name }}
+                        {{ object.user.middle_name }}</a></h4>
                     <p class="ml-5">
                         <form action="{% url 'main' 1 %}" method="post" class="favorite">{% csrf_token %}
                             <input type="hidden" name="checked" value="{{ object.pk }}">
@@ -33,16 +33,16 @@
                         {% endif %}
                     </p>
                 </div>
-                <p class="small text-muted mb-0">{{ object.user.jobseeker.city }}</p>
+                <p class="small text-muted mb-0">{{ object.user.city }}</p>
                 <div class="d-flex pl-0 col-12 col-sm-7 justify-content-between mb-0">
                     <p class="text-muted mb-0">Дата рождения:
-                    {{object.user.jobseeker.birthday|date:"d.m.Y"}}</p>
+                    {{object.user.birthday|date:"d.m.Y"}}</p>
                     <p class="text-muted mb-0">Семейный статус:
-                    {{object.user.jobseeker.get_married_status_display}}</p>
+                    {{object.user.get_married_status_display}}</p>
                 </div>
                 <div class="d-flex pl-0 col-12 col-sm-7 justify-content-between">
-                    <p class="text-muted">тел: {{ object.user.jobseeker.phone_number }}</p>
-                    <p class="text-muted">email: {{ object.user.email }}</p>
+                    <p class="text-muted">тел: {{ object.user.phone_number }}</p>
+                    <p class="text-muted">email: {{ object.user.user.email }}</p>
                 </div>
                 <p><span class="font-weight-bold">Желаемая должность:</span> {{ object.name }}</p>
                 <div class="d-flex">

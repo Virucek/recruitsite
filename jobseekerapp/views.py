@@ -98,76 +98,43 @@ def create_resume(request, jobseeker_id):
     jobseeker = get_object_or_404(Jobseeker, pk=jobseeker_id)
     resume = None
     experience = ResumeExperience.objects.filter(resume=resume, is_active=True)
+    education = ResumeEducation.objects.filter(resume=resume, is_active=True)
     sent = False
     action = None
-    ExperienceFormSet = modelformset_factory(ResumeExperience, form=ResumeExperienceForm, extra=3)
+    education_formset = modelformset_factory(ResumeEducation, form=ResumeEducationForm)
+    experience_formset = modelformset_factory(ResumeExperience, form=ResumeExperienceForm)
 
     if request.method == 'POST':
         form = ResumeForm(request.POST)
-        education_form = ResumeEducationForm(request.POST)
-        experience_form = ExperienceFormSet(request.POST, queryset=experience)
+        education_form = education_formset(request.POST, prefix='1', queryset=education)
+        experience_form = experience_formset(request.POST, prefix='2', queryset=experience)
         if form.is_valid() and education_form.is_valid() and experience_form.is_valid():
             resume = form.save(commit=False)
-            resume.name = form.cleaned_data.get('name')
-            resume.salary_min = form.cleaned_data.get('salary_min')
-            resume.salary_max = form.cleaned_data.get('salary_max')
-            resume.kye_skills = form.cleaned_data.get('key_skills')
-            resume.currency = form.cleaned_data.get('currency')
-            resume.about = form.cleaned_data.get('about')
-            resume.status = form.cleaned_data.get('status')
             resume.user = jobseeker
             resume.save()
-            education = education_form.save(commit=False)
-            education.resume = resume
-            education.save()
+            for form in education_form:
+                education = form.save(commit=False)
+                education.edu_type = form.cleaned_data.get('edu_type')
+                education.resume = resume
+                if education.edu_type:
+                    education.save()
             for form in experience_form:
                 experience = form.save(commit=False)
                 experience.company_name = form.cleaned_data.get('company_name')
-                experience.job_title = form.cleaned_data.get('job_title')
-                experience.from_date = form.cleaned_data.get('from_date')
-                experience.to_date = form.cleaned_data.get('to_date')
-                experience.description = form.cleaned_data.get('description')
-                if experience.company_name and experience.job_title and experience.from_date:
-                    experience.resume = resume
+                experience.resume = resume
+                if experience.company_name:
                     experience.save()
 
-            experience_form.save()
             sent = True
             action = resume.status
     else:
         form = ResumeForm()
-        education_form = ResumeEducationForm()
-        experience_form = ExperienceFormSet(queryset=experience)
-    # if request.method == 'POST':
-    #     form = ResumeForm(request.POST)
-    #     education_form = ResumeEducationForm(request.POST)
-    #     experience_form = ResumeExperienceForm(request.POST)
-    #     if form.is_valid() and education_form.is_valid() and experience_form.is_valid():
-    #         resume = form.save(commit=False)
-    #         education = education_form.save(commit=False)
-    #         experience = experience_form.save(commit=False)
-    #         resume.name = form.cleaned_data.get('name')
-    #         resume.salary_min = form.cleaned_data.get('salary_min')
-    #         resume.salary_max = form.cleaned_data.get('salary_max')
-    #         resume.kye_skills = form.cleaned_data.get('key_skills')
-    #         resume.currency = form.cleaned_data.get('currency')
-    #         resume.about = form.cleaned_data.get('about')
-    #         resume.status = form.cleaned_data.get('status')
-    #         resume.user = jobseeker
-    #         resume.save()
-    #         education.resume = resume
-    #         education.save()
-    #         experience.resume = resume
-    #         experience.save()
-    #         sent = True
-    #         action = resume.status
-    # else:
-    #     form = ResumeForm()
-    #     education_form = ResumeEducationForm()
-    #     experience_form = ResumeExperienceForm()
+        education_form = education_formset(prefix='1', queryset=education)
+        experience_form = experience_formset(prefix='2', queryset=experience)
 
     context = {'title': title, 'sent': sent, 'action': action, 'form': form, 'jobseeker':
-        jobseeker, 'education_form': education_form, 'experience_form': experience_form}
+        jobseeker, 'education_form': education_form, 'experience_form': experience_form,
+               'resume': resume, 'experience': experience}
     return render(request, 'jobseekerapp/resume_create.html', context)
 
 
@@ -210,53 +177,40 @@ def resume_update(request, jobseeker_id, pk):
     resume = get_object_or_404(Resume, pk=pk)
     education = ResumeEducation.objects.filter(resume=resume, is_active=True)
     experience = ResumeExperience.objects.filter(resume=resume, is_active=True)
-    EducationFormSet = modelformset_factory(ResumeEducation, form=ResumeEducationForm, extra=1,
-                                            can_delete=True)
-    ExperienceFormSet = modelformset_factory(ResumeExperience, form=ResumeExperienceForm,
-                                             extra=3, can_delete=True)
+    education_formset = modelformset_factory(ResumeEducation, form=ResumeEducationForm, extra=1)
+    experience_formset = modelformset_factory(ResumeExperience, form=ResumeExperienceForm, extra=1)
     sent = False
     action = None
     if request.method == 'POST':
         form = ResumeForm(request.POST, instance=resume)
-        education_form = EducationFormSet(request.POST, queryset=education, prefix=education)
-        experience_form = ExperienceFormSet(request.POST, queryset=experience, prefix=experience)
+        education_form = education_formset(request.POST, prefix='1', queryset=education)
+        experience_form = experience_formset(request.POST, prefix='2', queryset=experience)
         if form.is_valid() and education_form.is_valid() and experience_form.is_valid():
             form.save()
             for form in education_form:
                 education = form.save(commit=False)
+                education.resume = resume
                 education.edu_type = form.cleaned_data.get('edu_type')
-                education.degree = form.cleaned_data.get('degree')
-                education.institution_name = form.cleaned_data.get('institution_name')
-                education.from_date = form.cleaned_data.get('from_date')
-                education.to_date = form.cleaned_data.get('to_date')
-                education.course_name = form.cleaned_data.get('course_name')
-                education.description = form.cleaned_data.get('description')
-                if education.edu_type and education.degree and education.institution_name and \
-                        education.from_date and education.to_date:
-                    education.resume = resume
+                if education.edu_type:
                     education.save()
             for form in experience_form:
                 experience = form.save(commit=False)
                 experience.company_name = form.cleaned_data.get('company_name')
-                experience.job_title = form.cleaned_data.get('job_title')
-                experience.from_date = form.cleaned_data.get('from_date')
-                experience.to_date = form.cleaned_data.get('to_date')
-                experience.description = form.cleaned_data.get('description')
-                if experience.company_name and experience.job_title and experience.from_date:
-                    experience.resume = resume
+                experience.resume = resume
+                if experience.company_name:
                     experience.save()
-            education_form.save()
-            experience_form.save()
+
             resume.failed_moderation = ''
             resume.save()
             sent = True
             action = resume.status
     else:
         form = ResumeForm(instance=resume)
-        education_form = EducationFormSet(queryset=education, prefix=education)
-        experience_form = ExperienceFormSet(queryset=experience, prefix=experience)
+        education_form = education_formset(prefix='1', queryset=education)
+        experience_form = experience_formset(prefix='2', queryset=experience)
     context = {'title': title, 'jobseeker': jobseeker, 'resume': resume, 'sent': sent, 'action':
-        action, 'form': form, 'education_form': education_form, 'experience_form': experience_form}
+        action, 'form': form, 'education_form': education_form, 'experience_form':
+        experience_form, 'experience': experience}
     return render(request, 'jobseekerapp/resume_create.html', context)
 
 
@@ -279,41 +233,9 @@ class ResumeDeleteView(JobseekerViewMixin, DeleteView):
         return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': data['object'].user.user.id})
 
 
-class ResumeExperienceCreateView(ResumeItemViewMixin, CreateView):
-    """
-    Добавление данных об опытке.
-
-    *Model*
-    :model:`jobseekerapp.ResumeExperience`
-
-    *Template*
-    :template:`jobseekerapp/resume_experience_create.html`
-    """
-    model = ResumeExperience
-    template_name = 'jobseekerapp/resume_experience_create.html'
-    form_class = ResumeExperienceForm
-    title = 'Добавление записи об опыте'
-
-
-class ResumeExperienceUpdateView(ResumeItemViewMixin, UpdateView):
-    """
-    Редактирование данных об опыте.
-
-    *Model*
-    :model:`jobseekerapp.ResumeExperience`
-
-    *Template*
-    :template:`jobseekerapp/resume_experience_create.html`
-    """
-    model = ResumeExperience
-    template_name = 'jobseekerapp/resume_experience_create.html'
-    form_class = ResumeExperienceForm
-    title = 'Редактирование записи об опыте'
-
-
 class ResumeExperienceDeleteView(ResumeItemViewMixin, DeleteView):
     """
-    Удаление записи об опытке.
+    Удаление записи об опыте.
 
     *Model*
     :model:`jobseekerapp.ResumeExperience`
@@ -324,38 +246,6 @@ class ResumeExperienceDeleteView(ResumeItemViewMixin, DeleteView):
     model = ResumeExperience
     template_name = 'jobseekerapp/resume_experience_delete.html'
     title = 'Удаление записи об опыте'
-
-
-class ResumeEducationCreateView(ResumeItemViewMixin, CreateView):
-    """
-    Добавление записи об обучении.
-
-    *Model*
-    :model:`jobseekerapp.ResumeEducation`
-
-    *Template*
-    :template:`jobseekerapp/resume_education_create.html`
-    """
-    model = ResumeEducation
-    template_name = 'jobseekerapp/resume_education_create.html'
-    form_class = ResumeEducationForm
-    title = 'Добавление записи об обучении'
-
-
-class ResumeEducationUpdateView(ResumeItemViewMixin, UpdateView):
-    """
-    Редактирование записи об обучении.
-
-    *Model*
-    :model:`jobseekerapp.ResumeEducation`
-
-    *Template*
-    :template:`jobseekerapp/resume_education_create.html`
-    """
-    model = ResumeEducation
-    template_name = 'jobseekerapp/resume_education_create.html'
-    form_class = ResumeEducationForm
-    title = 'Редактирование записи об обучении'
 
 
 class ResumeEducationDeleteView(ResumeItemViewMixin, DeleteView):
@@ -432,20 +322,6 @@ class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
         return super(JobseekerOfferCreateView, self).form_valid(form)
 
 
-# class JobseekerOfferListView(JobseekerViewMixin, ListView):
-#     """
-#     Просмотр отклика на вакансию.
-#
-#     *Model*
-#     :model:`jobseekerapp.Offer`
-#     """
-#     model = Offer
-#     title = 'Мои отклики'
-#
-#     def get_queryset(self):
-#         jobseeker = Jobseeker.objects.get(user=self.request.user)
-#         resumes = Resume.objects.filter(user=jobseeker, is_active=True)
-#         return super().get_queryset().filter(resume__in=resumes)
 @login_required
 def offer_list(request, jobseeker_id):
     """
@@ -533,7 +409,7 @@ class SearchVacancyListView(JobseekerViewMixin, ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        search = self.request.GET.get('search')
+        search = self.request.GET.get('search-field')
         company_name = self.request.GET.get('company_name')
         city = self.request.GET.get('city')
         min_salary = self.request.GET.get('min_salary')
