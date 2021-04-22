@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -7,27 +9,43 @@ from authapp.models import Jobseeker
 class Resume(models.Model):
     DRAFT = 'draft'
     OPENED = 'opened'
+    NEED_MODER = 'need_moderation'
+    MODER_REJECT = 'moderation_reject'
     RESUME_STATUS_CHOICES = (
         (DRAFT, 'черновик'),
-        (OPENED, 'открыт'),
+        (OPENED, 'модерация пройдена успешно'),
+        (NEED_MODER, 'требуется модерация'),
+        (MODER_REJECT, 'модерация отклонена')
     )
     name = models.CharField(verbose_name='Желаемая должность', max_length=128)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    salary_min = models.IntegerField(verbose_name='Минимальная зарплата', blank=True, null=True)
-    salary_max = models.IntegerField(verbose_name='Максимальная зарплата', blank=True, null=True)
+    user = models.ForeignKey(Jobseeker, on_delete=models.CASCADE)
+    salary_min = models.IntegerField(verbose_name='Минимальная зарплата', blank=True, null=True,
+                                     help_text='поле необязательное')
+    salary_max = models.IntegerField(verbose_name='Максимальная зарплата', blank=True, null=True,
+                                     help_text='поле необязательное')
     currency = models.CharField(verbose_name='Валюта', max_length=3, blank=True, null=True)
     added_at = models.DateTimeField(verbose_name='Время добавления резюме', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Время обновления резюме', auto_now=True)
-    key_skills = models.TextField(verbose_name='Ключевые навыки', blank=True, null=True)
-    about = models.TextField(verbose_name='О себе', blank=True, null=True)
-    status = models.CharField(verbose_name='Статус', choices=RESUME_STATUS_CHOICES, max_length=16, default=OPENED)
+    key_skills = models.TextField(verbose_name='Ключевые навыки', blank=True,
+                                  help_text='поле необязательное', default='')
+    about = models.TextField(verbose_name='О себе', blank=True, default='', help_text='поле '
+                                                                                     'необязательное')
+    status = models.CharField(verbose_name='Статус', choices=RESUME_STATUS_CHOICES,
+                              max_length=32)
+    failed_moderation = models.TextField(verbose_name='Сообщение в случае непрохождения '
+                                                'модерации резюме', max_length=254, blank=True)
     is_active = models.BooleanField(verbose_name='Активный', default=True)
 
     class Meta:
         verbose_name_plural = verbose_name = 'Резюме'
 
     def __str__(self):
-        return f'{self.name} {self.user.first_name} {self.user.last_name}'
+        return f'{self.name} {self.user.user.first_name} {self.user.user.last_name}'
+
+    def save(self, *args, **kwargs):
+        if self.status == 'opened' or self.status == 'moderation_reject':
+            self.updated_at = datetime.now()
+        super(Resume, self).save(*args, **kwargs)
 
     def get_experience_items(self):
         return self.experienceitems.select_related().filter(is_active=True)
@@ -62,7 +80,7 @@ class ResumeEducation(models.Model):
     DEGREE_CHOICES = (
         (MASTER, 'магистр'),
         (BACHELOR, 'бакалавр'),
-        (SPECIALIST, 'специлист'),
+        (SPECIALIST, 'специалист'),
         (SERTIFICATE, 'сертификат'),
     )
     degree = models.CharField(verbose_name='Уровень', max_length=64, null=True, choices=DEGREE_CHOICES, blank=False, default=MASTER)
@@ -70,7 +88,7 @@ class ResumeEducation(models.Model):
     from_date = models.DateField(verbose_name='Начало периода', blank=True, null=True)
     to_date = models.DateField(verbose_name='Конец периода(фактическая или планируемая)')
     course_name = models.CharField(verbose_name='Название курса/кафедры', max_length=256)
-    description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    edu_description = models.TextField(verbose_name='Описание', blank=True, null=True)
     is_active = models.BooleanField(verbose_name='Активный', default=True)
 
     class Meta:
@@ -78,7 +96,7 @@ class ResumeEducation(models.Model):
         verbose_name_plural = 'Места обучения для резюме'
 
     def __str__(self):
-        return f'{self.resume.name} {self.resume.user.first_name} {self.resume.user.last_name} ' \
+        return f'{self.resume.name} {self.resume.user.user.first_name} {self.resume.user.user.last_name} ' \
                f'({self.get_edu_type_display()}, {self.get_degree_display()})'
 
 
@@ -86,9 +104,10 @@ class ResumeExperience(models.Model):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='experienceitems')
     company_name = models.CharField(verbose_name='Название компании', max_length=128)
     job_title = models.CharField(verbose_name='Название вакансии', max_length=128)
-    from_date = models.DateField(verbose_name='Начало работы')
-    to_date = models.DateField(verbose_name='Конец работы', blank=True, null=True)
-    description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    start_date = models.DateField(verbose_name='Начало работы')
+    finish_date = models.DateField(verbose_name='Конец работы', blank=True, null=True,
+                               help_text='оставьте пустым если работаете по настоящее время')
+    job_description = models.TextField(verbose_name='Описание', blank=True, null=True)
     is_active = models.BooleanField(verbose_name='Активный', default=True)
 
     class Meta:
@@ -96,7 +115,8 @@ class ResumeExperience(models.Model):
         verbose_name_plural = 'Места опыта для резюме'
 
     def __str__(self):
-        return f'{self.resume.name} {self.resume.user.first_name} {self.resume.user.last_name} {self.company_name} ' \
+        return f'{self.resume.name} {self.resume.user.user.first_name}' \
+               f' {self.resume.user.user.last_name} {self.company_name} ' \
                f'{self.job_title}'
 
 

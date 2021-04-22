@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
+from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView, ListView
 from django.db.models import Q
@@ -80,57 +81,88 @@ class JobseekerDetailView(JobseekerViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(JobseekerDetailView, self).get_context_data()
-        context['resumes'] = Resume.get_user_resumes(self.request.user.id)
+        context['resumes'] = Resume.objects.filter(status='opened', is_active=True,
+                                                   user=self.object).order_by(
+            'updated_at')
+        context['drafts'] = Resume.objects.filter(status='draft', is_active=True, user=self.object).order_by(
+            'updated_at')
+        context['messages'] = Resume.objects.filter(Q(status='opened') | Q(
+            status='moderation_reject'), user=self.object)
+        context['offers'] = Offer.objects.filter(resume__user=self.object.pk)
+        context['favorites'] = Favorite.objects.filter(user=self.object)
         return context
 
 
-class ResumeCreateView(JobseekerViewMixin, CreateView):
-    """
-    Создание резюме.
-
-    *Model*
-    :model:`jobseekerapp.Resume`
-
-    *Template*
-    :template:`jobseekerapp/resume_create.html`
-    """
-
-    model = Resume
-    template_name = 'jobseekerapp/resume_create.html'
-    form_class = ResumeForm
+def create_resume(request, jobseeker_id):
     title = 'Создание резюме'
+    jobseeker = get_object_or_404(Jobseeker, pk=jobseeker_id)
+    resume = None
+    experience = ResumeExperience.objects.filter(resume=resume, is_active=True)
+    education = ResumeEducation.objects.filter(resume=resume, is_active=True)
+    sent = False
+    action = None
+    education_formset = modelformset_factory(ResumeEducation, form=ResumeEducationForm)
+    experience_formset = modelformset_factory(ResumeExperience, form=ResumeExperienceForm)
 
-    def get_success_url(self):
-        data = self.get_context_data()
-        return reverse_lazy('jobseeker:resume_detail',
-                            kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
+    if request.method == 'POST':
+        form = ResumeForm(request.POST)
+        education_form = education_formset(request.POST, prefix='1', queryset=education)
+        experience_form = experience_formset(request.POST, prefix='2', queryset=experience)
+        if form.is_valid() and education_form.is_valid() and experience_form.is_valid():
+            resume = form.save(commit=False)
+            resume.user = jobseeker
+            resume.save()
+            for form in education_form:
+                education = form.save(commit=False)
+                education.edu_type = form.cleaned_data.get('edu_type')
+                education.resume = resume
+                if education.edu_type:
+                    education.save()
+            for form in experience_form:
+                experience = form.save(commit=False)
+                experience.company_name = form.cleaned_data.get('company_name')
+                experience.resume = resume
+                if experience.company_name:
+                    experience.save()
 
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        if 'salary_min' not in form.cleaned_data and 'salary_max' not in form.cleaned_data:
-            form.cleaned_data['currency'].pop()
-        self.object = form.save()
+            sent = True
+            action = resume.status
+    else:
+        form = ResumeForm()
+        education_form = education_formset(prefix='1', queryset=education)
+        experience_form = experience_formset(prefix='2', queryset=experience)
 
-        return super(ResumeCreateView, self).form_valid(form)
+    context = {'title': title, 'sent': sent, 'action': action, 'form': form, 'jobseeker':
+        jobseeker, 'education_form': education_form, 'experience_form': experience_form,
+               'resume': resume, 'experience': experience}
+    return render(request, 'jobseekerapp/resume_create.html', context)
 
 
-class ResumeDetailView(JobseekerViewMixin, DetailView):
+@login_required
+def messages(request, seeker_id):
+    title = 'Сообщения'
+    jobseeker = get_object_or_404(Jobseeker, pk=seeker_id)
+    resume_list = Resume.objects.all().exclude(status='draft').order_by('updated_at')
+    context = {'title': title, 'resume_list': resume_list, 'jobseeker': jobseeker}
+    return render(request, 'jobseekerapp/messages.html', context)
+
+
+class ResumeDetailView(DetailView):
     """
     Просмотр резюме.
-
     *Model*
     :model:`jobseekerapp.Resume`
 
     *Template*
     :template:`jobseekerapp/resume_detail.html`
     """
-
     model = Resume
     template_name = 'jobseekerapp/resume_detail.html'
-    title = 'Резюме'
+    extra_context = {'title': 'Резюме'}
 
 
-class ResumeUpdateView(JobseekerViewMixin, UpdateView):
+@login_required
+def resume_update(request, jobseeker_id, pk):
     """
     Редактирование резюме.
 
@@ -140,15 +172,46 @@ class ResumeUpdateView(JobseekerViewMixin, UpdateView):
     *Template*
     :template:`jobseekerapp/resume_create.html`
     """
-    model = Resume
-    template_name = 'jobseekerapp/resume_create.html'
-    form_class = ResumeForm
     title = 'Редактирование резюме'
+    jobseeker = get_object_or_404(Jobseeker, pk=jobseeker_id)
+    resume = get_object_or_404(Resume, pk=pk)
+    education = ResumeEducation.objects.filter(resume=resume, is_active=True)
+    experience = ResumeExperience.objects.filter(resume=resume, is_active=True)
+    education_formset = modelformset_factory(ResumeEducation, form=ResumeEducationForm, extra=1)
+    experience_formset = modelformset_factory(ResumeExperience, form=ResumeExperienceForm, extra=1)
+    sent = False
+    action = None
+    if request.method == 'POST':
+        form = ResumeForm(request.POST, instance=resume)
+        education_form = education_formset(request.POST, prefix='1', queryset=education)
+        experience_form = experience_formset(request.POST, prefix='2', queryset=experience)
+        if form.is_valid() and education_form.is_valid() and experience_form.is_valid():
+            form.save()
+            for form in education_form:
+                education = form.save(commit=False)
+                education.resume = resume
+                education.edu_type = form.cleaned_data.get('edu_type')
+                if education.edu_type:
+                    education.save()
+            for form in experience_form:
+                experience = form.save(commit=False)
+                experience.company_name = form.cleaned_data.get('company_name')
+                experience.resume = resume
+                if experience.company_name:
+                    experience.save()
 
-    def get_success_url(self):
-        data = self.get_context_data()
-        return reverse_lazy('jobseeker:resume_detail',
-                            kwargs={'jobseeker_id': data['resume'].user.id, 'pk': data['resume'].id})
+            resume.failed_moderation = ''
+            resume.save()
+            sent = True
+            action = resume.status
+    else:
+        form = ResumeForm(instance=resume)
+        education_form = education_formset(prefix='1', queryset=education)
+        experience_form = experience_formset(prefix='2', queryset=experience)
+    context = {'title': title, 'jobseeker': jobseeker, 'resume': resume, 'sent': sent, 'action':
+        action, 'form': form, 'education_form': education_form, 'experience_form':
+        experience_form, 'experience': experience}
+    return render(request, 'jobseekerapp/resume_create.html', context)
 
 
 class ResumeDeleteView(JobseekerViewMixin, DeleteView):
@@ -167,44 +230,12 @@ class ResumeDeleteView(JobseekerViewMixin, DeleteView):
 
     def get_success_url(self):
         data = self.get_context_data()
-        return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': data['object'].user.id})
-
-
-class ResumeExperienceCreateView(ResumeItemViewMixin, CreateView):
-    """
-    Добавление данных об опытке.
-
-    *Model*
-    :model:`jobseekerapp.ResumeExperience`
-
-    *Template*
-    :template:`jobseekerapp/resume_experience_create.html`
-    """
-    model = ResumeExperience
-    template_name = 'jobseekerapp/resume_experience_create.html'
-    form_class = ResumeExperienceForm
-    title = 'Добавление записи об опыте'
-
-
-class ResumeExperienceUpdateView(ResumeItemViewMixin, UpdateView):
-    """
-    Редактирование данных об опыте.
-
-    *Model*
-    :model:`jobseekerapp.ResumeExperience`
-
-    *Template*
-    :template:`jobseekerapp/resume_experience_create.html`
-    """
-    model = ResumeExperience
-    template_name = 'jobseekerapp/resume_experience_create.html'
-    form_class = ResumeExperienceForm
-    title = 'Редактирование записи об опыте'
+        return reverse_lazy('jobseeker:cabinet', kwargs={'jobseeker_id': data['object'].user.user.id})
 
 
 class ResumeExperienceDeleteView(ResumeItemViewMixin, DeleteView):
     """
-    Удаление записи об опытке.
+    Удаление записи об опыте.
 
     *Model*
     :model:`jobseekerapp.ResumeExperience`
@@ -215,38 +246,6 @@ class ResumeExperienceDeleteView(ResumeItemViewMixin, DeleteView):
     model = ResumeExperience
     template_name = 'jobseekerapp/resume_experience_delete.html'
     title = 'Удаление записи об опыте'
-
-
-class ResumeEducationCreateView(ResumeItemViewMixin, CreateView):
-    """
-    Добавление записи об обучении.
-
-    *Model*
-    :model:`jobseekerapp.ResumeEducation`
-
-    *Template*
-    :template:`jobseekerapp/resume_education_create.html`
-    """
-    model = ResumeEducation
-    template_name = 'jobseekerapp/resume_education_create.html'
-    form_class = ResumeEducationForm
-    title = 'Добавление записи об обучении'
-
-
-class ResumeEducationUpdateView(ResumeItemViewMixin, UpdateView):
-    """
-    Редактирование записи об обучении.
-
-    *Model*
-    :model:`jobseekerapp.ResumeEducation`
-
-    *Template*
-    :template:`jobseekerapp/resume_education_create.html`
-    """
-    model = ResumeEducation
-    template_name = 'jobseekerapp/resume_education_create.html'
-    form_class = ResumeEducationForm
-    title = 'Редактирование записи об обучении'
 
 
 class ResumeEducationDeleteView(ResumeItemViewMixin, DeleteView):
@@ -323,19 +322,18 @@ class JobseekerOfferCreateView(JobseekerViewMixin, CreateView):
         return super(JobseekerOfferCreateView, self).form_valid(form)
 
 
-class JobseekerOfferListView(JobseekerViewMixin, ListView):
+@login_required
+def offer_list(request, jobseeker_id):
     """
-    Просмотр отклика на вакансию.
-
-    *Model*
-    :model:`jobseekerapp.Offer`
-    """
-    model = Offer
+        Просмотр отклика на вакансию.
+        *Model*
+        :model:`jobseekerapp.Offer`
+        """
     title = 'Мои отклики'
-
-    def get_queryset(self):
-        resumes = Resume.objects.filter(user=self.request.user, is_active=True)
-        return super().get_queryset().filter(resume__in=resumes)
+    jobseeker = get_object_or_404(Jobseeker, pk=jobseeker_id)
+    offer_list = Offer.objects.filter(resume__user=jobseeker.pk).order_by('date')
+    context = {'title': title, 'object_list': offer_list, 'jobseeker': jobseeker}
+    return render(request, 'jobseekerapp/offer_list.html', context)
 
 
 class JobseekerFavoriteListView(JobseekerViewMixin, ListView):
@@ -411,7 +409,7 @@ class SearchVacancyListView(JobseekerViewMixin, ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        search = self.request.GET.get('search')
+        search = self.request.GET.get('search-field')
         company_name = self.request.GET.get('company_name')
         city = self.request.GET.get('city')
         min_salary = self.request.GET.get('min_salary')

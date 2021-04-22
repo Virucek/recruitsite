@@ -67,15 +67,10 @@ window.onload = function() {
 
 $('.bi-sliders').on('click', function() {
     $('.extend').css('display', 'block');
-    $('label[for=search-field]').css('display', 'inline');
+    $('label[for=search-field]').css('display', 'inline-block');
     $(this).css('opacity', 0);
-//    $('#search-field').attr('required', 'required');
     $('.button-search').css('margin-left', '1.3rem');
-//    $('#city').attr('required', 'required');
-//    $('#sex').attr('required', 'required');
-//    $('#salary').attr('required', 'required');
-//    $('#from_date').attr('required', 'required');
-//    $('#till_date').attr('required', 'required');
+
 })
 
 $('.share').on('click', function() {
@@ -83,3 +78,17 @@ $('.share').on('click', function() {
     return false;
 });
 
+
+$('.experience-button').formset({
+    addText: 'Добавить опыт работы',
+    deleteText: '',
+    prefix: '2',
+    formCssClass: 'dynamic-experience_form'
+});
+
+$('.education-button').formset({
+    addText: 'Добавить образование',
+    deleteText: '',
+    prefix: '1',
+    formCssClass: 'dynamic-education_form'
+});

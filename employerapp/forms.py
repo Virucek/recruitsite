@@ -28,18 +28,21 @@ class VacancyCreationForm(forms.ModelForm):
         self.fields['min_salary'] = forms.CharField(validators=[RegexValidator(regex='^[1-9]{1}['
                                                                                      '0-9]{2,6}$',
         message='Для поля "минимальный уровень з/п" допускаются только цифры от 3-х до 7-ми '
-        'цифр.')], label='Минимальный уровень з/п', help_text='Поле необязательно к заполнению')
+        'цифр.')], label='Минимальный уровень з/п', help_text='Поле необязательно к заполнению',
+                                                    required=False)
         self.fields['max_salary'] = forms.CharField(validators=[RegexValidator(regex='^[1-9]{1}['
                                                                                      '0-9]{2,6}$',
         message='Для поля "максимальный уровень з/п" допускаются только цифры от 3-х до 7-ми '
-        'цифр.')], label='Максимальный уровень з/п', help_text='Поле необязательно к заполнению')
+        'цифр.')], label='Максимальный уровень з/п', help_text='Поле необязательно к заполнению',
+                                                    required=False)
 
     def clean_max_salary(self):
         min_salary = self.cleaned_data.get('min_salary')
         max_salary = self.cleaned_data.get('max_salary')
 
-        if int(max_salary) < int(min_salary):
-            raise forms.ValidationError('Максимальный уровень з/п должен быть больше или равен '
+        if max_salary and min_salary:
+            if int(max_salary) < int(min_salary):
+                raise forms.ValidationError('Максимальный уровень з/п должен быть больше или равен '
                                         'минимальному уровню')
         return max_salary
 
@@ -60,9 +63,10 @@ class VacancyEditForm(forms.ModelForm):
         min_salary = self.cleaned_data.get('min_salary')
         max_salary = self.cleaned_data.get('max_salary')
 
-        if int(max_salary) < int(min_salary):
-            raise forms.ValidationError('Максимальный уровень з/п должен быть больше или равен '
-                                        'минимальному уровню')
+        if max_salary and min_salary:
+            if int(max_salary) < int(min_salary):
+                raise forms.ValidationError('Максимальный уровень з/п должен быть больше или равен '
+                                            'минимальному уровню')
         return max_salary
 
 

@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_tags %}
 {% block content %}
-{% if user.is_authenticated and user.employer %}
+{% if user.employer %}
 <div class="container my-5">
     <div class="row">
         <div class="col">
@@ -11,19 +11,19 @@
             <p class="mb-5">Статус: Работодатель</p>
             <form action="{% url 'employerapp:search_resume' user.employer.pk %}"
                   class="mb-5 search-form" method="get">
-                <div class="form-group">
-                    <label class="pl-0 col-2" for="search-field">Ключевые слова</label>
-                    <input id="search-field" type="text" class="d-inline form-control col-8 col-sm-6 col-md-4"
+                <div class="new">
+                    <label class="pl-0 col-3" for="search-field">Ключевые слова</label>
+                    <input id="search-field" type="text" class="col-8 col-sm-6 col-md-4 form-control d-inline"
                            name="search" placeholder="должность или навык...">
                     <span title="расширенный поиск"><svg xmlns="http://www.w3.org/2000/svg" width="16"
                          height="16" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
                       <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3h9.05zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8h2.05zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1h9.05z"/>
                     </svg></span>
                     <div class="extend my-3">
-                        <label class="pl-0 col-2" for="city">Город</label>
+                        <label class="pl-0 col-3" for="city">Город</label>
                         <input class="mb-3 col-8 col-sm-6 col-md-4 form-control d-inline"
                                type="text" name="city" id="city"><br>
-                        <!--<label class="pl-0 col-2" for="sex">Выберите пол</label>
+                        <!--<label class="pl-0 col-3" for="sex">Выберите пол</label>
                         <select name="sex" id="sex"
                                 class="mb-3 col-8 col-sm-6 col-md-4 form-control d-inline">
                             <option value="none"></option>
@@ -31,22 +31,26 @@
                             <option value="f">женский</option>
                         </select><br>-->
                         <div class="d-flex pl-0 col-10 col-sm-8 col-md-6">
-                            <label class="mb-3 col-4 pl-0" for="salary">Уровень дохода от</label>
+                            <label class="mb-3 col-4 col-sm-6 pl-0 mr-1" for="salary">Уровень дохода
+                                от</label>
                             <input type="number" name="salary" id="salary"
                                    class="mb-3 ml-2 form-control d-inline col-5">
-                            <select name="currency" id="" class="ml-3 col-3 form-control d-inline">
+                            <select name="currency" id=""
+                                    class="ml-3 col-3 form-control d-inline">
                                 <option value="RUB">RUB</option>
                                 <option value="EUR">EUR</option>
                                 <option value="USD">USD</option>
                             </select>
                         </div>
-                        <div class="d-flex pl-0 col-10 col-sm-8 col-md-6">
-                            <span class="col-4 px-0 col-form-label">Объявления за период от
+                        <div class="d-flex pl-0">
+                            <span class="col-3 px-0 col-form-label">Объявления за
+                                период от
                             </span><input
-                                class="ml-2 form-control d-inline px-1 col-5" type="date"
+                                class="ml-1 form-control d-inline px-1 col-3 col-sm-2" type="date"
                                 name="from_date" id="from_date">
                             <span class="px-3 col-form-label">до</span><input
-                                class="form-control d-inline px-1 col-5" type="date" name="till_date" id="till_date">
+                                class="form-control d-inline px-1 col-3 col-sm-2" type="date"
+                                name="till_date" id="till_date">
                         </div>
                     </div>
                     <button class="btn btn-primary px-4 button-search" type="submit">поиск
@@ -56,8 +60,9 @@
             {% for resume in resume_all %}
             <div class="mb-5">
                 <div class="d-flex align-items-center">
-                    <h4 style="color: blue;"><a href="{% url 'jobseeker:resume_external_detail' resume.id %}">{{ resume.user.last_name }} {{ resume.user.first_name }}
-                        {{ resume.user.jobseeker.middle_name }}</a></h4>
+                    <h4 style="color: blue;"><a
+                            href="{% url 'jobseeker:resume_external_detail' resume.id %}">{{ resume.user.user.last_name }} {{ resume.user.user.first_name }}
+                        {{ resume.user.middle_name }}</a></h4>
                     <!--<p class="ml-5">
                         <form action="{% url 'main' 1 %}" method="post" class="favorite">{%
                         csrf_token %}-->
@@ -94,16 +99,16 @@
                         {% endif %}
                     </p>
                 </div>
-                <p class="small text-muted mb-0">{{ resume.user.jobseeker.city }}</p>
+                <p class="small text-muted mb-0">{{ resume.user.city }}</p>
                 <div class="d-flex pl-0 col-12 col-sm-7 justify-content-between mb-0">
                     <p class="text-muted mb-0">Дата рождения:
-                    {{resume.user.jobseeker.birthday|date:"d.m.Y"}}</p>
+                    {{resume.user.birthday|date:"d.m.Y"}}</p>
                     <p class="text-muted mb-0">Семейный статус:
-                    {{resume.user.jobseeker.get_married_status_display}}</p>
+                    {{resume.user.get_married_status_display}}</p>
                 </div>
                 <div class="d-flex pl-0 col-12 col-sm-7 justify-content-between">
-                    <p class="text-muted">тел: {{ resume.user.jobseeker.phone_number }}</p>
-                    <p class="text-muted">email: {{ resume.user.email }}</p>
+                    <p class="text-muted">тел: {{ resume.user.phone_number }}</p>
+                    <p class="text-muted">email: {{ resume.user.user.email }}</p>
                 </div>
                 <p><span class="font-weight-bold">Желаемая должность:</span> {{ resume.name }}</p>
                 <div class="d-flex">
@@ -121,7 +126,7 @@
         </div>
     </div>
 </div>
-{% elif user.is_authenticated and user.jobseeker %}
+{% elif user.jobseeker %}
     {% include 'jobseekerapp/main.html' %}
 {% else %}
 <div class="container my-5">
@@ -130,7 +135,7 @@
             <h1 class="text-center font-italic mb-5">Новости IT Portal</h1>
             <form action="{% url 'search_news' %}" class="mb-5 search-form" method="get">
                 <div class="form-group">
-                    <input type="text" class="d-inline form-control col-8 col-sm-6 col-md-4"
+                    <input type="text" class="d-inline form-control col-8 col-sm-6 col-md-5"
                            name="search" placeholder="поиск новостей...">
                     <button id="search_news" class="btn btn-primary px-4" type="submit">поиск
                     </button>
@@ -186,7 +191,6 @@
             <a class="btn btn-outline-primary w-100 mb-3" role="button" href="{% url 'auth:register_jobseeker' %}">
                 соискателя
             </a>
-
         </div>
     </div>
     {% if employers %}
