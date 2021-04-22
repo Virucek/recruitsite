@@ -3,6 +3,7 @@ from datetime import date
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 
 from authapp.models import Jobseeker, IndustryType, Employer
 
@@ -161,6 +162,9 @@ class EmployerEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EmployerEditForm, self).__init__(*args, **kwargs)
+        self.fields['phone_number'] = forms.CharField(label='Телефон компании', validators=[
+                    RegexValidator(regex='^8[0-9]{10}$', message='Допускаются только цифры '
+                    'начиная с 8-ки, например 84952354422 или 89147900000.')])
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
